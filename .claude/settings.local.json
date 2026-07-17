@@ -3,7 +3,8 @@
     "allow": [
       "mcp__c07e35db-b719-459c-ad3c-68081ebe1ec9__list_tables_for_base",
       "mcp__c07e35db-b719-459c-ad3c-68081ebe1ec9__get_table_schema",
-      "mcp__c07e35db-b719-459c-ad3c-68081ebe1ec9__list_records_for_table"
+      "mcp__c07e35db-b719-459c-ad3c-68081ebe1ec9__list_records_for_table",
+      "PowerShell(git add -A)"
     ]
   }
 }

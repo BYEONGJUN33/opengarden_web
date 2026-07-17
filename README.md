@@ -16,6 +16,16 @@ api/
 package.json
 ```
 
+## 로컬 미리보기
+
+```bash
+npm run dev        # → http://localhost:3000
+```
+
+- `.env` 없이 실행하면 카탈로그는 샘플 데이터로 표시됩니다.
+- 에어테이블 실데이터로 보려면: `.env.example`을 복사해 `.env`를 만들고 `AIRTABLE_TOKEN`만 채우세요.
+  (`.env`는 .gitignore에 등록되어 있어 커밋되지 않습니다)
+
 ## 배포 전 준비 (1회)
 
 ### 1. 에어테이블 토큰 발급

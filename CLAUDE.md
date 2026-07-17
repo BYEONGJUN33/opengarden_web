@@ -14,12 +14,15 @@ api/
   catalog.js      GET  /api/catalog?group=immediate|preorder — 에어테이블 읽기
   quote.js        POST /api/quote — 견적요청 기록 + 요청번호(Q-YYYYMMDD-XXX) 발급
 docs/             아키텍처·구조·인수인계 문서 + 사용자 플로우 다이어그램 (작업 전 필독)
+dev.js            로컬 미리보기 서버 (`npm run dev` → localhost:3000, 의존성 0)
+.env.example      로컬용 환경변수 견본 — .env로 복사해 사용 (.env는 커밋 금지)
 ```
 
 ## 절대 원칙 (위반 금지)
 
-1. **가격 비노출**: 단가_EUR·원화 단가 필드는 어떤 경로로도 브라우저에 도달하면 안 됨.
+1. **가격 비노출**: 단가_EUR·단가_WON(실제 필드명) 필드는 어떤 경로로도 브라우저에 도달하면 안 됨.
    `api/catalog.js`의 `FIELDS` 화이트리스트가 유일한 관문 — 가격 필드를 추가하지 말 것.
+   Status 원본값도 내부 정보(공급처 회신 메모 등) 포함 → API 응답에 넣지 않는다.
 2. **토큰 보안**: 에어테이블 토큰은 호스팅 환경변수로만. 코드·커밋·클라이언트에 절대 포함 금지.
 3. **단일 데이터 원본**: 품종·재고 데이터를 HTML에 하드코딩하지 않는다.
    `catalog.html`의 `PLANTS` 샘플 배열은 미연동 상태의 폴백 전용.
@@ -44,22 +47,42 @@ docs/             아키텍처·구조·인수인계 문서 + 사용자 플로�
 ```
 AIRTABLE_TOKEN            (scopes: data.records:read/write, OpenGarden 베이스만)
 AIRTABLE_BASE_ID          appzLstFHtHcQlWSu
-AIRTABLE_TABLE_ID         tblm8bjSeDCflcIzk   (Master DB, 1,924종)
-AIRTABLE_VIEW_IMMEDIATE   기본값: 즉시 출하 가능 카탈로그
-AIRTABLE_VIEW_PREORDER    기본값: 사전 예약용 카탈로그
+AIRTABLE_TABLE_ID         tblm8bjSeDCflcIzk   (Master DB)
+AIRTABLE_VIEW_IMMEDIATE   (선택) 뷰 생성 후 설정 — 둘 다 설정해야 뷰 기준 분류로 전환
+AIRTABLE_VIEW_PREORDER    (선택) 위와 세트
 AIRTABLE_QUOTE_TABLE      기본값: 견적요청
 ```
 
-## 남은 작업 (우선순위)
+## 에어테이블 실측 메모 (2026-07-17 MCP로 확인)
 
-1. git 초기화 + 로컬 미리보기 환경
-2. 에어테이블 준비: 견적요청 테이블 생성(README 참고), `catalog.js`의 `FIELDS`가 실제 필드명과 일치하는지 검증
-3. 호스팅 선택 → 배포 → 자체 도메인 연결
-4. 콘텐츠 교체: KAKAO_URL, 푸터 사업자 정보, 실사진(히어로·사례·서비스), 지표 수치 확정,
+- Master DB 총 1,923행 중 **실데이터 208건**(전부 추식구근 계열 — 튤립·수선화·히아신스 등,
+  Status '공급확정(260713 HBM 회신)', 공급시기 '2026년 가을'). 나머지 ~1,715행은 빈 행.
+  → `catalog.js`가 filterByFormula로 빈 행을 서버에서 제외함.
+- `이미지_URL`·`재고`·이미지 첨부(Image, Web Image (Auto-search)) 전부 0건 → 당분간 사진 없는 카탈로그.
+- 즉시출하/사전예약 **뷰는 아직 없음** (사용자 확인). 뷰 생성 전까지 `catalog.js`의
+  `IMMEDIATE_STATUS` 규칙(주문가능·출하대기 → 즉시 출하)으로 임시 분류.
+- Status 실제 옵션: 주문가능 / 수입대기 / 순화중 / 출하대기 / 수입예정 /
+  공급확정(260713 HBM 회신) / 가격 재확인 필요(오퍼 등재) — 뒤 2개는 내부 정보라 비노출.
+- 내한성 값 형식 혼재: `Zone 5`, `Zone 4-8`(하이픈), `-20℃` 등 → 프론트 필터는 데이터에서 자동 생성.
+- 카테고리 옵션에 중복·오염 있음(낙엽수/낙엽활엽수, 덩쿨성/덩굴식물, "카테고리"·"Status" 같은
+  헤더 잔재 옵션) → 에어테이블 쪽 정리 권장 (동작은 막지 않음).
+- `견적요청` 테이블 미생성 (사용자 결정: 후순위, 배포 전에는 생성 필요).
+- 카카오 연결은 **카카오톡 채널(pf.kakao.com) 방식으로 확정** (사용자 확인). 링크는 추후 교체.
+
+## 남은 작업 (우선순위 — 2026-07-17 사용자 확인: 로컬 우선, 배포·견적테이블은 후순위)
+
+1. ~~git 초기화 + 로컬 미리보기 환경~~ ✅ (dev.js, `npm run dev`)
+2. ~~`catalog.js`의 `FIELDS` 실제 필드명 검증~~ ✅ (Web Image → 'Web Image (Auto-search)' 수정 완료)
+3. 로컬에서 홈·카탈로그 완성도 높이기 + 플로우 다듬기 (현재 단계)
+4. 에어테이블 데이터 정비: 국명 없는 행 정리, 이미지_URL 채우기, Status/카테고리 옵션 정리,
+   즉시출하·사전예약 뷰 생성 (뷰 생성 후 AIRTABLE_VIEW_* 설정)
+5. 견적요청 테이블 생성(README 참고) — 배포 전 필수
+6. 호스팅 선택 → 배포 → 자체 도메인 연결
+7. 콘텐츠 교체: KAKAO_URL, 푸터 사업자 정보, 실사진(히어로·사례·서비스), 지표 수치 확정,
    실제 로고로 assets/logo.svg 교체, og:image를 배포 도메인의 절대 URL로 교체(카톡 미리보기용),
    privacy.html 빈칸 채우고 검토
-5. FAQ의 "(확정 후 기재)" 답변 채우기
-6. (2차) 카카오 알림톡/상담톡 API 검토, 애널리틱스, sitemap
+8. FAQ의 "(확정 후 기재)" 답변 채우기
+9. (2차) 카카오 알림톡/상담톡 API 검토, 애널리틱스, sitemap
 
 ## 검증 체크리스트 (배포 후)
 
