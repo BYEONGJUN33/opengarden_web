@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>식물 카탈로그 | 오픈가든</title>
+<meta name="description" content="유럽 직수입 정원수·관목·초화·그라스 1,924종. 카테고리·내한성으로 골라 담고 카카오톡으로 견적받으세요.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="오픈가든 식물 카탈로그 — 1,924종">
+<meta property="og:description" content="원하는 품종을 담아 카카오톡으로 바로 견적 요청하세요.">
+<meta property="og:image" content="/assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--green:#1F4D33;--green-dark:#123023;--ink:#111814;--gray:#6b746e;--bg:#fff;--bg-soft:#F4F6F3;--line:#E4E8E3;--kakao:#FEE500}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;font-size:15px;letter-spacing:-.01em}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+button{font-family:inherit;cursor:pointer}
+
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font-weight:800;font-size:19px;color:var(--ink);text-decoration:none}
+.logo em{font-style:normal;color:var(--green)}
+.nav a.link{font-size:14.5px;font-weight:500;color:var(--ink);text-decoration:none;margin-left:22px}
+.nav a.link.on{color:var(--green);font-weight:700}
+@media(max-width:640px){.nav a.link:not(.on){display:none}}
+
+.page-head{padding:56px 0 8px}
+.page-head h1{font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em}
+.page-head p{color:var(--gray);margin-top:8px;font-size:15px}
+
+.toolbar{position:sticky;top:60px;z-index:40;background:var(--bg);padding:18px 0 14px;border-bottom:1px solid var(--line)}
+.toolbar .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search{flex:1;min-width:200px;display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:999px;padding:10px 18px;background:var(--bg-soft)}
+.search input{border:0;outline:0;background:transparent;font-family:inherit;font-size:14.5px;width:100%}
+select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font-family:inherit;font-size:14px;background:#fff;color:var(--ink)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 15px;font-size:13.5px;font-weight:500;color:var(--ink)}
+.chip.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:700}
+.count{font-size:13px;color:var(--gray);margin-top:12px}
+
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding:28px 0 140px}
+@media(max-width:920px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:680px){.grid{grid-template-columns:repeat(2,1fr);gap:12px}}
+.plant{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.plant .ph{aspect-ratio:1/1;background:linear-gradient(135deg,#dfe9de,#c0d3bd);display:flex;align-items:center;justify-content:center;color:var(--green);font-size:12px;font-weight:700;position:relative}
+.badge{position:absolute;top:10px;left:10px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;background:#fff}
+.badge.pre{background:#FFF3D6;color:#8a6100}
+.badge.now{background:#E2F0E6;color:var(--green)}
+.pbody{padding:14px 15px 15px;display:flex;flex-direction:column;flex:1}
+.kname{font-size:15px;font-weight:800;letter-spacing:-.02em}
+.sname{font-size:12px;color:var(--gray);font-style:italic;margin-top:1px}
+.meta{display:flex;gap:5px;flex-wrap:wrap;margin:10px 0 12px}
+.tag{font-size:11px;font-weight:700;color:#4d5a50;background:var(--bg-soft);border-radius:5px;padding:3px 7px}
+.add{margin-top:auto;border:1.5px solid var(--green);background:#fff;color:var(--green);border-radius:8px;padding:9px 0;font-size:13.5px;font-weight:700;transition:.12s}
+.add:hover{background:var(--green);color:#fff}
+.add.added{background:var(--green);color:#fff}
+.add:focus-visible{outline:3px solid #9dc3a9;outline-offset:2px}
+
+/* 하단 견적 바 */
+.quote-bar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--green-dark);color:#fff;transform:translateY(110%);transition:transform .25s ease}
+.quote-bar.show{transform:none}
+.quote-bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 20px}
+.quote-bar .info{font-size:14.5px;font-weight:500}
+.quote-bar .info b{font-weight:800;color:#bfe3c8}
+.quote-bar .go{background:var(--kakao);color:#191919;border:0;border-radius:999px;padding:12px 26px;font-size:15px;font-weight:800}
+
+/* 견적 모달 */
+.overlay{position:fixed;inset:0;background:rgba(10,20,14,.5);z-index:70;display:none;align-items:flex-end;justify-content:center}
+.overlay.show{display:flex}
+@media(min-width:640px){.overlay.show{align-items:center}}
+.modal{background:#fff;width:100%;max-width:520px;max-height:88vh;border-radius:20px 20px 0 0;overflow:auto;padding:26px 24px}
+@media(min-width:640px){.modal{border-radius:20px}}
+.modal h2{font-size:20px;font-weight:800}
+.modal .desc{font-size:13.5px;color:var(--gray);margin:6px 0 18px}
+.item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.item .n{font-size:14px;font-weight:700}
+.item .s{font-size:12px;color:var(--gray)}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{width:28px;height:28px;border-radius:8px;border:1.5px solid var(--line);background:#fff;font-size:15px;font-weight:700}
+.qty input{width:52px;text-align:center;border:1.5px solid var(--line);border-radius:8px;padding:5px 0;font-family:inherit;font-size:14px}
+.rm{border:0;background:none;color:#b04a3a;font-size:12px;font-weight:700;margin-left:4px}
+.field{margin-top:14px}
+.field label{font-size:12.5px;font-weight:700;color:var(--gray);display:block;margin-bottom:5px}
+.field input,.field textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;font-family:inherit;font-size:14px;outline:0}
+.field input:focus,.field textarea:focus{border-color:var(--green)}
+.send{width:100%;margin-top:20px;background:var(--kakao);color:#191919;border:0;border-radius:12px;padding:15px 0;font-size:15.5px;font-weight:800}
+.send-note{font-size:12px;color:var(--gray);text-align:center;margin-top:10px}
+.close{position:sticky;top:0;float:right;border:0;background:var(--bg-soft);border-radius:50%;width:32px;height:32px;font-size:15px;font-weight:700}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:13.5px;font-weight:700;padding:11px 20px;border-radius:999px;opacity:0;transition:.25s;z-index:80;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.empty{grid-column:1/-1;text-align:center;color:var(--gray);padding:60px 0}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#">Open<em>Garden</em></a>
+    <nav>
+      <a class="link" href="/">홈</a>
+      <a class="link" href="/#service">서비스</a>
+      <a class="link on" href="/catalog.html">카탈로그</a>
+      <a class="link" href="/#faq">FAQ</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap page-head">
+  <h1>식물 카탈로그</h1>
+  <p>원하는 품종을 담고 '견적 요청'을 누르면 카카오톡으로 바로 문의할 수 있습니다. <b>· 에어테이블 실시간 연동 예정</b></p>
+</div>
+
+<div class="toolbar">
+  <div class="wrap">
+    <div class="row">
+      <div class="search">🔍 <input id="q" type="search" placeholder="국명 또는 학명 검색" aria-label="검색"></div>
+      <select id="zone" aria-label="내한성 필터">
+        <option value="">내한성 전체</option>
+        <option>Zone 4–8</option><option>Zone 4–9</option><option>Zone 5–9</option><option>Zone 6–9</option>
+      </select>
+      <select id="status" aria-label="공급 구분">
+        <option value="">공급 구분 전체</option>
+        <option value="즉시 출하">즉시 출하</option>
+        <option value="사전 예약">사전 예약</option>
+      </select>
+    </div>
+    <div class="chips" id="cats" role="group" aria-label="카테고리 필터"></div>
+    <div class="count" id="count"></div>
+  </div>
+</div>
+
+<main class="wrap"><div class="grid" id="grid"></div></main>
+
+<!-- 하단 견적 바 -->
+<div class="quote-bar" id="bar">
+  <div class="wrap">
+    <div class="info"><b id="barCount">0종</b> 선택됨 · 가격은 견적서로 안내됩니다</div>
+    <button class="go" onclick="openModal()">견적 요청하기</button>
+  </div>
+</div>
+
+<!-- 견적 모달 -->
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="견적 요청">
+    <button class="close" onclick="closeModal()" aria-label="닫기">✕</button>
+    <h2>견적 요청</h2>
+    <p class="desc">수량을 확인한 뒤 보내기를 누르면, 선택 목록이 복사되고 오픈가든 카카오톡 채널이 열립니다. 채팅창에 붙여넣기만 하면 완료!</p>
+    <div id="items"></div>
+    <div class="field"><label for="fname">성함 / 소속 (선택)</label><input id="fname" placeholder="예: 홍길동 / ○○조경"></div>
+    <div class="field"><label for="fmemo">요청 사항 (선택)</label><textarea id="fmemo" rows="2" placeholder="납품 희망 시기, 현장 위치 등"></textarea></div>
+    <button class="send" onclick="sendQuote()">📋 목록 복사하고 카카오톡 열기</button>
+    <div id="fallback" style="display:none;margin-top:14px">
+      <p style="font-size:12.5px;color:var(--gray);margin-bottom:6px">자동 복사가 안 되는 브라우저입니다. 아래 상자를 눌러 전체 선택한 뒤 복사해주세요.</p>
+      <textarea id="fallbackText" rows="7" readonly style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;font-family:inherit;font-size:13px" onclick="this.select()"></textarea>
+      <button class="send" style="margin-top:10px" onclick="window.open(KAKAO_URL,'_blank')">복사했어요 — 카카오톡 열기</button>
+    </div>
+    <p class="send-note">* 보내기를 누르면 견적 요청이 자동 기록되고 요청번호가 발급됩니다 (미배포 상태에선 복사만 진행)</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── 샘플 데이터 (에어테이블 Master DB 필드 구조와 동일하게 구성) ──
+// 연동 시: fetch('/api/catalog') → Airtable View(즉시 출하/사전 예약) 레코드로 교체
+const PLANTS=[
+ {id:"SKU-001",kname:"샘플 품종 A",sname:"Genus species 'Alpha'",size:"P9",zone:"Zone 5–9",cat:"관목",status:"즉시 출하"},
+ {id:"SKU-002",kname:"샘플 품종 B",sname:"Genus species 'Beta'",size:"C2",zone:"Zone 4–8",cat:"낙엽수",status:"즉시 출하"},
+ {id:"SKU-003",kname:"샘플 품종 C",sname:"Genus species",size:"P14 H",zone:"Zone 6–9",cat:"초화",status:"사전 예약"},
+ {id:"SKU-004",kname:"샘플 품종 D",sname:"Genus species 'Delta'",size:"P9",zone:"Zone 4–9",cat:"사초·그라스",status:"즉시 출하"},
+ {id:"SKU-005",kname:"샘플 품종 E",sname:"Genus species",size:"C2",zone:"Zone 5–9",cat:"침엽수",status:"사전 예약"},
+ {id:"SKU-006",kname:"샘플 품종 F",sname:"Genus species 'Zeta'",size:"P9",zone:"Zone 6–9",cat:"상록활엽수",status:"즉시 출하"},
+ {id:"SKU-007",kname:"샘플 품종 G",sname:"Genus species",size:"C5",zone:"Zone 4–8",cat:"교목",status:"사전 예약"},
+ {id:"SKU-008",kname:"샘플 품종 H",sname:"Genus species 'Eta'",size:"P14",zone:"Zone 4–9",cat:"덩굴식물",status:"즉시 출하"},
+ {id:"SKU-009",kname:"샘플 품종 I",sname:"Genus species",size:"P9",zone:"Zone 5–9",cat:"관목",status:"즉시 출하"},
+ {id:"SKU-010",kname:"샘플 품종 J",sname:"Genus species 'Iota'",size:"C2",zone:"Zone 6–9",cat:"초화",status:"사전 예약"},
+ {id:"SKU-011",kname:"샘플 품종 K",sname:"Genus species",size:"P9",zone:"Zone 4–8",cat:"사초·그라스",status:"즉시 출하"},
+ {id:"SKU-012",kname:"샘플 품종 L",sname:"Genus species 'Kappa'",size:"C3",zone:"Zone 4–9",cat:"낙엽수",status:"즉시 출하"},
+];
+const KAKAO_URL="https://pf.kakao.com/_openGarden/chat"; // 실제 채널 주소로 교체
+
+let cat="전체", cart={}; // cart: {id: qty}
+
+// 카테고리 칩 — 데이터에서 자동 생성 (에어테이블에 새 카테고리가 생기면 필터도 자동 반영)
+const CAT_ORDER=["낙엽수","침엽수","상록활엽수","관목","교목","초화","사초·그라스","덩굴식물","구근"];
+const catsEl=document.getElementById('cats');
+function renderCats(){
+  const found=[...new Set(PLANTS.map(p=>p.cat).filter(Boolean))];
+  const ordered=[...CAT_ORDER.filter(c=>found.includes(c)),...found.filter(c=>!CAT_ORDER.includes(c))];
+  if(cat!=="전체"&&!ordered.includes(cat))cat="전체";
+  catsEl.innerHTML='';
+  ["전체",...ordered].forEach(c=>{
+    const b=document.createElement('button');
+    b.className='chip'+(c===cat?' on':''); b.textContent=c;
+    b.onclick=()=>{cat=c;[...catsEl.children].forEach(x=>x.classList.toggle('on',x.textContent===c));render();};
+    catsEl.appendChild(b);
+  });
+}
+renderCats();
+
+function filtered(){
+  const q=document.getElementById('q').value.trim().toLowerCase();
+  const z=document.getElementById('zone').value, s=document.getElementById('status').value;
+  return PLANTS.filter(p=>
+    (cat==="전체"||p.cat===cat)&&(!z||p.zone===z)&&(!s||p.status===s)&&
+    (!q||p.kname.toLowerCase().includes(q)||p.sname.toLowerCase().includes(q)));
+}
+
+function render(){
+  const list=filtered(), grid=document.getElementById('grid');
+  document.getElementById('count').textContent=`${list.length}개 품종 표시 중`;
+  grid.innerHTML=list.length?"":"<div class='empty'>조건에 맞는 품종이 없습니다.<br>필터를 조정해보세요.</div>";
+  list.forEach(p=>{
+    const inCart=cart[p.id];
+    const el=document.createElement('div'); el.className='plant';
+    el.innerHTML=`
+      <div class="ph">${p.image?`<img src="${p.image}" alt="${p.kname}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`:'식물 사진'}<span class="badge ${p.status==='즉시 출하'?'now':'pre'}">${p.status}</span></div>
+      <div class="pbody">
+        <div class="kname">${p.kname}</div>
+        <div class="sname">${p.sname}</div>
+        <div class="meta"><span class="tag">${p.size}</span><span class="tag">${p.zone}</span><span class="tag">${p.cat}</span></div>
+        <button class="add${inCart?' added':''}" data-id="${p.id}">${inCart?'✓ 담김':'견적에 담기'}</button>
+      </div>`;
+    el.querySelector('.add').onclick=e=>toggle(p.id,e.target);
+    grid.appendChild(el);
+  });
+}
+
+function toggle(id,btn){
+  if(cart[id]){delete cart[id];btn.classList.remove('added');btn.textContent='견적에 담기';}
+  else{cart[id]=1;btn.classList.add('added');btn.textContent='✓ 담김';toast('견적 목록에 담았습니다');}
+  updateBar();
+}
+
+function updateBar(){
+  const n=Object.keys(cart).length;
+  document.getElementById('bar').classList.toggle('show',n>0);
+  document.getElementById('barCount').textContent=n+'종';
+}
+
+function openModal(){
+  const box=document.getElementById('items');box.innerHTML='';
+  Object.keys(cart).forEach(id=>{
+    const p=PLANTS.find(x=>x.id===id);
+    const row=document.createElement('div');row.className='item';
+    row.innerHTML=`<div><div class="n">${p.kname}</div><div class="s">${p.size} · ${p.zone}</div></div>
+      <div class="qty">
+        <button aria-label="수량 감소">−</button>
+        <input type="number" min="1" value="${cart[id]}" aria-label="${p.kname} 수량">
+        <button aria-label="수량 증가">+</button>
+        <button class="rm">삭제</button>
+      </div>`;
+    const[minus,plus]=[row.querySelectorAll('.qty button')[0],row.querySelectorAll('.qty button')[1]];
+    const input=row.querySelector('input');
+    minus.onclick=()=>{input.value=Math.max(1,+input.value-1);cart[id]=+input.value};
+    plus.onclick=()=>{input.value=+input.value+1;cart[id]=+input.value};
+    input.onchange=()=>{input.value=Math.max(1,+input.value||1);cart[id]=+input.value};
+    row.querySelector('.rm').onclick=()=>{delete cart[id];row.remove();updateBar();if(!Object.keys(cart).length)closeModal();render();};
+    box.appendChild(row);
+  });
+  document.getElementById('overlay').classList.add('show');
+}
+function closeModal(){document.getElementById('overlay').classList.remove('show')}
+document.getElementById('overlay').onclick=e=>{if(e.target.id==='overlay')closeModal()};
+
+async function sendQuote(){
+  const name=document.getElementById('fname').value.trim();
+  const memo=document.getElementById('fmemo').value.trim();
+  const items=Object.keys(cart).map(id=>{
+    const p=PLANTS.find(x=>x.id===id);
+    return {sku:p.id,kname:p.kname,size:p.size,qty:cart[id]};
+  });
+
+  // ① 에어테이블에 먼저 기록하고 요청번호를 받는다 (미배포·실패 시에도 카톡 플로우는 계속)
+  let requestNo=null;
+  try{
+    const r=await fetch('/api/quote',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name,memo,items,website:''})
+    });
+    if(r.ok){const d=await r.json();requestNo=d.requestNo||null;}
+  }catch(e){/* 로컬 미리보기 등 → 번호 없이 진행 */}
+
+  // ② 카톡에 붙여넣을 메시지 (요청번호 포함 시 에어테이블 기록과 매칭됨)
+  const lines=items.map((it,i)=>`${i+1}. ${it.kname} · ${it.size} · ${it.qty}개`);
+  const msg=[
+    `[오픈가든 견적 요청${requestNo?` · ${requestNo}`:''}]`,
+    name?`요청자: ${name}`:null,
+    ``, ...lines,
+    memo?`\n요청사항: ${memo}`:null
+  ].filter(x=>x!==null).join('\n');
+
+  // ③ 클립보드 복사 → 실패하면 수동 복사 상자 표시 (일부 인앱 브라우저 대비)
+  let copied=false;
+  try{await navigator.clipboard.writeText(msg);copied=true;}catch(e){}
+  if(!copied){
+    document.getElementById('fallback').style.display='block';
+    document.getElementById('fallbackText').value=msg;
+    toast('아래 상자의 목록을 복사해주세요');
+    return; // 복사 후 "카카오톡 열기" 버튼으로 이동
+  }
+  toast('목록이 복사되었습니다 — 카카오톡 채팅창에 붙여넣어주세요');
+  // ④ 카카오톡 채널 열기
+  setTimeout(()=>window.open(KAKAO_URL,'_blank'),900);
+}
+
+let toastTimer;
+function toast(t){
+  const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
+}
+
+['q','zone','status'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+
+// 초기화: 배포 후엔 /api/catalog에서 실데이터 로드, 실패(로컬 미리보기 등) 시 샘플 데이터 유지
+(async function init(){
+  try{
+    const [im,pre]=await Promise.all([
+      fetch('/api/catalog?group=immediate').then(r=>r.ok?r.json():{items:[]}),
+      fetch('/api/catalog?group=preorder').then(r=>r.ok?r.json():{items:[]})
+    ]);
+    const live=[
+      ...im.items.map(x=>({...x,status:'즉시 출하'})),
+      ...pre.items.map(x=>({...x,status:'사전 예약'}))
+    ].map(x=>({
+      id:x.sku||x.id, kname:x.kname, sname:x.sname, size:x.size,
+      zone:x.zone, cat:Array.isArray(x.cat)?(x.cat[0]||''):x.cat,
+      status:x.status, image:x.image||null
+    }));
+    if(live.length){ PLANTS.length=0; PLANTS.push(...live); cart={}; updateBar(); }
+  }catch(e){ /* 미연동/오프라인 → 샘플 데이터로 표시 */ }
+  renderCats();
+  render();
+})();
+</script>
+</body>
+</html>

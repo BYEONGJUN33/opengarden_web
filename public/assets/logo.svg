@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- 오픈가든 임시 브랜드 마크: 실제 로고 확정 시 이 파일 교체 -->
+  <rect width="64" height="64" rx="14" fill="#123023"/>
+  <circle cx="32" cy="26" r="11" fill="none" stroke="#7FA05B" stroke-width="4.5"/>
+  <line x1="32" y1="37" x2="32" y2="50" stroke="#7FA05B" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M32 44 Q 42 42 45 34" fill="none" stroke="#DCE8CF" stroke-width="4" stroke-linecap="round"/>
+</svg>

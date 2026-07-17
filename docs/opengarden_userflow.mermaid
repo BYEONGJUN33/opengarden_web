@@ -1,0 +1,65 @@
+flowchart TD
+
+subgraph IN["① 유입 채널"]
+  K1["카카오톡 채널"]
+  S1["인스타그램"]
+  N1["네이버 스마트스토어"]
+  G1["검색 · 지인 공유"]
+end
+
+subgraph SITE["② 오픈가든 사이트 — 페이지 2개로 축소"]
+  subgraph HOME["🏠 홈 · 원페이지"]
+    H1["히어로 + CTA"]
+    H2["소개 · 서비스 강점"]
+    H3["납품 사례"]
+    H4["이용 안내 · FAQ 섹션"]
+  end
+  subgraph CAT["🌿 카탈로그 페이지"]
+    C1["검색 + 필터<br/>카테고리 · 내한성 · 공급구분"]
+    C2["견적에 담기<br/>하단 바에 N종 표시"]
+    C3["견적 모달<br/>수량 조절 · 요청사항 입력"]
+  end
+end
+
+subgraph BE["③ 백엔드 — 함수 2개 · 호스팅 어디든 동일"]
+  A1["GET /api/catalog<br/>가격 필드 제거 후 전달"]
+  A2["POST /api/quote<br/>요청번호 발급"]
+end
+
+subgraph DATA["④ 에어테이블 — 유일한 데이터 원본"]
+  D1[("Master DB<br/>1,924종")]
+  D2[("견적요청<br/>테이블")]
+end
+
+subgraph AFTER["⑤ 접수 이후"]
+  T1["카톡 채팅 열림<br/>복사된 목록 붙여넣기"]
+  T2["담당자 확인<br/>요청번호로 기록 매칭"]
+  T3["제안서 PDF 발송<br/>→ 계약 · 납품"]
+end
+
+K1 --> H1
+S1 --> H1
+N1 --> H1
+G1 --> H1
+
+H1 -->|"카탈로그 보기"| C1
+H1 -->|"바로 문의하기"| T1
+H4 -->|"견적 CTA"| C1
+
+D1 --> A1
+A1 -->|"품종 데이터 · 10분 캐시"| C1
+C1 --> C2 --> C3
+C3 -->|"① 자동 기록"| A2
+A2 --> D2
+C3 -->|"② 목록 복사 + 카톡 열기"| T1
+T1 --> T2 --> T3
+D2 -.->|"요청번호 매칭"| T2
+
+classDef page fill:#E8F0E9,stroke:#1F4D33,stroke-width:2px,color:#111814
+classDef api fill:#FFF8E6,stroke:#B8860B,color:#111814
+classDef db fill:#EDEAF7,stroke:#5B4A9E,color:#111814
+classDef after fill:#FFF0E8,stroke:#B85C38,color:#111814
+class H1,H2,H3,H4,C1,C2,C3 page
+class A1,A2 api
+class D1,D2 db
+class T1,T2,T3 after

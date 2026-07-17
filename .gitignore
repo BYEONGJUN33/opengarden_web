@@ -1,0 +1,6 @@
+# 에어테이블 토큰이 담기는 파일 — 절대 커밋 금지
+.env
+
+node_modules/
+.vercel/
+.DS_Store
