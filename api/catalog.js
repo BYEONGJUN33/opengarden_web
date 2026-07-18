@@ -30,6 +30,8 @@ const SOURCES = {
       cat: 'fldin9Roj1xTXYYHY',   // 속 (튤립·크로커스 등) → 카테고리로 사용
       size: 'fldrQ830PgqMwsmiL',  // Size (규격) — 예: 11/12 규격
       zone: 'fldvnaxRNwATuI8JK',  // 내한성 — 예: -20℃
+      desc: 'fldLgt242IX3HfZje',  // 특징 (상세 모달용)
+      use: 'fldZuyylSbD2YBfXn',   // 쓰임새 추천
       image: 'fldPSrlViJFjaUerf', // image 첨부
     },
   },
@@ -77,6 +79,8 @@ module.exports = async (req, res) => {
         size: f[F.size] || '',
         cat: f[F.cat] ? [f[F.cat]] : [],
         zone: (F.zone && f[F.zone]) || '',
+        desc: (F.desc && f[F.desc]) || '',
+        use: (F.use && f[F.use]) || '',
         moq: (F.moq && f[F.moq]) || null, // 최소주문수량 (국내 라인업만)
         // 카드용으로는 원본(수 MB) 대신 large 썸네일(~512px) 우선.
         // 첨부 URL은 수 시간 뒤 만료되지만 캐시(10분)가 더 짧아 항상 유효한 URL이 나감.

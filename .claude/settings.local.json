@@ -7,7 +7,12 @@
       "PowerShell(git add -A)",
       "PowerShell(Remove-Item \"public\\\\design-directions.html\" -Confirm:$false)",
       "mcp__c07e35db-b719-459c-ad3c-68081ebe1ec9__update_records_for_table",
-      "mcp__c07e35db-b719-459c-ad3c-68081ebe1ec9__create_table"
+      "mcp__c07e35db-b719-459c-ad3c-68081ebe1ec9__create_table",
+      "PowerShell(git add CLAUDE.md)",
+      "PowerShell(if \\(-not \\(Test-Path .env\\)\\) { Copy-Item .env.example .env }; Start-Process notepad .env)",
+      "PowerShell($line = Select-String -Path .env -Pattern '^AIRTABLE_TOKEN=\\(.+\\)$' -Quiet; \"토큰 입력 여부: $line\"; Start-Process notepad .env)",
+      "PowerShell(Start-Process notepad \"C:\\\\Users\\\\bbk03\\\\Documents\\\\opengarden-starter\\\\.env\")",
+      "PowerShell($ok = Select-String -Path .env -Pattern '^AIRTABLE_TOKEN=pat.+$' -Quiet; \"토큰 입력 확인: $ok\")"
     ]
   }
 }
