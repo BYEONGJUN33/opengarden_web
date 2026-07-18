@@ -11,7 +11,7 @@ public/
   catalog.html    카탈로그: 검색/필터 → 담기 → 견적 모달 → API 기록 + 클립보드 복사 + 카톡 열기
   assets/         로고, og.jpg(카톡 공유 미리보기), 사진
 api/
-  catalog.js      GET  /api/catalog?group=immediate|preorder — 에어테이블 읽기
+  catalog.js      GET  /api/catalog?group=immediate|preorder — 국내/판매 라인업 읽기
   quote.js        POST /api/quote — 견적요청 기록 + 요청번호(Q-YYYYMMDD-XXX) 발급
 docs/             아키텍처·구조·인수인계 문서 + 사용자 플로우 다이어그램 (작업 전 필독)
 dev.js            로컬 미리보기 서버 (`npm run dev` → localhost:3000, 의존성 0)
@@ -20,9 +20,9 @@ dev.js            로컬 미리보기 서버 (`npm run dev` → localhost:3000, 
 
 ## 절대 원칙 (위반 금지)
 
-1. **가격 비노출**: 단가_EUR·단가_WON(실제 필드명) 필드는 어떤 경로로도 브라우저에 도달하면 안 됨.
-   `api/catalog.js`의 `FIELDS` 화이트리스트가 유일한 관문 — 가격 필드를 추가하지 말 것.
-   Status 원본값도 내부 정보(공급처 회신 메모 등) 포함 → API 응답에 넣지 않는다.
+1. **가격 비노출**: 가격 필드는 어떤 경로로도 브라우저에 도달하면 안 됨 —
+   국내 라인업 '도매가', 판매 라인업 '단가_EUR·정가_KRW·할증반영가_KRW·관급가_KRW·크레이트가_KRW·성립선'.
+   `api/catalog.js`의 `SOURCES` 필드ID 화이트리스트가 유일한 관문 — 가격 필드를 추가하지 말 것.
 2. **토큰 보안**: 에어테이블 토큰은 호스팅 환경변수로만. 코드·커밋·클라이언트에 절대 포함 금지.
 3. **단일 데이터 원본**: 품종·재고 데이터를 HTML에 하드코딩하지 않는다.
    `catalog.html`의 `PLANTS` 샘플 배열은 미연동 상태의 폴백 전용.
@@ -47,13 +47,26 @@ dev.js            로컬 미리보기 서버 (`npm run dev` → localhost:3000, 
 ```
 AIRTABLE_TOKEN            (scopes: data.records:read/write, OpenGarden 베이스만)
 AIRTABLE_BASE_ID          appzLstFHtHcQlWSu
-AIRTABLE_TABLE_ID         tblm8bjSeDCflcIzk   (Master DB)
-AIRTABLE_VIEW_IMMEDIATE   (선택) 뷰 생성 후 설정 — 둘 다 설정해야 뷰 기준 분류로 전환
-AIRTABLE_VIEW_PREORDER    (선택) 위와 세트
-AIRTABLE_QUOTE_TABLE      기본값: 견적요청
+AIRTABLE_TABLE_DOMESTIC   (선택) 기본값 tblDMLlaBwkW1NfhU = 국내 라인업 → 즉시 출하
+AIRTABLE_TABLE_IMPORT     (선택) 기본값 tblylbZq6PLfzH1Ol = 판매 라인업 → 사전 예약
+AIRTABLE_QUOTE_TABLE      기본값: 견적요청 (tbllSGZWApKiMTNOK)
 ```
 
-## 에어테이블 실측 메모 (2026-07-17 MCP로 확인)
+## 에어테이블 실측 메모 (2026-07-18 업데이트 — 데이터 원본 교체됨)
+
+- **실제 영업 데이터는 라인업 테이블 2개** (사용자 확인: "예전 마스터DB… 현재는 국내/해외 라인업으로 영업"):
+  - `판매 라인업` tblylbZq6PLfzH1Ol — 45종 수입 구근(7/13 생성), **사진 첨부·가격(단가_EUR 등) 포함**
+  - `국내 라인업` tblDMLlaBwkW1NfhU — 25종 국내 재고(7/16 생성), **실물 사진·도매가 포함**
+  - → catalog.js가 이 둘을 읽음 (국내=immediate, 판매=preorder). 필드는 ID로 참조 (판매 라인업의
+    SKU 필드명 앞에 보이지 않는 BOM 문자가 있어 이름 참조는 위험).
+- Master DB(tblm8bjSeDCflcIzk)는 구버전 오퍼시트. 단, **판매 라인업에 없는 163종의 HBM 오퍼
+  (가격 포함)가 여기에만 있음** → 삭제 여부는 사용자 결정 대기, 그전까지 보관.
+  Size 날짜 오염 74건은 복원 완료(예: '11월 12일'→'11/12').
+- `견적요청` 테이블 생성 완료 (tbllSGZWApKiMTNOK, 2026-07-18). 요청번호(기본)/요청자/요청사항/
+  품목요약/품목JSON/상태(신규·제안서발송·계약·종료). API 제약으로 '접수일시'(Created time)
+  필드는 못 만듦 → 에어테이블 UI에서 직접 추가 권장.
+
+## (구) 실측 메모 (2026-07-17 — Master DB 기준, 참고용)
 
 - Master DB 총 1,923행 중 **실데이터 208건**(전부 추식구근 계열 — 튤립·수선화·히아신스 등,
   Status '공급확정(260713 HBM 회신)', 공급시기 '2026년 가을'). 나머지 ~1,715행은 빈 행.
@@ -73,10 +86,9 @@ AIRTABLE_QUOTE_TABLE      기본값: 견적요청
 
 1. ~~git 초기화 + 로컬 미리보기 환경~~ ✅ (dev.js, `npm run dev`)
 2. ~~`catalog.js`의 `FIELDS` 실제 필드명 검증~~ ✅ (Web Image → 'Web Image (Auto-search)' 수정 완료)
-3. 로컬에서 홈·카탈로그 완성도 높이기 + 플로우 다듬기 (현재 단계)
-4. 에어테이블 데이터 정비: 국명 없는 행 정리, 이미지_URL 채우기, Status/카테고리 옵션 정리,
-   즉시출하·사전예약 뷰 생성 (뷰 생성 후 AIRTABLE_VIEW_* 설정)
-5. 견적요청 테이블 생성(README 참고) — 배포 전 필수
+3. ~~디자인 고급화(명암·페이드)~~ ✅ / ~~견적요청 테이블 생성~~ ✅ / ~~카탈로그를 라인업 테이블로 전환~~ ✅
+4. **사용자 토큰 발급 → .env 설정 → 실데이터(45+25종, 사진 포함) 로컬 확인** (다음 단계)
+5. Master DB 처리 결정(163종 오퍼가 여기에만 있음 — 보관 권장), 견적요청에 '접수일시' 필드 추가(UI)
 6. 호스팅 선택 → 배포 → 자체 도메인 연결
 7. 콘텐츠 교체: KAKAO_URL, 푸터 사업자 정보, 실사진(히어로·사례·서비스), 지표 수치 확정,
    실제 로고로 assets/logo.svg 교체, og:image를 배포 도메인의 절대 URL로 교체(카톡 미리보기용),

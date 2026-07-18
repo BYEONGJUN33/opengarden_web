@@ -1,41 +1,51 @@
 // GET /api/catalog?group=immediate|preorder
-// 에어테이블 Master DB를 읽어 사이트에 전달합니다.
-// 가격 필드(단가_EUR, 단가_WON)는 FIELDS 화이트리스트에 없으므로
-// 서버 밖으로 절대 나가지 않습니다. Status 원본값도 내부 정보 → 비노출.
+// immediate = 국내 라인업 (국내 재고 → 즉시 출하)
+// preorder  = 판매 라인업 (유럽 수입 구근 → 사전 예약)
+// 가격 필드(도매가, 단가_EUR, 정가·할증반영가·관급가·크레이트가 등)는 아래 필드ID
+// 화이트리스트에 없으므로 서버 밖으로 절대 나가지 않습니다.
+// (예전 Master DB 기준 코드는 git 이력 6e3b205 참고)
 
-const BASE = process.env.AIRTABLE_BASE_ID;   // 예: appzLstFHtHcQlWSu
-const TABLE = process.env.AIRTABLE_TABLE_ID; // 예: tblm8bjSeDCflcIzk (Master DB)
+const BASE = process.env.AIRTABLE_BASE_ID;
 const TOKEN = process.env.AIRTABLE_TOKEN;
 
-// 즉시출하/사전예약 전용 뷰가 에어테이블에 준비되면 환경변수 두 개를 모두 설정하세요
-// → 뷰 기준으로 그룹을 나눕니다. 미설정 시(2026-07 현재 뷰 없음)
-// 테이블 전체를 읽고 아래 IMMEDIATE_STATUS 규칙으로 나눕니다.
-const VIEWS = {
-  immediate: process.env.AIRTABLE_VIEW_IMMEDIATE,
-  preorder: process.env.AIRTABLE_VIEW_PREORDER,
+// 테이블·필드를 이름이 아닌 ID로 지정 — 에어테이블에서 이름을 바꿔도 안 깨짐 (2026-07-18 실스키마 대조)
+const SOURCES = {
+  immediate: {
+    table: process.env.AIRTABLE_TABLE_DOMESTIC || 'tblDMLlaBwkW1NfhU', // 국내 라인업
+    fields: {
+      kname: 'fldxfOsqC0b41oxmt', // 국명
+      sname: 'fld92Co6Q7JYeyAPe', // 학명
+      size: 'fldBy0z3isyaVqCmC',  // Size (규격) — 예: 7치
+      cat: 'fldD4hy9yFpeiSN2K',   // 카테고리
+      moq: 'fldOntZJg6Qjn1fAd',   // 최소주문수량
+      image: 'fldwpaj4TS0bW9E0x', // image 첨부
+    },
+  },
+  preorder: {
+    table: process.env.AIRTABLE_TABLE_IMPORT || 'tblylbZq6PLfzH1Ol', // 판매 라인업 (유럽 수입)
+    fields: {
+      sku: 'fldbSwnIpkkGqKkpC',   // SKU (실제 필드명 앞에 보이지 않는 BOM 문자가 있어 ID 지정이 특히 중요)
+      kname: 'fldM4cqde0Qn5qiIy', // 국명
+      sname: 'fldh1PgjsPs6zAwwS', // 학명
+      cat: 'fldin9Roj1xTXYYHY',   // 속 (튤립·크로커스 등) → 카테고리로 사용
+      size: 'fldrQ830PgqMwsmiL',  // Size (규격) — 예: 11/12 규격
+      zone: 'fldvnaxRNwATuI8JK',  // 내한성 — 예: -20℃
+      image: 'fldPSrlViJFjaUerf', // image 첨부
+    },
+  },
 };
 
-// 뷰가 없을 때의 임시 분류 규칙: Status가 아래 목록이면 '즉시 출하', 나머지는 '사전 예약'
-// (주문가능·출하대기 외 옵션: 수입대기, 순화중, 수입예정, 공급확정(…), 가격 재확인 필요(…))
-const IMMEDIATE_STATUS = ['주문가능', '출하대기'];
-
-// 사이트에 내보낼 필드만 명시 — 실제 에어테이블 필드명과 대조 완료 (2026-07-17)
-const FIELDS = [
-  '국명', '학명', 'SKU', 'Size (규격)', '카테고리', '내한성',
-  'Status', '공급가능시기', '이미지_URL', 'Web Image (Auto-search)', '재고',
-];
-
-async function fetchAll(view) {
+async function fetchAll(src) {
   // 에어테이블은 100건씩 페이지네이션 → 전부 모아서 반환
   let records = [];
   let offset;
   do {
-    const url = new URL(`https://api.airtable.com/v0/${BASE}/${TABLE}`);
-    if (view) url.searchParams.set('view', view);
-    // 국명·학명이 둘 다 빈 행(~1,700건)은 서버에서 제외 — 페이지네이션 낭비 방지
+    const url = new URL(`https://api.airtable.com/v0/${BASE}/${src.table}`);
+    url.searchParams.set('returnFieldsByFieldId', 'true');
+    // 이름(국명·학명)이 둘 다 빈 행은 서버에서 제외
     url.searchParams.set('filterByFormula', 'OR({국명}!="",{학명}!="")');
     url.searchParams.set('pageSize', '100');
-    FIELDS.forEach((f) => url.searchParams.append('fields[]', f));
+    Object.values(src.fields).forEach((f) => url.searchParams.append('fields[]', f));
     if (offset) url.searchParams.set('offset', offset);
 
     const r = await fetch(url, { headers: { Authorization: `Bearer ${TOKEN}` } });
@@ -47,51 +57,33 @@ async function fetchAll(view) {
   return records;
 }
 
-// 뷰 미사용 모드에서 전체 테이블 조회를 10분간 메모리 캐시
-// (immediate/preorder 두 요청이 조회 한 번을 공유)
-let cache = { at: 0, records: null };
-
 module.exports = async (req, res) => {
   try {
-    if (!BASE || !TABLE || !TOKEN) {
+    if (!BASE || !TOKEN) {
       return res.status(500).json({ error: '환경변수가 설정되지 않았습니다.' });
     }
     const group = req.query.group === 'preorder' ? 'preorder' : 'immediate';
+    const src = SOURCES[group];
+    const F = src.fields;
 
-    let records;
-    if (VIEWS.immediate && VIEWS.preorder) {
-      records = await fetchAll(VIEWS[group]);
-    } else {
-      if (!cache.records || Date.now() - cache.at > 600000) {
-        cache = { at: Date.now(), records: await fetchAll(null) };
-      }
-      records = cache.records.filter((r) => {
-        const s = (r.fields && r.fields['Status']) || '';
-        const immediate = IMMEDIATE_STATUS.includes(s);
-        return group === 'immediate' ? immediate : !immediate;
-      });
-    }
-
-    const items = records.map(({ id, fields: f }) => ({
-      id,
-      sku: f['SKU'] || '',
-      kname: f['국명'] || '',
-      sname: f['학명'] || '',
-      size: f['Size (규격)'] || '',
-      cat: Array.isArray(f['카테고리']) ? f['카테고리'] : f['카테고리'] ? [f['카테고리']] : [],
-      zone: f['내한성'] || '',
-      seasons: f['공급가능시기'] || [],
-      // 재고 '수량'은 내부 정보 → 유무(boolean)만 노출
-      inStock: typeof f['재고'] === 'number' ? f['재고'] > 0 : null,
-      // 이미지: 고정 URL(이미지_URL) 우선. 첨부 URL은 만료되므로 임시용
-      image:
-        f['이미지_URL'] ||
-        (Array.isArray(f['Web Image (Auto-search)']) &&
-          f['Web Image (Auto-search)'][0] &&
-          f['Web Image (Auto-search)'][0].url) ||
-        null,
-      group,
-    }));
+    const records = await fetchAll(src);
+    const items = records.map(({ id, fields: f }) => {
+      const att = Array.isArray(f[F.image]) && f[F.image][0];
+      return {
+        id,
+        sku: (F.sku && f[F.sku]) || '',
+        kname: f[F.kname] || '',
+        sname: f[F.sname] || '',
+        size: f[F.size] || '',
+        cat: f[F.cat] ? [f[F.cat]] : [],
+        zone: (F.zone && f[F.zone]) || '',
+        moq: (F.moq && f[F.moq]) || null, // 최소주문수량 (국내 라인업만)
+        // 카드용으로는 원본(수 MB) 대신 large 썸네일(~512px) 우선.
+        // 첨부 URL은 수 시간 뒤 만료되지만 캐시(10분)가 더 짧아 항상 유효한 URL이 나감.
+        image: (att && ((att.thumbnails && att.thumbnails.large && att.thumbnails.large.url) || att.url)) || null,
+        group,
+      };
+    });
 
     // 10분 캐시 → 에어테이블 API 한도(초당 5회) 보호 + 빠른 응답
     res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=1200');

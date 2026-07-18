@@ -246,7 +246,7 @@ function render(){
       <div class="pbody">
         <div class="kname">${p.kname}</div>
         <div class="sname">${p.sname}</div>
-        <div class="meta"><span class="tag">${p.size}</span><span class="tag">${p.zone}</span><span class="tag">${p.cat}</span></div>
+        <div class="meta">${[p.size,p.zone,p.cat].filter(Boolean).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
         <button class="add${inCart?' added':''}" data-id="${p.id}">${inCart?'✓ 담김':'견적에 담기'}</button>
       </div>`;
     el.querySelector('.add').onclick=e=>toggle(p.id,e.target);
