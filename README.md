@@ -78,9 +78,10 @@ vercel --prod
 const r = await fetch('/api/quote', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ name, memo, items, website: '' }),
+  body: JSON.stringify({ name, phone, memo, items, website: '' }),
 });
 const { ok, requestNo } = await r.json();
 ```
 
-`requestNo`를 카톡 복사 텍스트 첫 줄에 넣으면 카톡 문의 ↔ 에어테이블 기록이 매칭됩니다.
+`phone`(연락처)은 필수 — 접수 구조(고객은 접수만, 연락은 오픈가든이 먼저)의 핵심입니다.
+`requestNo`는 카톡 문의 ↔ 에어테이블 기록 매칭용입니다.
