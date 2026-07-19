@@ -37,10 +37,12 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
 .logo em{font-style:normal;color:var(--green)}
 .nav a.link{font-size:14.5px;font-weight:500;color:var(--ink);text-decoration:none;margin-left:22px}
 .nav a.link:hover{color:var(--green)}
+.nav a.btn-nav{background:var(--green);color:#fff;font-weight:700;padding:9px 20px;border-radius:999px;box-shadow:0 2px 8px rgba(18,48,35,.15);transition:background .15s,transform .2s ease,box-shadow .2s ease}
+.nav a.btn-nav:hover{color:#fff;background:var(--green-dark);transform:translateY(-1px);box-shadow:0 6px 14px rgba(18,48,35,.22)}
 @media(max-width:700px){.nav a.link:not(.keep){display:none}}
 
 /* 1. 히어로 */
-.hero{min-height:86vh;display:flex;align-items:center;text-align:center;color:#fff;padding:0;
+.hero{position:relative;min-height:86vh;display:flex;align-items:center;text-align:center;color:#fff;padding:0;
   background:radial-gradient(110% 80% at 50% 0%,rgba(255,255,255,.07),transparent 55%),
   linear-gradient(rgba(10,24,16,.5),rgba(6,15,10,.7)),
   linear-gradient(135deg,#2c5e40,#183b28 60%,#0f2519); /* 배포 시 농장·현장 사진으로 교체 */
@@ -52,6 +54,11 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
 .hero p{animation:rise .9s cubic-bezier(.22,.61,.36,1) .15s backwards}
 .hero .btn{animation:rise .9s cubic-bezier(.22,.61,.36,1) .3s backwards}
 @keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.scroll-hint{position:absolute;bottom:30px;left:50%;width:20px;height:20px;border-left:2px solid rgba(255,255,255,.65);border-bottom:2px solid rgba(255,255,255,.65);transform:translateX(-50%) rotate(-45deg);animation:hint 1.9s ease-in-out infinite}
+@keyframes hint{0%,100%{transform:translateX(-50%) rotate(-45deg);opacity:.65}50%{transform:translateX(-50%) translateY(7px) rotate(-45deg);opacity:1}}
+
+/* 섹션 키커 — h2 위의 작은 초록 라벨 (섹션 리듬용) */
+.kicker-s{font-size:12px;font-weight:700;letter-spacing:.26em;color:var(--green);margin-bottom:12px}
 
 /* 2. 한 줄 밴드 */
 .band{background:var(--bg-soft);padding:64px 0;text-align:center}
@@ -130,7 +137,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 .reveal.in{opacity:1;animation:rise .7s cubic-bezier(.22,.61,.36,1) var(--d,0s) backwards}
 @media(prefers-reduced-motion:reduce){
   .reveal{opacity:1}
-  .reveal.in,.hero h1,.hero p,.hero .btn{animation:none}
+  .reveal.in,.hero h1,.hero p,.hero .btn,.scroll-hint{animation:none}
   .stat,.svc,.card,.step .ico,.btn{transition:none}
 }
 </style>
@@ -139,13 +146,11 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 
 <header>
   <div class="wrap nav">
-    <a class="logo" href="#">Open<em>Garden</em></a>
+    <a class="logo" href="/">Open<em>Garden</em></a>
     <nav>
-      <a class="link" href="/catalog.html">카탈로그</a>
       <a class="link" href="#about">소개</a>
-      <a class="link" href="#projects">납품 사례</a>
       <a class="link" href="#faq">FAQ</a>
-      <a class="link keep" href="#contact" style="color:var(--green);font-weight:700">견적 문의</a>
+      <a class="link keep btn-nav" href="/catalog.html">카탈로그</a>
     </nav>
   </div>
 </header>
@@ -157,6 +162,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
     <p>정원수부터 구근까지, 유럽·국내 라인업을 한 곳에서</p>
     <a href="/catalog.html" class="btn">카탈로그에서 견적 담기</a>
   </div>
+  <div class="scroll-hint" aria-hidden="true"></div>
 </section>
 
 <!-- 2. 한 줄 밴드 -->
@@ -169,6 +175,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <!-- 3. 지표 -->
 <section>
   <div class="wrap center">
+    <div class="kicker-s">OVERVIEW</div>
     <h2>더 다양한 품종을,<br>더 확실한 품질로.</h2>
     <p class="sub">오픈가든은 유럽 협력 농장과 함께<br>국내 현장에 맞는 식물을 직수입으로 공급합니다.</p>
     <div class="stats">
@@ -184,6 +191,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <section class="about" id="about">
   <div class="wrap about-grid">
     <div>
+      <div class="kicker-s">ABOUT</div>
       <h2>유럽 농장과 국내 현장을<br>잇는 사람들</h2>
       <p>오픈가든은 유럽 현지 농장에서 직수입한 식물을 국내 조경 현장에 공급하는 B2B 파트너입니다. 유럽 수입 라인업과 국내에서 재배·순화한 라인업을 함께 공급하며, 수입 품종에는 내한성 정보를 표기해 우리 기후에 맞는 선택을 돕습니다.</p>
       <p>작은 팀이기에 가능한 방식이 있습니다 — 문의부터 제안서, 납품까지 담당자가 처음부터 끝까지 직접 챙깁니다. 필요한 품종이 목록에 없다면 대체 품종을 찾아 제안드립니다.</p>
@@ -195,6 +203,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <!-- 5. 서비스 -->
 <section id="service">
   <div class="wrap">
+    <div class="kicker-s">SERVICE</div>
     <h2>필요한 식물 선정부터 납품까지,<br>오픈가든이 전 과정을 함께합니다.</h2>
     <div class="svc-grid">
       <div class="svc">
@@ -228,6 +237,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <!-- 6. 납품 프로젝트 -->
 <section class="proj" id="projects">
   <div class="wrap">
+    <div class="kicker-s">PROJECTS</div>
     <h2>주요 납품 프로젝트</h2>
     <p class="sub">오픈가든의 식물이 자라고 있는 공간들.</p>
     <div class="proj-scroll">
@@ -242,6 +252,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <!-- 7. 이용 안내 -->
 <section>
   <div class="wrap center">
+    <div class="kicker-s">PROCESS</div>
     <h2>이용 안내</h2>
     <p class="sub">견적 요청부터 납품까지, 온라인으로 간편하게.</p>
     <div class="steps-grid">
@@ -301,13 +312,17 @@ const flist=document.getElementById('flist');
 FAQ.forEach(([q,a])=>{
   const d=document.createElement('div');d.className='qa';
   d.innerHTML=`<button><span class="q">Q</span><span class="t">${q}</span></button><div class="a">${a}</div>`;
-  d.querySelector('button').onclick=()=>d.classList.toggle('open');
+  d.querySelector('button').onclick=()=>{
+    const was=d.classList.contains('open');
+    [...flist.children].forEach(x=>x.classList.remove('open')); // 한 번에 하나만 열림
+    if(!was)d.classList.add('open');
+  };
   flist.appendChild(d);
 });
 
 // 스크롤 등장 페이드 (모션 최소화 설정 시 생략 — 그리드 자식은 시차를 두고 순차 등장)
 if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
-  const els=[...document.querySelectorAll('h2,.sub,.stat,.svc,.card,.step,.about-grid>div,.qa,.final .actions')];
+  const els=[...document.querySelectorAll('h2,.sub,.kicker-s,.stat,.svc,.card,.step,.about-grid>div,.qa,.final .actions')];
   els.forEach(el=>el.classList.add('reveal'));
   document.querySelectorAll('.stats,.svc-grid,.steps-grid,.proj-scroll').forEach(g=>
     [...g.children].forEach((c,i)=>c.style.setProperty('--d',Math.min(i*90,360)+'ms')));
@@ -327,7 +342,16 @@ Promise.all([
   fetch('/api/catalog?group=preorder').then(r=>r.ok?r.json():{count:0})
 ]).then(([a,b])=>{
   const n=(a.count||0)+(b.count||0);
-  if(n)document.getElementById('statCount').textContent=n+'종+';
+  if(!n)return;
+  const el=document.getElementById('statCount');
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent=n+'종+';return;}
+  // 0 → n 카운트업 (0.8초, 끝으로 갈수록 감속)
+  const t0=performance.now();
+  (function step(t){
+    const k=Math.min(1,(t-t0)/800);
+    el.textContent=Math.round(n*k*(2-k))+'종+';
+    if(k<1)requestAnimationFrame(step);
+  })(t0);
 }).catch(()=>{});
 </script>
 </body>

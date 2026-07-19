@@ -26,8 +26,10 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
 .logo{font-weight:800;font-size:19px;color:var(--ink);text-decoration:none}
 .logo em{font-style:normal;color:var(--green)}
 .nav a.link{font-size:14.5px;font-weight:500;color:var(--ink);text-decoration:none;margin-left:22px}
-.nav a.link.on{color:var(--green);font-weight:700}
-@media(max-width:640px){.nav a.link:not(.on){display:none}}
+.nav a.link:hover{color:var(--green)}
+.nav a.btn-nav{background:var(--green);color:#fff;font-weight:700;padding:9px 20px;border-radius:999px;box-shadow:0 2px 8px rgba(18,48,35,.15);transition:background .15s,transform .2s ease,box-shadow .2s ease}
+.nav a.btn-nav:hover{color:#fff;background:var(--green-dark);transform:translateY(-1px);box-shadow:0 6px 14px rgba(18,48,35,.22)}
+@media(max-width:640px){.nav a.link:not(.keep){display:none}}
 
 .page-head{padding:56px 0 8px}
 .page-head h1{font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;animation:fadeUp .6s cubic-bezier(.22,.61,.36,1) backwards}
@@ -131,12 +133,11 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 
 <header>
   <div class="wrap nav">
-    <a class="logo" href="#">Open<em>Garden</em></a>
+    <a class="logo" href="/">Open<em>Garden</em></a>
     <nav>
-      <a class="link" href="/">홈</a>
-      <a class="link" href="/#service">서비스</a>
-      <a class="link on" href="/catalog.html">카탈로그</a>
+      <a class="link" href="/#about">소개</a>
       <a class="link" href="/#faq">FAQ</a>
+      <a class="link keep btn-nav" href="/catalog.html" aria-current="page">카탈로그</a>
     </nav>
   </div>
 </header>
