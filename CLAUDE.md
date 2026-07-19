@@ -40,7 +40,7 @@ dev.js            로컬 미리보기 서버 (`npm run dev` → localhost:3000, 
 - 단, `api/*.js`는 Node (req, res) 형식(Vercel 계열 기준)으로 작성됨.
   Netlify/Cloudflare 선택 시 핸들러 형식 변환 필요 — 로직은 그대로, 겉모양만 바꾸면 됨.
 - 카카오톡 채널은 메시지 사전 채움 불가 → "API 기록 + 클립보드 복사 + 채팅 열기" 방식이 확정 설계.
-  `catalog.html`의 `KAKAO_URL` 상수를 실제 채널 주소로 교체 필요.
+  `catalog.html`의 `KAKAO_URL` = https://pf.kakao.com/_lGfxhX/chat (2026-07-19 실채널 반영 완료).
 
 ## 환경변수 (호스팅에 설정)
 
