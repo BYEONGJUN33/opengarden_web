@@ -8,7 +8,8 @@
 ```
 public/
   index.html      홈 원페이지 (히어로→밴드→지표→소개→서비스→사례→이용안내→FAQ→CTA→푸터)
-  catalog.html    카탈로그: 검색/필터 → 담기 → 견적 모달 → API 기록 + 클립보드 복사 + 카톡 열기
+  catalog.html    카탈로그: 검색/필터 → 담기 → 상세 모달 → 견적 접수(연락처) → 접수완료 화면
+                  품종 링크 공유: /catalog.html?item=<SKU 또는 레코드ID> 로 해당 품종 상세가 바로 열림
   assets/         로고, og.jpg(카톡 공유 미리보기), 사진
 api/
   catalog.js      GET  /api/catalog?group=immediate|preorder — 국내/판매 라인업 읽기
