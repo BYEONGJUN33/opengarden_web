@@ -59,6 +59,7 @@ module.exports = async (req, res) => {
                 품목요약: summary,
                 품목JSON: JSON.stringify(clean),
                 상태: '신규',
+                접수일시: new Date().toISOString(), // 접수 시각 (에어테이블이 KST로 표시)
               },
             },
           ],
