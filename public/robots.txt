@@ -1,3 +1,5 @@
 User-agent: *
 Allow: /
+# 내부 관계자용 재고조정 앱 — 검색 노출 제외
+Disallow: /stock.html
 Sitemap: https://open-garden.co.kr/sitemap.xml
