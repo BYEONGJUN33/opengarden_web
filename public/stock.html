@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#1B4332">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- 내부 관계자용 페이지 — 검색엔진에 노출되지 않도록 (robots.txt에도 Disallow) -->
+<meta name="robots" content="noindex, nofollow">
 <title>오픈가든 농장 재고조정</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
@@ -550,7 +552,8 @@ try {
   const raw = localStorage.getItem('og_worker');
   if (raw) {
     const p = JSON.parse(raw);
-    if (p && p.id && p.name) savedWorker = p;
+    // pin은 쓰기 요청마다 서버에서 다시 확인하므로 함께 보관합니다.
+    if (p && p.id && p.name && p.pin) savedWorker = p;
   }
 } catch (e) { localStorage.removeItem('og_worker'); }
 
@@ -613,6 +616,16 @@ function resetWorker() {
   show('pin');
 }
 
+// PIN이 더 이상 유효하지 않을 때(작업자 비활성/코드 변경) 확인창 없이 로그인 화면으로
+function resetWorkerSilent() {
+  localStorage.removeItem('og_worker');
+  state.worker = null;
+  state.pin = '';
+  updatePinDisplay();
+  document.getElementById('worker-badge').style.display = 'none';
+  show('pin');
+}
+
 async function refreshData() {
   localStorage.removeItem('og_cache');
   state.cache = null;
@@ -645,7 +658,7 @@ async function verifyPin() {
   try {
     const data = await fetchWithRetry(`${ENDPOINT}?action=worker&pin=${state.pin}`, 2);
     if (data.error || !data.id) { showPinError(); return; }
-    state.worker = { id: data.id, name: data.name };
+    state.worker = { id: data.id, name: data.name, pin: state.pin };
     localStorage.setItem('og_worker', JSON.stringify(state.worker));
     state.pin = '';
     renderBadge();
@@ -772,8 +785,26 @@ function selectZone(zone) {
   renderItems();
 }
 
-// 품목 고유 키 (품목명 + 규격)
-function keyOf(item) { return item.plant + '|' + (item.size || ''); }
+// 품목 고유 키 = 에어테이블 레코드 ID.
+// 이름으로 묶으면 같은 품목명·규격이 두 줄일 때(실제로 있음) 서로 구분되지 않습니다.
+function keyOf(item) { return item.id; }
+
+// 쓰기 요청 공통 처리 — 응답을 반드시 확인해서 실패를 성공으로 착각하지 않게 합니다.
+async function postJSON(payload) {
+  const res = await fetch(ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...payload, pin: state.worker && state.worker.pin }),
+  });
+  let data = {};
+  try { data = await res.json(); } catch (e) {}
+  if (!res.ok || data.error || data.ok !== true) {
+    const err = new Error(data.error || `저장 실패 (HTTP ${res.status})`);
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
 
 // 정렬: 1) 수량>0 먼저 (이름차순)  2) 수량=0 뒤 (이름차순)
 function sortItems(items) {
@@ -970,19 +1001,14 @@ async function saveNewItem() {
   btn.textContent = '저장 중...';
 
   try {
-    await fetch(ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'addItem',
-        zone_id: state.zone.id,
-        worker_name: state.worker && state.worker.name,
-        plant, size,
-        expected: qty
-      }),
-      redirect: 'follow'
+    const out = await postJSON({
+      action: 'addItem',
+      zone_id: state.zone.id,
+      plant, size,
+      expected: qty
     });
-    const newItem = { zone_id: state.zone.id, plant, size, expected: qty };
+    // 서버가 만든 레코드 ID를 받아야 방금 추가한 품목을 바로 조정할 수 있습니다.
+    const newItem = { id: out.id, zone_id: state.zone.id, plant, size, expected: qty };
     state.items.push(newItem);
     if (state.cache) {
       state.cache.items.push(newItem);
@@ -992,7 +1018,7 @@ async function saveNewItem() {
     renderItems();
     toast('품목 추가 완료', 'success');
   } catch (e) {
-    toast('추가 실패. 다시 시도하세요', 'error');
+    toast(e.message || '추가 실패. 다시 시도하세요', 'error');
   } finally {
     btn.disabled = false;
     btn.textContent = '추가';
@@ -1004,22 +1030,17 @@ async function submit() {
   const changes = Object.entries(state.deltas);
   if (changes.length === 0) return;
 
+  // 최종값이 아니라 증감(delta)을 보냅니다. 서버가 방금 읽은 현재값에 더하므로
+  // 다른 사람이 먼저 조정했더라도 그 조정을 지우지 않습니다.
   const payload = {
     worker_id: state.worker.id,
-    worker_name: state.worker.name,
     farm_id: state.farm.id,
     farm_name: state.farm.name,
     zone_id: state.zone.id,
     zone_name: state.zone.name,
-    adjustments: changes.map(([k, delta]) => {
-      const it = state.items.find(i => keyOf(i) === k);
-      return {
-        plant: it.plant,
-        size: it.size || '',
-        expected: it.expected,
-        delta,
-        final: Math.max(0, it.expected + delta)
-      };
+    adjustments: changes.map(([id, delta]) => {
+      const it = state.items.find(i => keyOf(i) === id);
+      return { id, plant: it.plant, size: it.size || '', delta };
     })
   };
 
@@ -1028,21 +1049,15 @@ async function submit() {
   btn.textContent = '전송 중...';
 
   try {
-    await fetch(ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      redirect: 'follow'
-    });
+    await postJSON(payload);
 
-    // 로컬 상태/캐시 갱신 (expected = final)
+    // 서버 저장이 확인된 뒤에만 화면 숫자를 갱신합니다.
     payload.adjustments.forEach(a => {
-      const idx = state.items.findIndex(i => i.plant === a.plant && (i.size || '') === (a.size || '') && i.zone_id === state.zone.id);
-      if (idx >= 0) state.items[idx].expected = a.final;
+      const it = state.items.find(i => keyOf(i) === a.id);
+      if (it) it.expected = Math.max(0, it.expected + a.delta);
       if (state.cache) {
-        const cidx = state.cache.items.findIndex(i =>
-          i.plant === a.plant && (i.size || '') === (a.size || '') && i.zone_id === state.zone.id);
-        if (cidx >= 0) state.cache.items[cidx].expected = a.final;
+        const ci = state.cache.items.find(i => i.id === a.id);
+        if (ci) ci.expected = Math.max(0, ci.expected + a.delta);
       }
     });
     if (state.cache) saveCache(state.cache);
@@ -1054,7 +1069,9 @@ async function submit() {
       renderItems();
     }, 700);
   } catch (e) {
-    toast('전송 실패. 다시 시도해주세요', 'error');
+    // 실패하면 조정 내역을 그대로 남겨 다시 승인할 수 있게 합니다.
+    toast(e.message || '전송 실패. 다시 시도해주세요', 'error');
+    if (e.status === 401) setTimeout(resetWorkerSilent, 1200);
     btn.disabled = false;
     btn.textContent = '승인하기';
   }
@@ -1118,7 +1135,7 @@ function pressEnd() {
 function openEditItem(itemKey) {
   const item = findItemByKey(itemKey);
   if (!item) return;
-  state.editing = { oldKey: itemKey, oldPlant: item.plant, oldSize: item.size || '' };
+  state.editing = { id: item.id, oldPlant: item.plant, oldSize: item.size || '' };
   document.getElementById('edit-plant').value = item.plant;
   document.getElementById('edit-size').value = item.size || '';
   document.getElementById('edit-modal').classList.add('show');
@@ -1152,43 +1169,27 @@ async function saveEditItem() {
   btn.textContent = '저장 중...';
 
   try {
-    await fetch(ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'updateItem',
-        zone_id: state.zone.id,
-        worker_name: state.worker && state.worker.name,
-        old_plant: oldPlant,
-        old_size: oldSize,
-        new_plant: newPlant,
-        new_size: newSize
-      }),
-      redirect: 'follow'
+    await postJSON({
+      action: 'updateItem',
+      id: state.editing.id,
+      zone_id: state.zone.id,
+      new_plant: newPlant,
+      new_size: newSize
     });
 
-    // 로컬 상태/캐시 동기화
+    // 로컬 상태/캐시 동기화 (키가 레코드 ID라 진행 중이던 조정도 그대로 유지됩니다)
     const updateRow = (arr) => {
-      const idx = arr.findIndex(i =>
-        i.zone_id === state.zone.id && i.plant === oldPlant && (i.size || '') === oldSize);
-      if (idx >= 0) { arr[idx].plant = newPlant; arr[idx].size = newSize; }
+      const it = arr.find(i => i.id === state.editing.id);
+      if (it) { it.plant = newPlant; it.size = newSize; }
     };
     updateRow(state.items);
     if (state.cache) { updateRow(state.cache.items); saveCache(state.cache); }
-
-    // 진행 중이던 delta 키도 이어주기
-    const oldK = oldPlant + '|' + oldSize;
-    const newK = newPlant + '|' + newSize;
-    if (state.deltas[oldK] !== undefined) {
-      state.deltas[newK] = state.deltas[oldK];
-      delete state.deltas[oldK];
-    }
 
     closeEditItem();
     renderItems();
     toast('수정 완료', 'success');
   } catch (e) {
-    toast('수정 실패', 'error');
+    toast(e.message || '수정 실패', 'error');
   } finally {
     btn.disabled = false;
     btn.textContent = '저장';
