@@ -5,9 +5,62 @@
 // website 필드는 honeypot(봇 트랩) — 사람에게는 보이지 않는 입력칸.
 // 값이 차 있으면 봇이므로 조용히 성공 응답만 하고 기록하지 않습니다.
 
+const crypto = require('crypto');
+
 const BASE = process.env.AIRTABLE_BASE_ID;
 const QTABLE = process.env.AIRTABLE_QUOTE_TABLE || '견적요청';
 const TOKEN = process.env.AIRTABLE_TOKEN;
+
+// ── 솔라피 알림톡: 접수 확인 메시지를 고객 폰으로 발송 ──
+// 환경변수(SOLAPI_*)가 하나라도 없으면 조용히 건너뜀 → 미설정 상태에서도 접수는 정상 동작.
+// 승인 템플릿 변수: #{요청번호} #{요청자} #{품목요약}
+async function sendAlimtalk({ phone, no, name, summary }) {
+  const KEY = process.env.SOLAPI_API_KEY;
+  const SECRET = process.env.SOLAPI_API_SECRET;
+  const PFID = process.env.SOLAPI_PFID;
+  const TEMPLATE = process.env.SOLAPI_TEMPLATE_ID;
+  const FROM = process.env.SOLAPI_SENDER;
+  if (!KEY || !SECRET || !PFID || !TEMPLATE || !FROM) return; // 미설정 → 건너뜀
+
+  const to = String(phone).replace(/\D/g, '');
+  if (to.length < 10) return;
+
+  // 품목요약이 너무 길면 축약 (알림톡 변수 길이 보호)
+  let items = summary;
+  if (items.length > 800) {
+    items = items.slice(0, 760).replace(/\n[^\n]*$/, '') + '\n…(그 외 품목은 상담 시 확인)';
+  }
+
+  // 인증 서명: HMAC-SHA256(secret, date+salt)
+  const date = new Date().toISOString();
+  const salt = crypto.randomBytes(20).toString('hex');
+  const signature = crypto.createHmac('sha256', SECRET).update(date + salt).digest('hex');
+
+  const r = await fetch('https://api.solapi.com/messages/v4/send', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `HMAC-SHA256 apiKey=${KEY}, date=${date}, salt=${salt}, signature=${signature}`,
+    },
+    body: JSON.stringify({
+      message: {
+        to,
+        from: String(FROM).replace(/\D/g, ''),
+        kakaoOptions: {
+          pfId: PFID,
+          templateId: TEMPLATE,
+          variables: {
+            '#{요청번호}': no,
+            '#{요청자}': name && name.trim() ? name.trim().slice(0, 40) : '고객',
+            '#{품목요약}': items,
+          },
+          disableSms: false, // 카톡 실패 시 SMS/LMS로 자동 대체발송
+        },
+      },
+    }),
+  });
+  if (!r.ok) throw new Error(`Solapi ${r.status} ${await r.text().catch(() => '')}`);
+}
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -74,6 +127,13 @@ module.exports = async (req, res) => {
       }
     );
     if (!r.ok) throw new Error(`Airtable ${r.status}`);
+
+    // 접수 확인 알림톡 발송 — 실패해도 접수 자체는 성공으로 응답 (기록은 이미 완료됨)
+    try {
+      await sendAlimtalk({ phone: cleanPhone, no, name, summary });
+    } catch (e) {
+      console.error('alimtalk send failed:', e.message);
+    }
 
     res.status(200).json({ ok: true, requestNo: no });
   } catch (e) {
