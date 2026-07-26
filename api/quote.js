@@ -15,11 +15,11 @@ const TOKEN = process.env.AIRTABLE_TOKEN;
 // 환경변수(SOLAPI_*)가 하나라도 없으면 조용히 건너뜀 → 미설정 상태에서도 접수는 정상 동작.
 // 승인 템플릿 변수: #{요청번호} #{요청자} #{품목요약}
 async function sendAlimtalk({ phone, no, name, summary }) {
-  const KEY = process.env.SOLAPI_API_KEY;
-  const SECRET = process.env.SOLAPI_API_SECRET;
-  const PFID = process.env.SOLAPI_PFID;
-  const TEMPLATE = process.env.SOLAPI_TEMPLATE_ID;
-  const FROM = process.env.SOLAPI_SENDER;
+  const KEY = (process.env.SOLAPI_API_KEY || '').trim();
+  const SECRET = (process.env.SOLAPI_API_SECRET || '').trim();
+  const PFID = (process.env.SOLAPI_PFID || '').trim();
+  const TEMPLATE = (process.env.SOLAPI_TEMPLATE_ID || '').trim();
+  const FROM = (process.env.SOLAPI_SENDER || '').trim();
   if (!KEY || !SECRET || !PFID || !TEMPLATE) return; // 발신번호(FROM)는 선택 — 없으면 SMS 대체발송만 꺼짐
 
   const to = String(phone).replace(/\D/g, '');
@@ -77,7 +77,7 @@ module.exports = async (req, res) => {
   // 진단용(임시): 솔라피 인증이 통하는지 잔액조회로 확인 (메시지 발송 안 함)
   if (req.method === 'GET' && req.query && req.query.debug === 'solapi') {
     try {
-      const KEY = process.env.SOLAPI_API_KEY, SECRET = process.env.SOLAPI_API_SECRET;
+      const KEY = (process.env.SOLAPI_API_KEY || '').trim(), SECRET = (process.env.SOLAPI_API_SECRET || '').trim();
       const date = new Date().toISOString();
       const salt = crypto.randomBytes(20).toString('hex');
       const signature = crypto.createHmac('sha256', SECRET).update(date + salt).digest('hex');
@@ -85,7 +85,7 @@ module.exports = async (req, res) => {
         headers: { Authorization: `HMAC-SHA256 apiKey=${KEY}, date=${date}, salt=${salt}, signature=${signature}` },
       });
       const body = await rr.text();
-      return res.status(200).json({ authStatus: rr.status, authOk: rr.ok, body: body.slice(0, 200) });
+      return res.status(200).json({ authStatus: rr.status, authOk: rr.ok, keyLen: KEY.length, secretLen: SECRET.length, body: body.slice(0, 200) });
     } catch (e) {
       return res.status(200).json({ error: e.message });
     }
