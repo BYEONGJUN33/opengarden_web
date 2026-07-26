@@ -52,15 +52,14 @@ async function atFetch(path, opts = {}) {
   return r.json();
 }
 
-// filterByFormula(선택)에 맞는 재고 레코드를 100건 단위 페이지 끝까지 모아옵니다.
+// 재고 레코드를 100건 단위 페이지 끝까지 모아옵니다.
 // 페이지를 끊으면 뒤쪽 품목이 "못 찾음"으로 조용히 누락되므로 반드시 전체를 훑습니다.
-async function fetchStock(formula) {
+async function fetchStock() {
   let records = [];
   let offset;
   do {
     const url = new URL(`https://api.airtable.com/v0/${BASE}/${encodeURIComponent(STOCK_TABLE)}`);
     url.searchParams.set('pageSize', '100');
-    if (formula) url.searchParams.set('filterByFormula', formula);
     if (offset) url.searchParams.set('offset', offset);
     const r = await fetch(url, { headers: { Authorization: `Bearer ${TOKEN}` } });
     if (!r.ok) throw new Error(`Airtable ${r.status}`);
@@ -196,14 +195,15 @@ async function handleUpdateItem(body, worker, res) {
 }
 
 async function handleSubmit(body, worker, res) {
-  const { zone_id, adjustments } = body;
+  const { adjustments } = body;
   if (!Array.isArray(adjustments) || adjustments.length === 0) {
     return res.status(400).json({ error: '조정 내역이 없습니다.' });
   }
-  const { farm } = parseZoneId(zone_id);
 
-  // 이 농장의 재고를 전부(페이지 끝까지) 읽어 레코드 ID로 현재값을 찾습니다.
-  const records = await fetchStock(`{농장}="${esc(farm)}"`);
+  // 재고 전체를 읽어 레코드 ID로 현재값을 찾습니다.
+  // 농장으로 걸러 오려 했으나 filterByFormula가 singleSelect(농장)에서는 0건을 돌려주어
+  // 모든 조정이 "품목 못 찾음"으로 실패했습니다. 필터 없이 읽는 방식은 확실히 동작합니다.
+  const records = await fetchStock();
   const byId = new Map(records.map((r) => [r.id, r]));
 
   const toPatch = [];
