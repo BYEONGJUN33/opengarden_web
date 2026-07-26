@@ -59,6 +59,7 @@
     color: #fff;
     padding: env(safe-area-inset-top) 20px 0;
     flex-shrink: 0;
+    position: relative; /* 작업자 메뉴를 화면이 아닌 헤더 기준으로 띄우기 위함 */
   }
   .hdr-inner {
     height: 56px;
@@ -239,6 +240,10 @@
   .key:active { transform: scale(0.95); background: var(--green-50); }
   .key.empty { background: transparent; border: none; pointer-events: none; }
   .key.back { font-size: 24px; color: var(--ink-mute); }
+  /* 아래 두 줄은 같은 이름의 다른 규칙(.empty 안내문구 / .back 헤더 뒤로가기)이
+     키패드 버튼에 끼어드는 것을 막습니다. 없으면 0·← 키가 밀리고 작아집니다. */
+  .key.empty { grid-column: auto; padding: 0; }
+  .key.back { width: auto; height: auto; }
 
   .loading, .err, .empty {
     grid-column: 1 / -1;
@@ -267,7 +272,7 @@
   .toast.error { background: var(--danger); }
 
   .worker-menu {
-    position: absolute; top: 56px; right: 12px;
+    position: absolute; top: 100%; right: 12px;
     background: var(--surface); border: 0.5px solid var(--line);
     border-radius: 12px; padding: 4px;
     box-shadow: 0 8px 24px rgba(27,43,34,0.12);
@@ -334,7 +339,7 @@
     transition: transform 0.08s ease, background 0.1s ease;
   }
   .mkey:active { transform: scale(0.95); background: var(--green-50); }
-  .mkey.back { font-size: 22px; color: var(--ink-mute); }
+  .mkey.back { font-size: 22px; color: var(--ink-mute); width: auto; height: auto; }
   .mkey.confirm {
     background: var(--green); color: #fff; font-size: 17px; font-weight: 600;
     border-color: var(--green);
@@ -971,6 +976,7 @@ async function saveNewItem() {
       body: JSON.stringify({
         action: 'addItem',
         zone_id: state.zone.id,
+        worker_name: state.worker && state.worker.name,
         plant, size,
         expected: qty
       }),
@@ -1152,6 +1158,7 @@ async function saveEditItem() {
       body: JSON.stringify({
         action: 'updateItem',
         zone_id: state.zone.id,
+        worker_name: state.worker && state.worker.name,
         old_plant: oldPlant,
         old_size: oldSize,
         new_plant: newPlant,

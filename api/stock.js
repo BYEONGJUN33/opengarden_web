@@ -8,6 +8,14 @@ const TOKEN = process.env.AIRTABLE_TOKEN;
 const STOCK_TABLE = process.env.AIRTABLE_STOCK_TABLE || '재고';
 const WORKER_TABLE = process.env.AIRTABLE_WORKER_TABLE || '작업자';
 
+// 농장 목록. 재고가 아직 한 건도 없는 농장(예: 4농장)도 선택 화면에 떠야
+// 그 농장에 첫 품목을 추가할 수 있으므로, 재고에서 뽑은 목록과 이 기본값을 합칩니다.
+// 농장이 늘면 Vercel 환경변수 STOCK_FARMS(쉼표 구분)만 고치면 됩니다.
+const DEFAULT_FARMS = (process.env.STOCK_FARMS || '1농장,2농장,3농장,4농장')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
+
 function esc(s) {
   return String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
@@ -85,6 +93,8 @@ async function handleAll(req, res) {
     });
   }
 
+  DEFAULT_FARMS.forEach((f) => farmSet.add(f));
+
   const farms = [...farmSet].sort().map((name) => ({
     id: name,
     name,
@@ -100,7 +110,7 @@ async function handleAll(req, res) {
 }
 
 async function handleAddItem(body, res) {
-  const { zone_id, plant, size, expected } = body;
+  const { zone_id, plant, size, expected, worker_name } = body;
   if (!plant) return res.status(400).json({ error: '품목명이 없습니다.' });
   const { farm, zone } = parseZoneId(zone_id);
   const label = `${plant}${size ? ' ' + size : ''} · ${farm}`;
@@ -118,6 +128,7 @@ async function handleAddItem(body, res) {
             품목명: String(plant).slice(0, 200),
             규격: String(size || '').slice(0, 50),
             현재고: Math.max(0, parseInt(expected, 10) || 0),
+            최종작업자: String(worker_name || '').slice(0, 50),
           },
         },
       ],
@@ -142,7 +153,7 @@ async function findStockRecord(farm, zone, plant, size) {
 }
 
 async function handleUpdateItem(body, res) {
-  const { zone_id, old_plant, old_size, new_plant, new_size } = body;
+  const { zone_id, old_plant, old_size, new_plant, new_size, worker_name } = body;
   if (!new_plant) return res.status(400).json({ error: '품목명이 없습니다.' });
   const { farm, zone } = parseZoneId(zone_id);
 
@@ -161,6 +172,7 @@ async function handleUpdateItem(body, res) {
             품목표시: label,
             품목명: String(new_plant).slice(0, 200),
             규격: String(new_size || '').slice(0, 50),
+            최종작업자: String(worker_name || '').slice(0, 50),
           },
         },
       ],
