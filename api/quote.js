@@ -20,7 +20,7 @@ async function sendAlimtalk({ phone, no, name, summary }) {
   const PFID = process.env.SOLAPI_PFID;
   const TEMPLATE = process.env.SOLAPI_TEMPLATE_ID;
   const FROM = process.env.SOLAPI_SENDER;
-  if (!KEY || !SECRET || !PFID || !TEMPLATE || !FROM) return; // 미설정 → 건너뜀
+  if (!KEY || !SECRET || !PFID || !TEMPLATE) return; // 발신번호(FROM)는 선택 — 없으면 SMS 대체발송만 꺼짐
 
   const to = String(phone).replace(/\D/g, '');
   if (to.length < 10) return;
@@ -36,28 +36,28 @@ async function sendAlimtalk({ phone, no, name, summary }) {
   const salt = crypto.randomBytes(20).toString('hex');
   const signature = crypto.createHmac('sha256', SECRET).update(date + salt).digest('hex');
 
+  const message = {
+    to,
+    kakaoOptions: {
+      pfId: PFID,
+      templateId: TEMPLATE,
+      variables: {
+        '#{요청번호}': no,
+        '#{요청자}': name && name.trim() ? name.trim().slice(0, 40) : '고객',
+        '#{품목요약}': items,
+      },
+      disableSms: !FROM, // 발신번호가 있으면 카톡 실패 시 SMS/LMS 자동 대체발송
+    },
+  };
+  if (FROM) message.from = String(FROM).replace(/\D/g, ''); // SMS 대체발송용 발신번호(선택)
+
   const r = await fetch('https://api.solapi.com/messages/v4/send', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `HMAC-SHA256 apiKey=${KEY}, date=${date}, salt=${salt}, signature=${signature}`,
     },
-    body: JSON.stringify({
-      message: {
-        to,
-        from: String(FROM).replace(/\D/g, ''),
-        kakaoOptions: {
-          pfId: PFID,
-          templateId: TEMPLATE,
-          variables: {
-            '#{요청번호}': no,
-            '#{요청자}': name && name.trim() ? name.trim().slice(0, 40) : '고객',
-            '#{품목요약}': items,
-          },
-          disableSms: false, // 카톡 실패 시 SMS/LMS로 자동 대체발송
-        },
-      },
-    }),
+    body: JSON.stringify({ message }),
   });
   if (!r.ok) throw new Error(`Solapi ${r.status} ${await r.text().catch(() => '')}`);
 }
