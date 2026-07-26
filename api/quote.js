@@ -63,6 +63,17 @@ async function sendAlimtalk({ phone, no, name, summary }) {
 }
 
 module.exports = async (req, res) => {
+  // 진단용(임시): 환경변수가 서버에 들어왔는지 있음/없음만 확인 (값은 노출 안 함)
+  if (req.method === 'GET' && req.query && req.query.debug === 'env') {
+    return res.status(200).json({
+      SOLAPI_API_KEY: !!process.env.SOLAPI_API_KEY,
+      SOLAPI_API_SECRET: !!process.env.SOLAPI_API_SECRET,
+      SOLAPI_PFID: !!process.env.SOLAPI_PFID,
+      SOLAPI_TEMPLATE_ID: !!process.env.SOLAPI_TEMPLATE_ID,
+      SOLAPI_SENDER: !!process.env.SOLAPI_SENDER,
+    });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'POST 요청만 허용됩니다.' });
   }
