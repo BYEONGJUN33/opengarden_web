@@ -18,6 +18,7 @@ if (fs.existsSync(envPath)) {
 const HANDLERS = {
   '/api/catalog': require('./api/catalog.js'),
   '/api/quote': require('./api/quote.js'),
+  '/api/stock': require('./api/stock.js'),
 };
 
 const MIME = {

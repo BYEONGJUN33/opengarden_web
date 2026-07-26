@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1B4332">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>오픈가든 농장 재고조정</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root {
+    --bg: #FAF8F3;
+    --surface: #FFFFFF;
+    --ink: #1B2B22;
+    --ink-mute: #6B7B72;
+    --ink-soft: #9AA69F;
+    --line: #E6E1D5;
+    --line-soft: #F0EBDE;
+    --green: #1B4332;
+    --green-dark: #0F2A1E;
+    --green-50: #EDF2EE;
+    --green-100: #D1DED5;
+    --gold: #C9A961;
+    --gold-50: #F7EFD9;
+    --danger: #B8543E;
+    --danger-50: #FBEDE8;
+    --success: #3B6D11;
+    --success-50: #EAF3DE;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+    user-select: none;
+    -webkit-user-select: none;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  input { font-family: inherit; }
+
+  #app {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    max-width: 520px;
+    margin: 0 auto;
+    background: var(--bg);
+  }
+
+  header {
+    background: var(--green);
+    color: #fff;
+    padding: env(safe-area-inset-top) 20px 0;
+    flex-shrink: 0;
+  }
+  .hdr-inner {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  .brand .mark { color: var(--gold); margin-right: 6px; }
+  .worker-badge {
+    font-size: 13px; padding: 6px 12px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 100px;
+    color: rgba(255,255,255,0.9); font-weight: 500;
+  }
+
+  .screen {
+    display: none; flex: 1; flex-direction: column; min-height: 0;
+    animation: fadeIn 0.2s ease;
+  }
+  .screen.active { display: flex; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .screen-hd {
+    padding: 20px 20px 12px;
+    display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+  }
+  .back {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--surface); border: 0.5px solid var(--line);
+    font-size: 20px; display: flex; align-items: center; justify-content: center;
+    color: var(--ink);
+  }
+  .back:active { background: var(--green-50); }
+  .screen-hd h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+  .screen-hd .sub { font-size: 13px; color: var(--ink-mute); margin-top: 2px; }
+
+  .tiles {
+    flex: 1; overflow-y: auto; padding: 8px 20px 24px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start;
+  }
+  .tile {
+    background: var(--surface); border: 0.5px solid var(--line);
+    border-radius: 16px; padding: 28px 16px;
+    font-size: 17px; font-weight: 600; color: var(--ink);
+    min-height: 96px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; letter-spacing: -0.01em;
+    transition: transform 0.1s ease, background 0.1s ease;
+  }
+  .tile:active { transform: scale(0.97); background: var(--green-50); border-color: var(--green-100); }
+  .tile .meta { font-size: 12px; font-weight: 400; color: var(--ink-soft); margin-top: 6px; }
+
+  .search-row {
+    padding: 0 20px 10px;
+    display: flex; gap: 8px; flex-shrink: 0;
+  }
+  .search-row input {
+    flex: 1; height: 48px; border-radius: 12px;
+    border: 0.5px solid var(--line); background: var(--surface);
+    padding: 0 16px; font-size: 16px; color: var(--ink); outline: none;
+  }
+  .search-row input:focus { border-color: var(--green); }
+  .search-row input::placeholder { color: var(--ink-soft); }
+  .add-btn {
+    flex-shrink: 0; height: 48px; padding: 0 16px;
+    border-radius: 12px; border: 1.5px dashed var(--gold);
+    background: var(--gold-50); color: var(--green);
+    font-size: 14px; font-weight: 600; white-space: nowrap;
+  }
+  .add-btn:active { transform: scale(0.97); }
+
+  .items { flex: 1; overflow-y: auto; padding: 0 20px 160px; }
+  .item {
+    background: var(--surface); border: 0.5px solid var(--line);
+    border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    transition: opacity 0.2s ease, background 0.2s ease;
+  }
+  .item.changed { border-color: var(--gold); background: var(--gold-50); }
+  .item.zero {
+    opacity: 0.55;
+    background: var(--line-soft);
+    border-color: var(--line);
+  }
+  .item.zero .item-name { color: var(--ink-mute); }
+  .item-info { min-width: 0; flex: 1; }
+  .item-name {
+    font-size: 16px; font-weight: 600; letter-spacing: -0.01em;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .item-size {
+    display: inline-block; font-size: 11px; font-weight: 500;
+    padding: 2px 8px; border-radius: 100px; margin-left: 6px;
+    background: var(--green-50); color: var(--green); vertical-align: middle;
+  }
+  .item-sub { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .item-ctrl { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .cbtn {
+    width: 46px; height: 46px; border-radius: 12px;
+    background: var(--bg); border: 0.5px solid var(--line);
+    font-size: 24px; font-weight: 500; color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.08s ease;
+  }
+  .cbtn:active { transform: scale(0.92); background: var(--green-50); }
+  .cbtn.minus { color: var(--danger); }
+  .cbtn.plus { color: var(--success); }
+  .delta {
+    min-width: 48px; text-align: center;
+    font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums;
+  }
+  .delta.neg { color: var(--danger); }
+  .delta.pos { color: var(--success); }
+  .delta.zero { color: var(--ink-soft); font-size: 13px; }
+
+  .submit-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to bottom, rgba(250,248,243,0) 0%, var(--bg) 30%);
+    padding: 24px 20px calc(20px + env(safe-area-inset-bottom));
+    display: flex; gap: 12px; align-items: center;
+    max-width: 520px; margin: 0 auto;
+  }
+  .summary { flex-shrink: 0; font-size: 13px; color: var(--ink-mute); padding: 0 8px; }
+  .summary b { font-weight: 600; color: var(--ink); }
+  .primary {
+    flex: 1; background: var(--green); color: #fff;
+    border-radius: 14px; height: 56px;
+    font-size: 17px; font-weight: 600; letter-spacing: -0.01em;
+    transition: background 0.1s ease, transform 0.08s ease;
+  }
+  .primary:active { background: var(--green-dark); transform: scale(0.98); }
+  .primary:disabled { background: var(--ink-soft); opacity: 0.6; }
+
+  #screen-items { position: relative; }
+
+  .pin-wrap {
+    flex: 1; display: flex; flex-direction: column;
+    padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+    gap: 24px;
+  }
+  .pin-title { text-align: center; padding-top: 20px; }
+  .pin-title h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--green); }
+  .pin-title p { font-size: 13px; color: var(--ink-mute); margin-top: 6px; }
+  .pin-display {
+    display: flex; justify-content: center; gap: 18px;
+    margin: 8px 0; min-height: 20px;
+  }
+  .pin-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 1.5px solid var(--ink-soft); background: transparent;
+    transition: all 0.15s ease;
+  }
+  .pin-dot.filled { background: var(--green); border-color: var(--green); transform: scale(1.1); }
+  .pin-display.error .pin-dot {
+    border-color: var(--danger); background: var(--danger);
+    animation: shake 0.35s ease;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+  .keypad {
+    flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px; max-height: 480px; align-self: stretch;
+  }
+  .key {
+    background: var(--surface); border: 0.5px solid var(--line);
+    border-radius: 18px; font-size: 30px; font-weight: 500; color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    min-height: 72px; letter-spacing: -0.02em;
+    transition: transform 0.08s ease, background 0.1s ease;
+  }
+  .key:active { transform: scale(0.95); background: var(--green-50); }
+  .key.empty { background: transparent; border: none; pointer-events: none; }
+  .key.back { font-size: 24px; color: var(--ink-mute); }
+
+  .loading, .err, .empty {
+    grid-column: 1 / -1;
+    text-align: center; padding: 40px 20px;
+    color: var(--ink-mute); font-size: 14px;
+  }
+  .err { color: var(--danger); }
+  .err button {
+    display: inline-block; margin-top: 12px;
+    padding: 10px 20px; background: var(--green); color: #fff;
+    border-radius: 10px; font-size: 14px; font-weight: 600;
+  }
+
+  .toast {
+    position: fixed; bottom: calc(120px + env(safe-area-inset-bottom));
+    left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--green-dark); color: #fff;
+    padding: 14px 24px; border-radius: 100px;
+    font-size: 14px; font-weight: 500;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 100; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--danger); }
+
+  .worker-menu {
+    position: absolute; top: 56px; right: 12px;
+    background: var(--surface); border: 0.5px solid var(--line);
+    border-radius: 12px; padding: 4px;
+    box-shadow: 0 8px 24px rgba(27,43,34,0.12);
+    display: none; z-index: 50;
+  }
+  .worker-menu.show { display: block; }
+  .worker-menu button {
+    display: block; width: 100%; padding: 12px 20px;
+    font-size: 14px; color: var(--ink); text-align: left; border-radius: 8px;
+  }
+  .worker-menu button:active { background: var(--bg); }
+
+  /* ===== Modal (Keypad + Add Item) ===== */
+  .modal {
+    position: fixed; inset: 0;
+    background: rgba(15, 42, 30, 0.55);
+    display: none; align-items: flex-end;
+    z-index: 200;
+    animation: fadeBg 0.15s ease;
+  }
+  .modal.show { display: flex; }
+  @keyframes fadeBg { from { opacity: 0; } to { opacity: 1; } }
+  .modal-panel {
+    width: 100%; max-width: 520px; margin: 0 auto;
+    background: var(--bg);
+    border-radius: 20px 20px 0 0;
+    padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+    animation: slideUp 0.2s ease;
+    max-height: 90vh; overflow-y: auto;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal-hd { text-align: center; margin-bottom: 16px; }
+  .modal-title { font-size: 16px; font-weight: 600; color: var(--ink); }
+  .modal-sub { font-size: 13px; color: var(--ink-mute); margin-top: 2px; }
+
+  .modal-display {
+    background: var(--surface); border: 0.5px solid var(--line);
+    border-radius: 14px; padding: 20px;
+    text-align: center; margin-bottom: 16px;
+  }
+  .modal-display .val {
+    font-size: 40px; font-weight: 600;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .modal-display .val.minus { color: var(--danger); }
+  .modal-display .val.plus { color: var(--success); }
+  .modal-display .preview {
+    font-size: 13px; color: var(--ink-mute); margin-top: 6px;
+  }
+
+  .mpad {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px; margin-bottom: 12px;
+  }
+  .mkey {
+    background: var(--surface); border: 0.5px solid var(--line);
+    border-radius: 14px; font-size: 26px; font-weight: 500; color: var(--ink);
+    min-height: 64px;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.08s ease, background 0.1s ease;
+  }
+  .mkey:active { transform: scale(0.95); background: var(--green-50); }
+  .mkey.back { font-size: 22px; color: var(--ink-mute); }
+  .mkey.confirm {
+    background: var(--green); color: #fff; font-size: 17px; font-weight: 600;
+    border-color: var(--green);
+  }
+  .mkey.confirm:active { background: var(--green-dark); }
+
+  .modal-cancel {
+    width: 100%; height: 48px; margin-top: 4px;
+    background: transparent; color: var(--ink-mute);
+    font-size: 14px; font-weight: 500;
+  }
+
+  /* Add Item form */
+  .form-row { margin-bottom: 12px; }
+  .form-row label {
+    display: block; font-size: 13px; font-weight: 600;
+    color: var(--ink-mute); margin-bottom: 6px;
+  }
+  .form-row input {
+    width: 100%; height: 52px; border-radius: 12px;
+    border: 0.5px solid var(--line); background: var(--surface);
+    padding: 0 16px; font-size: 17px; color: var(--ink); outline: none;
+  }
+  .form-row input:focus { border-color: var(--green); }
+  .modal-btns {
+    display: flex; gap: 10px; margin-top: 16px;
+  }
+  .modal-btns button {
+    flex: 1; height: 52px; border-radius: 12px;
+    font-size: 16px; font-weight: 600;
+  }
+  .modal-btns .cancel {
+    background: var(--surface); color: var(--ink-mute); border: 0.5px solid var(--line);
+  }
+  .modal-btns .save {
+    background: var(--green); color: #fff;
+  }
+  .modal-btns .save:disabled { background: var(--ink-soft); opacity: 0.6; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="hdr-inner">
+      <div class="brand"><span class="mark">●</span>오픈가든</div>
+      <button class="worker-badge" id="worker-badge" onclick="toggleMenu()"></button>
+    </div>
+    <div class="worker-menu" id="worker-menu">
+      <button onclick="refreshData()">데이터 새로고침</button>
+      <button onclick="resetWorker()">작업자 변경</button>
+    </div>
+  </header>
+
+  <div class="screen" id="screen-pin">
+    <div class="pin-wrap">
+      <div class="pin-title">
+        <h1>작업자 번호 입력</h1>
+        <p>4자리 숫자를 입력하세요</p>
+      </div>
+      <div class="pin-display" id="pin-display">
+        <div class="pin-dot"></div><div class="pin-dot"></div>
+        <div class="pin-dot"></div><div class="pin-dot"></div>
+      </div>
+      <div class="keypad">
+        <button class="key" onclick="enterDigit('1')">1</button>
+        <button class="key" onclick="enterDigit('2')">2</button>
+        <button class="key" onclick="enterDigit('3')">3</button>
+        <button class="key" onclick="enterDigit('4')">4</button>
+        <button class="key" onclick="enterDigit('5')">5</button>
+        <button class="key" onclick="enterDigit('6')">6</button>
+        <button class="key" onclick="enterDigit('7')">7</button>
+        <button class="key" onclick="enterDigit('8')">8</button>
+        <button class="key" onclick="enterDigit('9')">9</button>
+        <button class="key empty"></button>
+        <button class="key" onclick="enterDigit('0')">0</button>
+        <button class="key back" onclick="removeDigit()">←</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-farm">
+    <div class="screen-hd">
+      <div>
+        <h2>농장 선택</h2>
+        <div class="sub">작업할 농장을 선택하세요</div>
+      </div>
+    </div>
+    <div class="tiles" id="farms"></div>
+  </div>
+
+  <div class="screen" id="screen-zone">
+    <div class="screen-hd">
+      <button class="back" onclick="goFarm()">←</button>
+      <div>
+        <h2 id="zone-title">구역 선택</h2>
+        <div class="sub" id="zone-sub"></div>
+      </div>
+    </div>
+    <div class="tiles" id="zones"></div>
+  </div>
+
+  <div class="screen" id="screen-items">
+    <div class="screen-hd">
+      <button class="back" onclick="goBackFromItems()">←</button>
+      <div>
+        <h2 id="items-title">품목 조정</h2>
+        <div class="sub" id="items-sub"></div>
+      </div>
+    </div>
+    <div class="search-row">
+      <input type="search" id="search" placeholder="품목 검색" oninput="renderItems()" autocomplete="off">
+      <button class="add-btn" onclick="openAddItem()">＋ 품목</button>
+    </div>
+    <div class="items" id="items"></div>
+    <div class="submit-bar">
+      <div class="summary" id="summary">조정 <b>0</b>건</div>
+      <button class="primary" id="submit-btn" onclick="submit()" disabled>승인하기</button>
+    </div>
+  </div>
+
+  <!-- Keypad Modal -->
+  <div class="modal" id="keypad-modal" onclick="modalBgClick(event, 'keypad')">
+    <div class="modal-panel">
+      <div class="modal-hd">
+        <div class="modal-title" id="keypad-title">수량 입력</div>
+        <div class="modal-sub" id="keypad-sub"></div>
+      </div>
+      <div class="modal-display">
+        <div class="val" id="keypad-val">0</div>
+        <div class="preview" id="keypad-preview"></div>
+      </div>
+      <div class="mpad">
+        <button class="mkey" onclick="kpDigit('1')">1</button>
+        <button class="mkey" onclick="kpDigit('2')">2</button>
+        <button class="mkey" onclick="kpDigit('3')">3</button>
+        <button class="mkey" onclick="kpDigit('4')">4</button>
+        <button class="mkey" onclick="kpDigit('5')">5</button>
+        <button class="mkey" onclick="kpDigit('6')">6</button>
+        <button class="mkey" onclick="kpDigit('7')">7</button>
+        <button class="mkey" onclick="kpDigit('8')">8</button>
+        <button class="mkey" onclick="kpDigit('9')">9</button>
+        <button class="mkey back" onclick="kpBack()">←</button>
+        <button class="mkey" onclick="kpDigit('0')">0</button>
+        <button class="mkey confirm" onclick="kpConfirm()">확인</button>
+      </div>
+      <button class="modal-cancel" onclick="closeKeypad()">취소</button>
+    </div>
+  </div>
+
+  <!-- Add Item Modal -->
+  <div class="modal" id="add-modal" onclick="modalBgClick(event, 'add')">
+    <div class="modal-panel">
+      <div class="modal-hd">
+        <div class="modal-title">품목 추가</div>
+        <div class="modal-sub" id="add-sub"></div>
+      </div>
+      <div class="form-row">
+        <label>품목명</label>
+        <input type="text" id="new-plant" placeholder="예: 몬스테라" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <label>규격</label>
+        <input type="text" id="new-size" placeholder="예: 중품" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <label>수량</label>
+        <input type="number" id="new-qty" inputmode="numeric" placeholder="0">
+      </div>
+      <div class="modal-btns">
+        <button class="cancel" onclick="closeAddItem()">취소</button>
+        <button class="save" id="add-save-btn" onclick="saveNewItem()">추가</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Item Modal -->
+<div class="modal" id="edit-modal" onclick="modalBgClick(event, 'edit')">
+  <div class="modal-panel">
+    <div class="modal-hd">
+      <div class="modal-title">품목 수정</div>
+      <div class="modal-sub">이름과 규격만 변경됩니다 · 수량은 유지</div>
+    </div>
+    <div class="form-row">
+      <label>품목명</label>
+      <input type="text" id="edit-plant" autocomplete="off">
+    </div>
+    <div class="form-row">
+      <label>규격</label>
+      <input type="text" id="edit-size" autocomplete="off">
+    </div>
+    <div class="modal-btns">
+      <button class="cancel" onclick="closeEditItem()">취소</button>
+      <button class="save" id="edit-save-btn" onclick="saveEditItem()">저장</button>
+    </div>
+  </div>
+</div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const ENDPOINT = '/api/stock';
+const CACHE_TTL = 5 * 60 * 1000; // 5분
+
+// ===== 상태 =====
+let savedWorker = null;
+try {
+  const raw = localStorage.getItem('og_worker');
+  if (raw) {
+    const p = JSON.parse(raw);
+    if (p && p.id && p.name) savedWorker = p;
+  }
+} catch (e) { localStorage.removeItem('og_worker'); }
+
+const state = {
+  worker: savedWorker,
+  pin: '',
+  farm: null,
+  zone: null,
+  items: [],      // 현재 구역 품목
+  deltas: {},     // key: plant|size, value: delta number
+  cache: null,    // {farms, zones, items}
+  keypad: null,   // {itemKey, mode: '-'|'+', value: string}
+  editing: null,
+};
+
+// ===== 초기화 =====
+function init() {
+  warmup(); // 백엔드 깨우기
+  if (!state.worker) {
+    show('pin');
+  } else {
+    renderBadge();
+    loadAll();
+  }
+}
+
+// 웜업 핑 (콜드스타트 방지)
+function warmup() {
+  fetch(`${ENDPOINT}?action=ping`, { cache: 'no-store' }).catch(() => {});
+}
+
+// ===== 화면 제어 =====
+function show(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('worker-menu').classList.remove('show');
+}
+
+function renderBadge() {
+  const el = document.getElementById('worker-badge');
+  if (state.worker && state.worker.name) {
+    el.textContent = state.worker.name;
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function toggleMenu() {
+  document.getElementById('worker-menu').classList.toggle('show');
+}
+
+function resetWorker() {
+  if (!confirm('작업자를 변경하시겠습니까?')) return;
+  localStorage.removeItem('og_worker');
+  state.worker = null;
+  state.pin = '';
+  updatePinDisplay();
+  document.getElementById('worker-badge').style.display = 'none';
+  show('pin');
+}
+
+async function refreshData() {
+  localStorage.removeItem('og_cache');
+  state.cache = null;
+  document.getElementById('worker-menu').classList.remove('show');
+  await loadAll(true);
+  toast('데이터 갱신 완료', 'success');
+}
+
+// ===== PIN =====
+function updatePinDisplay() {
+  const dots = document.querySelectorAll('#pin-display .pin-dot');
+  dots.forEach((dot, i) => dot.classList.toggle('filled', i < state.pin.length));
+  document.getElementById('pin-display').classList.remove('error');
+}
+
+function enterDigit(d) {
+  if (state.pin.length >= 4) return;
+  state.pin += d;
+  updatePinDisplay();
+  if (state.pin.length === 4) setTimeout(verifyPin, 150);
+}
+
+function removeDigit() {
+  if (state.pin.length === 0) return;
+  state.pin = state.pin.slice(0, -1);
+  updatePinDisplay();
+}
+
+async function verifyPin() {
+  try {
+    const data = await fetchWithRetry(`${ENDPOINT}?action=worker&pin=${state.pin}`, 2);
+    if (data.error || !data.id) { showPinError(); return; }
+    state.worker = { id: data.id, name: data.name };
+    localStorage.setItem('og_worker', JSON.stringify(state.worker));
+    state.pin = '';
+    renderBadge();
+    loadAll();
+  } catch (e) {
+    showPinError();
+    toast('네트워크 오류', 'error');
+  }
+}
+
+function showPinError() {
+  document.getElementById('pin-display').classList.add('error');
+  setTimeout(() => { state.pin = ''; updatePinDisplay(); }, 500);
+}
+
+// ===== 네트워크 (재시도 + 타임아웃) =====
+async function fetchWithRetry(url, attempts = 3, timeoutMs = 12000) {
+  let lastErr;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+      const res = await fetch(url, { signal: ctrl.signal, cache: 'no-store' });
+      clearTimeout(timer);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.json();
+    } catch (e) {
+      lastErr = e;
+      if (i < attempts - 1) await new Promise(r => setTimeout(r, 600 * (i + 1)));
+    }
+  }
+  throw lastErr;
+}
+
+// ===== 캐시 =====
+function saveCache(data) {
+  try {
+    localStorage.setItem('og_cache', JSON.stringify({ data, ts: Date.now() }));
+  } catch (e) {}
+}
+
+function loadCacheLocal() {
+  try {
+    const raw = localStorage.getItem('og_cache');
+    if (!raw) return null;
+    const { data, ts } = JSON.parse(raw);
+    if (Date.now() - ts > CACHE_TTL) return null;
+    return data;
+  } catch (e) { return null; }
+}
+
+// ===== 프리로드: 전체 데이터 한 번에 =====
+async function loadAll(forceRefresh = false) {
+  show('farm');
+  const el = document.getElementById('farms');
+
+  // 캐시 즉시 반영 (화면 바로 표시)
+  if (!forceRefresh) {
+    const cached = loadCacheLocal();
+    if (cached) {
+      state.cache = cached;
+      renderFarms();
+      return;
+    }
+  }
+
+  el.innerHTML = '<div class="loading">데이터 불러오는 중...</div>';
+  try {
+    const data = await fetchWithRetry(`${ENDPOINT}?action=all`);
+    if (data.error) throw new Error(data.error);
+    state.cache = data;
+    saveCache(data);
+    renderFarms();
+  } catch (e) {
+    el.innerHTML = `<div class="err">불러오기 실패<br><button onclick="loadAll(true)">다시 시도</button></div>`;
+  }
+}
+
+// ===== 농장 =====
+function renderFarms() {
+  const el = document.getElementById('farms');
+  const farms = (state.cache && state.cache.farms) || [];
+  if (!farms.length) {
+    el.innerHTML = '<div class="empty">등록된 농장이 없습니다</div>';
+    return;
+  }
+  el.innerHTML = farms.map(f =>
+    `<button class="tile" onclick='selectFarm(${JSON.stringify(f)})'>${escapeHtml(f.name)}</button>`
+  ).join('');
+}
+
+function selectFarm(farm) {
+  state.farm = farm;
+  // use_zones === 'N' 이면 구역 건너뛰고 바로 재고로
+  if (farm.use_zones === 'N') {
+    selectZone({ id: farm.id, farm_id: farm.id, name: farm.name });
+    return;
+  }
+  // 구역 있음
+  document.getElementById('zone-title').textContent = farm.name;
+  document.getElementById('zone-sub').textContent = '구역을 선택하세요';
+  show('zone');
+  const el = document.getElementById('zones');
+  const zones = (state.cache.zones || []).filter(z => z.farm_id === farm.id);
+  if (!zones.length) {
+    el.innerHTML = '<div class="empty">이 농장의 구역이 없습니다</div>';
+    return;
+  }
+  el.innerHTML = zones.map(z =>
+    `<button class="tile" onclick='selectZone(${JSON.stringify(z)})'>${escapeHtml(z.name)}</button>`
+  ).join('');
+}
+
+// ===== 구역 / 품목 =====
+function selectZone(zone) {
+  state.zone = zone;
+  state.deltas = {};
+  state.items = (state.cache.items || []).filter(i => i.zone_id === zone.id);
+
+  document.getElementById('items-title').textContent = zone.name;
+  document.getElementById('items-sub').textContent = state.farm.name;
+  document.getElementById('search').value = '';
+  show('items');
+  renderItems();
+}
+
+// 품목 고유 키 (품목명 + 규격)
+function keyOf(item) { return item.plant + '|' + (item.size || ''); }
+
+// 정렬: 1) 수량>0 먼저 (이름차순)  2) 수량=0 뒤 (이름차순)
+function sortItems(items) {
+  return [...items].sort((a, b) => {
+    const fa = a.expected + (state.deltas[keyOf(a)] || 0);
+    const fb = b.expected + (state.deltas[keyOf(b)] || 0);
+    const za = fa <= 0 ? 1 : 0;
+    const zb = fb <= 0 ? 1 : 0;
+    if (za !== zb) return za - zb;
+    const n = a.plant.localeCompare(b.plant, 'ko');
+    if (n !== 0) return n;
+    return (a.size || '').localeCompare(b.size || '', 'ko');
+  });
+}
+
+function renderItems() {
+  const el = document.getElementById('items');
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const filtered = q
+    ? state.items.filter(i =>
+        i.plant.toLowerCase().includes(q) ||
+        (i.size || '').toLowerCase().includes(q)
+      )
+    : state.items;
+
+  if (!state.items.length) {
+    el.innerHTML = '<div class="empty">이 구역의 품목이 없습니다<br>＋ 품목 추가 버튼을 눌러주세요</div>';
+    updateSummary();
+    return;
+  }
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty">검색 결과 없음</div>';
+    updateSummary();
+    return;
+  }
+
+  const sorted = sortItems(filtered);
+
+  el.innerHTML = sorted.map(item => {
+    const k = keyOf(item);
+    const d = state.deltas[k] || 0;
+    const final = item.expected + d;
+    const changed = d !== 0 ? ' changed' : '';
+    const zero = final <= 0 ? ' zero' : '';
+    const deltaCls = d < 0 ? 'neg' : d > 0 ? 'pos' : 'zero';
+    const deltaTxt = d > 0 ? `+${d}` : (d < 0 ? `${d}` : `${final}개`);
+    const keyEsc = escapeAttr(k);
+    const sizeTag = item.size ? `<span class="item-size">${escapeHtml(item.size)}</span>` : '';
+    const subTxt = d !== 0
+      ? `${item.expected}개 → <b style="color:var(--ink)">${final}개</b>`
+      : `현재 ${item.expected}개`;
+
+    return `
+  <div class="item${changed}${zero}"
+       ontouchstart="pressStart('${keyEsc}')"
+       ontouchend="pressEnd()"
+       ontouchmove="pressEnd()"
+       onmousedown="pressStart('${keyEsc}')"
+       onmouseup="pressEnd()"
+       onmouseleave="pressEnd()">
+    <div class="item-info">
+          <div class="item-name">${escapeHtml(item.plant)}${sizeTag}</div>
+          <div class="item-sub">${subTxt}</div>
+        </div>
+        <div class="item-ctrl">
+          <button class="cbtn minus" onclick="openKeypad('${keyEsc}','-')">−</button>
+          <span class="delta ${deltaCls}">${deltaTxt}</span>
+          <button class="cbtn plus" onclick="openKeypad('${keyEsc}','+')">+</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  updateSummary();
+}
+
+function updateSummary() {
+  const n = Object.keys(state.deltas).length;
+  document.getElementById('summary').innerHTML = `조정 <b>${n}</b>건`;
+  document.getElementById('submit-btn').disabled = n === 0;
+}
+
+function goFarm() { show('farm'); }
+function goBackFromItems() {
+  // use_zones=N 농장은 구역화면 건너뛰었으므로 바로 농장으로
+  if (state.farm && state.farm.use_zones === 'N') { show('farm'); return; }
+  // 아니면 구역화면으로
+  selectFarm(state.farm);
+}
+
+// ===== 키패드 모달 =====
+function findItemByKey(k) {
+  return state.items.find(i => keyOf(i) === k);
+}
+
+function openKeypad(itemKey, mode) {
+  const item = findItemByKey(itemKey);
+  if (!item) return;
+  state.keypad = { itemKey, mode, value: '' };
+  document.getElementById('keypad-title').textContent =
+    mode === '-' ? '차감할 수량' : '추가할 수량';
+  document.getElementById('keypad-sub').textContent =
+    item.plant + (item.size ? ' · ' + item.size : '');
+  updateKeypadDisplay();
+  document.getElementById('keypad-modal').classList.add('show');
+}
+
+function closeKeypad() {
+  document.getElementById('keypad-modal').classList.remove('show');
+  state.keypad = null;
+}
+
+function kpDigit(d) {
+  if (!state.keypad) return;
+  if (state.keypad.value.length >= 5) return;
+  if (state.keypad.value === '' && d === '0') return; // 선행 0 방지
+  state.keypad.value += d;
+  updateKeypadDisplay();
+}
+
+function kpBack() {
+  if (!state.keypad) return;
+  state.keypad.value = state.keypad.value.slice(0, -1);
+  updateKeypadDisplay();
+}
+
+function updateKeypadDisplay() {
+  if (!state.keypad) return;
+  const v = state.keypad.value || '0';
+  const n = parseInt(v, 10) || 0;
+  const item = findItemByKey(state.keypad.itemKey);
+  const curDelta = state.deltas[state.keypad.itemKey] || 0;
+  const newDelta = state.keypad.mode === '-' ? curDelta - n : curDelta + n;
+  const final = item.expected + newDelta;
+  const valEl = document.getElementById('keypad-val');
+  valEl.textContent = (state.keypad.mode === '-' ? '−' : '+') + v;
+  valEl.className = 'val ' + (state.keypad.mode === '-' ? 'minus' : 'plus');
+  document.getElementById('keypad-preview').innerHTML =
+    n > 0 ? `현재 ${item.expected}개 → <b style="color:var(--ink)">${Math.max(0, final)}개</b>` : `&nbsp;`;
+}
+
+function kpConfirm() {
+  if (!state.keypad) return;
+  const n = parseInt(state.keypad.value, 10) || 0;
+  if (n === 0) { closeKeypad(); return; }
+  const { itemKey, mode } = state.keypad;
+  const item = findItemByKey(itemKey);
+  const cur = state.deltas[itemKey] || 0;
+  let nextDelta = mode === '-' ? cur - n : cur + n;
+  // 재고 음수 방지
+  if (item.expected + nextDelta < 0) nextDelta = -item.expected;
+  if (nextDelta === 0) delete state.deltas[itemKey];
+  else state.deltas[itemKey] = nextDelta;
+  closeKeypad();
+  renderItems();
+}
+
+function modalBgClick(e, which) {
+  if (e.target.classList.contains('modal')) {
+    if (which === 'keypad') closeKeypad();
+    else if (which === 'add') closeAddItem();
+  }
+}
+
+// ===== 품목 추가 모달 =====
+function openAddItem() {
+  if (!state.zone) return;
+  document.getElementById('add-sub').textContent = state.zone.name;
+  document.getElementById('new-plant').value = '';
+  document.getElementById('new-size').value = '';
+  document.getElementById('new-qty').value = '';
+  document.getElementById('add-modal').classList.add('show');
+  setTimeout(() => document.getElementById('new-plant').focus(), 100);
+}
+
+function closeAddItem() {
+  document.getElementById('add-modal').classList.remove('show');
+  document.activeElement && document.activeElement.blur();
+}
+
+async function saveNewItem() {
+  const plant = document.getElementById('new-plant').value.trim();
+  const size = document.getElementById('new-size').value.trim();
+  const qty = parseInt(document.getElementById('new-qty').value, 10);
+
+  if (!plant) { toast('품목명을 입력하세요', 'error'); return; }
+  if (isNaN(qty) || qty < 0) { toast('수량을 올바르게 입력하세요', 'error'); return; }
+
+  // 중복 체크
+  const dup = state.items.find(i => i.plant === plant && (i.size || '') === size);
+  if (dup) { toast('이미 등록된 품목입니다', 'error'); return; }
+
+  const btn = document.getElementById('add-save-btn');
+  btn.disabled = true;
+  btn.textContent = '저장 중...';
+
+  try {
+    await fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'addItem',
+        zone_id: state.zone.id,
+        plant, size,
+        expected: qty
+      }),
+      redirect: 'follow'
+    });
+    const newItem = { zone_id: state.zone.id, plant, size, expected: qty };
+    state.items.push(newItem);
+    if (state.cache) {
+      state.cache.items.push(newItem);
+      saveCache(state.cache);
+    }
+    closeAddItem();
+    renderItems();
+    toast('품목 추가 완료', 'success');
+  } catch (e) {
+    toast('추가 실패. 다시 시도하세요', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '추가';
+  }
+}
+
+// ===== 승인 =====
+async function submit() {
+  const changes = Object.entries(state.deltas);
+  if (changes.length === 0) return;
+
+  const payload = {
+    worker_id: state.worker.id,
+    worker_name: state.worker.name,
+    farm_id: state.farm.id,
+    farm_name: state.farm.name,
+    zone_id: state.zone.id,
+    zone_name: state.zone.name,
+    adjustments: changes.map(([k, delta]) => {
+      const it = state.items.find(i => keyOf(i) === k);
+      return {
+        plant: it.plant,
+        size: it.size || '',
+        expected: it.expected,
+        delta,
+        final: Math.max(0, it.expected + delta)
+      };
+    })
+  };
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '전송 중...';
+
+  try {
+    await fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      redirect: 'follow'
+    });
+
+    // 로컬 상태/캐시 갱신 (expected = final)
+    payload.adjustments.forEach(a => {
+      const idx = state.items.findIndex(i => i.plant === a.plant && (i.size || '') === (a.size || '') && i.zone_id === state.zone.id);
+      if (idx >= 0) state.items[idx].expected = a.final;
+      if (state.cache) {
+        const cidx = state.cache.items.findIndex(i =>
+          i.plant === a.plant && (i.size || '') === (a.size || '') && i.zone_id === state.zone.id);
+        if (cidx >= 0) state.cache.items[cidx].expected = a.final;
+      }
+    });
+    if (state.cache) saveCache(state.cache);
+
+    state.deltas = {};
+    toast(`${changes.length}건 승인 완료`, 'success');
+    setTimeout(() => {
+      btn.textContent = '승인하기';
+      renderItems();
+    }, 700);
+  } catch (e) {
+    toast('전송 실패. 다시 시도해주세요', 'error');
+    btn.disabled = false;
+    btn.textContent = '승인하기';
+  }
+}
+
+// ===== 유틸 =====
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s) {
+  return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+let toastTimer;
+function toast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('worker-menu');
+  const badge = document.getElementById('worker-badge');
+  if (!menu.contains(e.target) && e.target !== badge) {
+    menu.classList.remove('show');
+  }
+});
+
+document.addEventListener('keydown', e => {
+  const active = document.querySelector('.screen.active');
+  if (active && active.id === 'screen-pin') {
+    if (e.key >= '0' && e.key <= '9') enterDigit(e.key);
+    else if (e.key === 'Backspace') removeDigit();
+  }
+  if (document.getElementById('keypad-modal').classList.contains('show')) {
+    if (e.key >= '0' && e.key <= '9') kpDigit(e.key);
+    else if (e.key === 'Backspace') kpBack();
+    else if (e.key === 'Enter') kpConfirm();
+    else if (e.key === 'Escape') closeKeypad();
+  }
+});
+
+// ===== 길게 누르기 → 수정 모달 =====
+let pressTimer = null;
+let pressedKey = null;
+
+function pressStart(key) {
+  pressedKey = key;
+  pressTimer = setTimeout(() => {
+    if (pressedKey === key) openEditItem(key);
+    pressTimer = null;
+  }, 600); // 0.6초
+}
+function pressEnd() {
+  if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+  pressedKey = null;
+}
+
+function openEditItem(itemKey) {
+  const item = findItemByKey(itemKey);
+  if (!item) return;
+  state.editing = { oldKey: itemKey, oldPlant: item.plant, oldSize: item.size || '' };
+  document.getElementById('edit-plant').value = item.plant;
+  document.getElementById('edit-size').value = item.size || '';
+  document.getElementById('edit-modal').classList.add('show');
+  // 햅틱 (지원 기기만)
+  if (navigator.vibrate) navigator.vibrate(30);
+}
+
+function closeEditItem() {
+  document.getElementById('edit-modal').classList.remove('show');
+  state.editing = null;
+  document.activeElement && document.activeElement.blur();
+}
+
+async function saveEditItem() {
+  if (!state.editing) return;
+  const newPlant = document.getElementById('edit-plant').value.trim();
+  const newSize = document.getElementById('edit-size').value.trim();
+  if (!newPlant) { toast('품목명을 입력하세요', 'error'); return; }
+
+  const { oldPlant, oldSize } = state.editing;
+  if (newPlant === oldPlant && newSize === oldSize) { closeEditItem(); return; }
+
+  // 중복 체크 (자기 자신 제외)
+  const dup = state.items.find(i =>
+    i.plant === newPlant && (i.size || '') === newSize
+    && !(i.plant === oldPlant && (i.size || '') === oldSize));
+  if (dup) { toast('같은 이름/규격이 이미 있습니다', 'error'); return; }
+
+  const btn = document.getElementById('edit-save-btn');
+  btn.disabled = true;
+  btn.textContent = '저장 중...';
+
+  try {
+    await fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'updateItem',
+        zone_id: state.zone.id,
+        old_plant: oldPlant,
+        old_size: oldSize,
+        new_plant: newPlant,
+        new_size: newSize
+      }),
+      redirect: 'follow'
+    });
+
+    // 로컬 상태/캐시 동기화
+    const updateRow = (arr) => {
+      const idx = arr.findIndex(i =>
+        i.zone_id === state.zone.id && i.plant === oldPlant && (i.size || '') === oldSize);
+      if (idx >= 0) { arr[idx].plant = newPlant; arr[idx].size = newSize; }
+    };
+    updateRow(state.items);
+    if (state.cache) { updateRow(state.cache.items); saveCache(state.cache); }
+
+    // 진행 중이던 delta 키도 이어주기
+    const oldK = oldPlant + '|' + oldSize;
+    const newK = newPlant + '|' + newSize;
+    if (state.deltas[oldK] !== undefined) {
+      state.deltas[newK] = state.deltas[oldK];
+      delete state.deltas[oldK];
+    }
+
+    closeEditItem();
+    renderItems();
+    toast('수정 완료', 'success');
+  } catch (e) {
+    toast('수정 실패', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '저장';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
