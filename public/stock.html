@@ -683,10 +683,17 @@ async function fetchWithRetry(url, attempts = 3, timeoutMs = 12000) {
       const timer = setTimeout(() => ctrl.abort(), timeoutMs);
       const res = await fetch(url, { signal: ctrl.signal, cache: 'no-store' });
       clearTimeout(timer);
+      // 인증 문제는 재시도해도 같으므로 바로 알립니다.
+      if (res.status === 401) {
+        const err = new Error('작업자 인증이 필요합니다');
+        err.status = 401;
+        throw err;
+      }
       if (!res.ok) throw new Error('HTTP ' + res.status);
       return await res.json();
     } catch (e) {
       lastErr = e;
+      if (e.status === 401) throw e;
       if (i < attempts - 1) await new Promise(r => setTimeout(r, 600 * (i + 1)));
     }
   }
@@ -727,12 +734,19 @@ async function loadAll(forceRefresh = false) {
 
   el.innerHTML = '<div class="loading">데이터 불러오는 중...</div>';
   try {
-    const data = await fetchWithRetry(`${ENDPOINT}?action=all`);
+    const pin = encodeURIComponent((state.worker && state.worker.pin) || '');
+    const data = await fetchWithRetry(`${ENDPOINT}?action=all&pin=${pin}`);
     if (data.error) throw new Error(data.error);
     state.cache = data;
     saveCache(data);
     renderFarms();
   } catch (e) {
+    // PIN이 더 이상 유효하지 않으면 로그인 화면으로 되돌립니다.
+    if (e.status === 401) {
+      toast('다시 로그인해주세요', 'error');
+      resetWorkerSilent();
+      return;
+    }
     el.innerHTML = `<div class="err">불러오기 실패<br><button onclick="loadAll(true)">다시 시도</button></div>`;
   }
 }

@@ -258,7 +258,12 @@ module.exports = async (req, res) => {
         if (!worker) return res.status(200).json({ error: 'invalid pin' });
         return res.status(200).json(worker);
       }
-      if (action === 'all') return await handleAll(req, res);
+      if (action === 'all') {
+        // 재고 목록도 PIN 없이는 못 봅니다(URL만 알아도 전체 재고가 노출되던 것 차단).
+        const viewer = await findWorker(req.query.pin);
+        if (!viewer) return res.status(401).json({ error: '작업자 인증이 필요합니다.' });
+        return await handleAll(req, res);
+      }
       return res.status(400).json({ error: '알 수 없는 action' });
     }
 
