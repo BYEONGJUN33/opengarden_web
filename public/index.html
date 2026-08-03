@@ -6,7 +6,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>오픈가든 — 글로벌 직수입 정원수 식물 B2B 공급</title>
 <meta name="description" content="정원수·관목·초화·그라스·구근을 글로벌 현지 농가에서 직수입해 공급합니다. 카탈로그에서 고르고 카카오톡으로 견적받으세요.">
-<!-- 카톡·SNS 공유 미리보기 (og.jpg 제작 후 assets에 업로드, 도메인 확정 시 og:url 교체) -->
+<!-- 카톡·SNS 공유 미리보기 -->
+<link rel="canonical" href="https://open-garden.co.kr/">
+<meta property="og:url" content="https://open-garden.co.kr/">
+<meta property="og:site_name" content="오픈가든">
 <meta property="og:type" content="website">
 <meta property="og:title" content="오픈가든 — 글로벌 직수입 정원수 식물 B2B 공급">
 <meta property="og:description" content="라이브 카탈로그에서 고르고, 카카오톡으로 바로 견적받으세요.">
@@ -197,9 +200,10 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
   <div class="wrap about-grid">
     <div>
       <div class="kicker-s">ABOUT</div>
-      <h2>유럽 농장과 국내 현장을<br>잇는 사람들</h2>
+      <h2>세계 각지의 농가와<br>국내 현장을 잇는 사람들</h2>
       <p>유럽과 글로벌 현지 농가에서 직수입한 식물을 국내 농가, 조경회사, 가든센터에 공급합니다.<br>수입 품종에는 내한성 정보를 표기해 우리 기후에 맞는 선택을 돕습니다.</p>
       <p>문의부터 제안서, 납품까지 담당자가 직접 챙깁니다. 찾는 품종이 목록에 없으면 문의 주세요 고객과 한팀이 되어 찾아드립니다.</p>
+      <a href="/about.html" class="btn" style="margin-top:26px;padding:13px 28px;font-size:15px">거래 네트워크 · 수입 과정 보기</a>
     </div>
     <div class="img-ph"><img src="/assets/about.jpg" alt="온실에서 자라는 묘목 — 오픈가든 육묘 현장" loading="lazy"></div>
   </div>
@@ -263,11 +267,14 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
   </div>
 </section>
 
-<!-- 8. FAQ -->
+<!-- 8. FAQ (대표 질문만 — 전체는 /faq.html) -->
 <section class="proj" id="faq">
   <div class="wrap">
     <h2 class="center">자주 묻는 질문</h2>
     <div class="faq-list" id="flist"></div>
+    <div class="center" style="margin-top:28px">
+      <a href="/faq.html" class="btn" style="background:#fff;color:var(--green-dark);border:1.5px solid var(--line)">전체 FAQ 보기</a>
+    </div>
   </div>
 </section>
 
@@ -303,13 +310,10 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 </footer>
 
 <script>
-// FAQ 축약 6문항 (답변 확정 시 교체)
+// 홈에는 대표 질문 4개만 — 전체 목록은 /faq.html 에서 관리 (중복 수정 방지)
 const FAQ=[
  ["견적은 어떻게 요청하나요?","카탈로그에서 원하는 품종을 담고 연락처를 남겨주시면 접수가 완료됩니다. 담당자가 재고·시즌을 확인해 연락드립니다. 급하시면 카카오톡 채널로 바로 문의하셔도 됩니다."],
- ["견적 요청 후 얼마나 걸리나요?","영업일 기준으로 빠르게 확인해 연락드립니다. 접수 시 발급되는 요청번호(Q-…)를 알려주시면 더 빠르게 조회됩니다."],
  ["가격은 왜 사이트에 없나요?","B2B 거래 특성상 수량·시기·규격에 따라 단가가 달라져 견적서로 안내드립니다."],
- ["규격 표기(P9, C2 등)는 어떤 의미인가요?","유럽 묘목 규격으로 화분 크기와 형태를 나타냅니다. 상세 기준은 카탈로그에서 확인할 수 있습니다."],
- ["내한성 존(Zone)은 무엇인가요?","식물이 견딜 수 있는 최저 기온 범위를 나타내는 기준입니다. 유럽 수입 품종에 표기되어 있습니다."],
  ["즉시 출하와 사전 예약의 차이는 무엇인가요?","즉시 출하는 현재 재고에서 바로 공급 가능한 품목, 사전 예약은 시즌에 맞춰 수입·공급되는 품목입니다."],
  ["수입 식물의 검역은 어떻게 처리되나요?","수입 검역 및 관련 절차는 오픈가든이 관리하며, 필요한 서류를 함께 제공해드립니다."]
 ];

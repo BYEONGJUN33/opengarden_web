@@ -12,9 +12,10 @@
 body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);line-height:1.75;font-size:15px}
 .wrap{max-width:760px;margin:0 auto;padding:0 20px}
 header{position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.nav{display:flex;align-items:center;justify-content:space-between;height:60px}
-.logo{font-weight:800;font-size:19px;color:var(--ink);text-decoration:none}
-.logo em{font-style:normal;color:var(--green)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:70px}
+.logo{display:inline-flex;align-items:center;text-decoration:none}
+.logo img{height:58px;width:auto;display:block}
+@media(max-width:640px){.logo img{height:48px}}
 main{padding:56px 0 90px}
 h1{font-size:clamp(24px,4vw,32px);font-weight:800;letter-spacing:-.03em}
 .date{color:var(--gray);font-size:13px;margin-top:6px}
@@ -25,7 +26,7 @@ ul{padding-left:20px}
 </style>
 </head>
 <body>
-<header><div class="wrap nav"><a class="logo" href="/">Open<em>Garden</em></a><a href="/" style="font-size:14px;color:var(--gray);text-decoration:none">홈으로</a></div></header>
+<header><div class="wrap nav"><a class="logo" href="/"><img src="/assets/logo.png" alt="오픈가든 Open Garden"></a><a href="/" style="font-size:14px;color:var(--gray);text-decoration:none">홈으로</a></div></header>
 <main class="wrap">
   <h1>개인정보 처리방침</h1>
   <p class="date">시행일: 2026년 7월 28일</p>
