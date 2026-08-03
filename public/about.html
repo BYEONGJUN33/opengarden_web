@@ -10,7 +10,7 @@
 <meta property="og:site_name" content="오픈가든">
 <meta property="og:type" content="website">
 <meta property="og:title" content="회사 소개 | 오픈가든">
-<meta property="og:description" content="6개국 현지 농가와 직접 거래하는 글로벌 네트워크와 수입 과정을 소개합니다.">
+<meta property="og:description" content="세계 각지의 협력 농가와 직접 거래하는 글로벌 네트워크와 수입 과정을 소개합니다.">
 <meta property="og:image" content="https://open-garden.co.kr/assets/og.jpg">
 <link rel="icon" href="/assets/logo_green_notext.png" type="image/png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -50,8 +50,8 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
 .mapwrap{position:relative;max-width:980px;margin:40px auto 0;aspect-ratio:1600/556}
 .mapdots{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:.85}
 .mapsvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.mapsvg .arc{fill:none;stroke:url(#ag);stroke-width:2.4;stroke-linecap:round;opacity:.9}
-.mapsvg .mk-ring{fill:none;stroke:var(--green);stroke-width:2}
+.mapsvg .arc{fill:none;stroke:url(#ag);stroke-width:1.5;stroke-linecap:round;opacity:.72}
+.mapsvg .mk-ring{fill:#fff;stroke:var(--green);stroke-width:1.4}
 .mapsvg .mk-dot{fill:var(--green)}
 .mapsvg .kor-ring{fill:none;stroke:var(--green-dark);stroke-width:2.5}
 .mapsvg .kor-dot{fill:var(--green-dark)}
@@ -123,8 +123,8 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <section class="mapsec">
   <div class="wrap center">
     <div class="kicker-s">GLOBAL NETWORK</div>
-    <h2>6개국 현지 농가와<br>직접 거래합니다.</h2>
-    <p class="sub">네덜란드·이탈리아·미국·캐나다·중국·대만의 검증된 협력 농가에서 직수입합니다.</p>
+    <h2>세계 각지의 협력 농가와<br>직접 거래합니다.</h2>
+    <p class="sub">네덜란드·이탈리아·미국·캐나다·중국·대만 등 여러 나라의 협력 농가에서 직수입합니다.</p>
     <div class="mapwrap">
       <img class="mapdots" src="/assets/worldmap-dots.png" alt="오픈가든 글로벌 거래 네트워크 세계지도">
       <svg class="mapsvg" viewBox="0 0 1600 556" role="img" aria-label="거래처 국가에서 한국으로 이어지는 글로벌 네트워크 지도">
@@ -133,26 +133,40 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
             <stop offset="0" stop-color="#4e7a5e"/><stop offset="1" stop-color="#1F4D33"/>
           </linearGradient>
         </defs>
-      <path class="arc" d="M 260.0 123.7 Q 530.0 63.9 800.0 189.0"/>
-      <path class="arc" d="M 291.1 169.0 Q 545.6 92.5 800.0 189.0"/>
-      <path class="arc" d="M 715.6 195.7 Q 757.8 178.0 800.0 189.0"/>
-      <path class="arc" d="M 773.3 250.4 Q 786.7 208.4 800.0 189.0"/>
-      <path class="arc" d="M 1400.0 182.4 Q 1100.0 83.7 800.0 189.0"/>
-      <path class="arc" d="M 1391.1 115.6 Q 1095.6 51.1 800.0 189.0"/>
-      <g class="mk"><circle cx="260.0" cy="123.7" r="7.5" class="mk-ring"/><circle cx="260.0" cy="123.7" r="3.2" class="mk-dot"/></g>
-      <g class="mk"><circle cx="291.1" cy="169.0" r="7.5" class="mk-ring"/><circle cx="291.1" cy="169.0" r="3.2" class="mk-dot"/></g>
-      <g class="mk"><circle cx="715.6" cy="195.7" r="7.5" class="mk-ring"/><circle cx="715.6" cy="195.7" r="3.2" class="mk-dot"/></g>
-      <g class="mk"><circle cx="773.3" cy="250.4" r="7.5" class="mk-ring"/><circle cx="773.3" cy="250.4" r="3.2" class="mk-dot"/></g>
-      <g class="mk"><circle cx="1400.0" cy="182.4" r="7.5" class="mk-ring"/><circle cx="1400.0" cy="182.4" r="3.2" class="mk-dot"/></g>
-      <g class="mk"><circle cx="1391.1" cy="115.6" r="7.5" class="mk-ring"/><circle cx="1391.1" cy="115.6" r="3.2" class="mk-dot"/></g>
-      <g class="mk-kor"><circle cx="800.0" cy="189.0" r="13" class="kor-pulse"/><circle cx="800.0" cy="189.0" r="8.5" class="kor-ring"/><circle cx="800.0" cy="189.0" r="4.5" class="kor-dot"/></g>
-      <text class="lbl" x="260.0" y="107.7">네덜란드</text>
-      <text class="lbl" x="291.1" y="195.0">이탈리아</text>
-      <text class="lbl" x="697.6" y="219.7">중국</text>
-      <text class="lbl" x="773.3" y="276.4">대만</text>
-      <text class="lbl" x="1400.0" y="208.4">미국</text>
-      <text class="lbl" x="1391.1" y="101.6">캐나다</text>
-      <text class="lbl lbl-kor" x="800.0" y="219.0">대한민국</text>
+      <path class="arc" d="M 256.3 124.2 Q 528.1 85.4 800.0 189.0"/>
+      <path class="arc" d="M 256.3 126.9 Q 528.1 67.7 800.0 189.0"/>
+      <path class="arc" d="M 260.6 124.9 Q 530.3 48.3 800.0 189.0"/>
+      <path class="arc" d="M 262.5 127.0 Q 531.3 30.9 800.0 189.0"/>
+      <path class="arc" d="M 284.1 160.4 Q 542.0 107.6 800.0 189.0"/>
+      <path class="arc" d="M 282.2 154.3 Q 541.1 86.1 800.0 189.0"/>
+      <path class="arc" d="M 775.1 217.1 Q 787.6 195.6 800.0 189.0"/>
+      <path class="arc" d="M 763.6 213.5 Q 781.8 191.0 800.0 189.0"/>
+      <path class="arc" d="M 755.6 193.0 Q 777.8 185.2 800.0 189.0"/>
+      <path class="arc" d="M 771.1 249.1 Q 785.6 208.1 800.0 189.0"/>
+      <path class="arc" d="M 769.8 253.5 Q 784.9 207.0 800.0 189.0"/>
+      <path class="arc" d="M 1289.8 154.3 Q 1044.9 56.3 800.0 189.0"/>
+      <path class="arc" d="M 1295.6 184.6 Q 1047.8 122.4 800.0 189.0"/>
+      <path class="arc" d="M 1451.6 196.2 Q 1125.8 85.1 800.0 189.0"/>
+      <path class="arc" d="M 1289.8 137.0 Q 1044.9 64.5 800.0 189.0"/>
+      <path class="arc" d="M 1481.8 161.9 Q 1140.9 15.1 800.0 189.0"/>
+      <g class="mk"><circle cx="256.3" cy="124.2" r="4" class="mk-ring"/><circle cx="256.3" cy="124.2" r="1.7" class="mk-dot"/></g>
+      <g class="mk"><circle cx="256.3" cy="126.9" r="4" class="mk-ring"/><circle cx="256.3" cy="126.9" r="1.7" class="mk-dot"/></g>
+      <g class="mk"><circle cx="260.6" cy="124.9" r="4" class="mk-ring"/><circle cx="260.6" cy="124.9" r="1.7" class="mk-dot"/></g>
+      <g class="mk"><circle cx="262.5" cy="127.0" r="4" class="mk-ring"/><circle cx="262.5" cy="127.0" r="1.7" class="mk-dot"/></g>
+      <g class="mk"><circle cx="284.1" cy="160.4" r="4" class="mk-ring"/><circle cx="284.1" cy="160.4" r="1.7" class="mk-dot"/></g>
+      <g class="mk"><circle cx="282.2" cy="154.3" r="4" class="mk-ring"/><circle cx="282.2" cy="154.3" r="1.7" class="mk-dot"/></g>
+      <g class="mk"><circle cx="775.1" cy="217.1" r="4" class="mk-ring"/><circle cx="775.1" cy="217.1" r="1.7" class="mk-dot"/></g>
+      <g class="mk"><circle cx="763.6" cy="213.5" r="4" class="mk-ring"/><circle cx="763.6" cy="213.5" r="1.7" class="mk-dot"/></g>
+      <g class="mk"><circle cx="755.6" cy="193.0" r="4" class="mk-ring"/><circle cx="755.6" cy="193.0" r="1.7" class="mk-dot"/></g>
+      <g class="mk"><circle cx="771.1" cy="249.1" r="4" class="mk-ring"/><circle cx="771.1" cy="249.1" r="1.7" class="mk-dot"/></g>
+      <g class="mk"><circle cx="769.8" cy="253.5" r="4" class="mk-ring"/><circle cx="769.8" cy="253.5" r="1.7" class="mk-dot"/></g>
+      <g class="mk"><circle cx="1289.8" cy="154.3" r="4" class="mk-ring"/><circle cx="1289.8" cy="154.3" r="1.7" class="mk-dot"/></g>
+      <g class="mk"><circle cx="1295.6" cy="184.6" r="4" class="mk-ring"/><circle cx="1295.6" cy="184.6" r="1.7" class="mk-dot"/></g>
+      <g class="mk"><circle cx="1451.6" cy="196.2" r="4" class="mk-ring"/><circle cx="1451.6" cy="196.2" r="1.7" class="mk-dot"/></g>
+      <g class="mk"><circle cx="1289.8" cy="137.0" r="4" class="mk-ring"/><circle cx="1289.8" cy="137.0" r="1.7" class="mk-dot"/></g>
+      <g class="mk"><circle cx="1481.8" cy="161.9" r="4" class="mk-ring"/><circle cx="1481.8" cy="161.9" r="1.7" class="mk-dot"/></g>
+      <g class="mk-kor"><circle cx="800.0" cy="189.0" r="14" class="kor-pulse"/><circle cx="800.0" cy="189.0" r="9" class="kor-ring"/><circle cx="800.0" cy="189.0" r="4.8" class="kor-dot"/></g>
+      <text class="lbl lbl-kor" x="800.0" y="221.0">대한민국</text>
       </svg>
     </div>
     <p class="mapnote">* 표시된 국가는 주요 거래·수입 지역입니다.</p>
