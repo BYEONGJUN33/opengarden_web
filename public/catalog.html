@@ -113,6 +113,7 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 .rm:hover{color:#8a3a2d}
 .field{margin-top:14px}
 .field label{font-size:12.5px;font-weight:700;color:var(--gray);display:block;margin-bottom:5px}
+.field label .hint{font-weight:500;color:#9aa39c}
 .field input,.field textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;font-family:inherit;font-size:14px;outline:0}
 .field input:focus,.field textarea:focus{border-color:var(--green)}
 .send{width:100%;margin-top:20px;background:var(--kakao);color:#191919;border:0;border-radius:12px;padding:15px 0;font-size:15.5px;font-weight:800;transition:transform .2s ease,box-shadow .2s ease}
@@ -194,16 +195,16 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 <main class="wrap"><div class="grid" id="grid"></div></main>
 
 <!-- 오른쪽 아래 카카오 채팅 버튼 -->
-<a class="chat-fab" id="chatFab" href="https://pf.kakao.com/_lGfxhX/chat" target="_blank" rel="noopener" aria-label="카카오톡으로 문의하기">
+<a class="chat-fab" id="chatFab" href="https://pf.kakao.com/_lGfxhX/chat" target="_blank" rel="noopener" aria-label="카카오톡 상담">
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 2.8 1.9 5.3 4.7 6.7-.2.7-.7 2.6-.8 3 0 0 0 .3.2.4.1.1.3 0 .4 0 .3-.2 2.6-1.8 3.6-2.5.6.1 1.3.1 1.9.1 5.5 0 10-3.6 10-8S17.5 3 12 3z"/></svg>
-  <span class="lbl">카톡 문의</span>
+  <span class="lbl">카카오톡 상담</span>
 </a>
 
 <!-- 하단 견적 바 -->
 <div class="quote-bar" id="bar">
   <div class="wrap">
     <div class="info"><b id="barCount">0종</b> 선택됨 · 가격은 견적서로 안내됩니다</div>
-    <button class="go" onclick="openModal()">견적 요청하기</button>
+    <button class="go" onclick="openModal()">견적 받기</button>
   </div>
 </div>
 
@@ -213,14 +214,14 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
     <button class="close" onclick="closeModal()" aria-label="닫기">✕</button>
     <div id="qform">
       <h2>견적 요청</h2>
-      <p class="desc">수량과 연락처만 확인해 접수해주세요. 담당자가 재고·시즌을 확인해 견적으로 연락드립니다.</p>
+      <p class="desc">연락처만 남기시면 접수됩니다. 담당자가 재고·시즌을 확인해 견적으로 연락드립니다.</p>
       <div id="items"></div>
-      <div class="field"><label for="fphone">연락처 (필수)</label><input id="fphone" type="tel" inputmode="tel" placeholder="010-0000-0000"></div>
-      <div class="field"><label for="fname">성함 / 소속 (선택)</label><input id="fname" placeholder="예: 홍길동 / ○○조경"></div>
-      <div class="field"><label for="fmemo">요청 사항 (선택)</label><textarea id="fmemo" rows="2" placeholder="납품 희망 시기, 현장 위치 등"></textarea></div>
+      <div class="field"><label for="fphone">연락처 (필수) <span class="hint">· 견적 안내에만 사용합니다</span></label><input id="fphone" type="tel" inputmode="tel" placeholder="010-0000-0000"></div>
+      <div class="field"><label for="fname">성함 / 소속 (선택) <span class="hint">· 기업 담당자시면 소속을 남겨주세요</span></label><input id="fname" placeholder="예: 홍길동 / ○○조경"></div>
+      <div class="field"><label for="fmemo">요청 사항 (선택) <span class="hint">· 희망 규격·수량·납기를 적어주시면 더 빠릅니다</span></label><textarea id="fmemo" rows="2" placeholder="납품 희망 시기, 현장 위치 등"></textarea></div>
       <button class="send" onclick="sendQuote()">📨 견적 요청 접수하기</button>
       <div id="fallback" style="display:none;margin-top:14px">
-        <p style="font-size:12.5px;color:var(--gray);margin-bottom:6px">접수 서버에 연결할 수 없습니다. 아래 목록을 복사해 카카오톡으로 보내주세요.</p>
+        <p style="font-size:12.5px;color:var(--gray);margin-bottom:6px">일시적으로 접수가 지연되고 있어요. 아래 목록을 복사해 카카오톡으로 보내주시면 바로 확인해 드릴게요.</p>
         <textarea id="fallbackText" rows="7" readonly style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;font-family:inherit;font-size:13px" onclick="this.select()"></textarea>
         <button class="send" style="margin-top:10px" onclick="window.open(KAKAO_URL,'_blank')">복사했어요 — 카카오톡 열기</button>
       </div>
@@ -230,7 +231,7 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
       <div style="font-size:42px">✅</div>
       <h2 style="margin-top:6px">견적 요청이 접수되었습니다</h2>
       <p class="desc" style="margin-top:10px">요청번호 <b id="doneNo" style="color:var(--green)"></b><br>담당자가 확인 후 곧 연락드리겠습니다.</p>
-      <button class="send" onclick="openKakaoAfterDone()">💬 급하신가요? 카카오톡 바로 상담</button>
+      <button class="send" onclick="openKakaoAfterDone()">💬 급하신가요? 카카오톡 상담</button>
       <p class="send-note">버튼을 누르면 요청번호가 복사되고 오픈가든 채팅이 열립니다.</p>
     </div>
   </div>
@@ -464,7 +465,7 @@ async function sendQuote(){
     ].filter(x=>x!==null).join('\n');
     document.getElementById('fallback').style.display='block';
     document.getElementById('fallbackText').value=msg;
-    toast('접수 서버에 연결할 수 없습니다 — 목록을 복사해 카카오톡으로 보내주세요');
+    toast('접수가 지연되고 있어요 — 목록을 복사해 카카오톡으로 보내주세요');
   }
 }
 
