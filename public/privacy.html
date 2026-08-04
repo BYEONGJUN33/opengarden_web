@@ -17,6 +17,13 @@
 /* 한글 모바일 기본값 — 어절 단위 줄바꿈 + 긴 영문은 예외적으로 끊기 */
 body{word-break:keep-all;overflow-wrap:break-word}
 html{-webkit-text-size-adjust:100%}
+/* 제목 줄바꿈은 브라우저가 균형 배분 — 폭마다 <br>가 어긋나던 문제 해결
+   (ch는 숫자 0 기준이라 한글에 부정확 → em 사용) */
+h1,h2,h3{max-width:18em;text-wrap:balance}
+.hero h1{max-width:14em}
+p,li,dd{text-wrap:pretty}
+/* 가운데 정렬 문맥에서는 최대폭이 좌측으로 쏠리지 않게 */
+.center h1,.center h2,.page-head h1,.page-head h2,.band h2,.process-head h2,.endcta h2,.mapsec h2,.faq-cta h3{margin-inline:auto}
 /* PC에서만 살리는 줄바꿈 (모바일에선 자연스럽게 흐르게) */
 @media(max-width:767px){.pc-br{display:none}}
 /* iOS Safari가 입력창 탭 시 확대하지 않도록 — 16px 미만 금지 */
@@ -45,6 +52,35 @@ ul{padding-left:20px}
 .nav a.btn-nav{background:var(--green);color:#fff;font-weight:700;padding:9px 20px;border-radius:999px;box-shadow:0 2px 8px rgba(18,48,35,.15)}
 .nav a.btn-nav:hover{color:#fff;background:#123023}
 @media(max-width:700px){.nav a.link:not(.keep){display:none}}
+
+/* 모바일 햄버거 메뉴 */
+.hamburger{display:none;width:44px;height:44px;border:0;background:none;align-items:center;justify-content:center;margin-left:10px;padding:0}
+.hamburger svg{width:24px;height:24px;stroke:var(--ink);stroke-width:1.8;stroke-linecap:round}
+@media(max-width:700px){.hamburger{display:inline-flex}}
+.nav-overlay{position:fixed;inset:0;background:rgba(10,20,14,.45);z-index:80;opacity:0;transition:opacity .25s ease}
+.nav-overlay.show{opacity:1}
+.mobile-nav{position:fixed;top:0;right:0;bottom:0;width:min(82vw,320px);background:#fff;z-index:81;
+  padding:20px 22px calc(24px + env(safe-area-inset-bottom));transform:translateX(100%);
+  transition:transform .28s cubic-bezier(.22,.61,.36,1);display:flex;flex-direction:column;overflow-y:auto;
+  box-shadow:-8px 0 30px rgba(10,25,16,.18)}
+.mobile-nav.show{transform:none}
+.mnav-close{align-self:flex-end;width:44px;height:44px;border:0;background:none;padding:0;margin-bottom:6px}
+.mnav-close svg{width:22px;height:22px;stroke:var(--ink);stroke-width:1.8;stroke-linecap:round}
+.mobile-nav a.mitem{display:flex;align-items:center;min-height:52px;font-size:17px;font-weight:700;
+  color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line)}
+.mobile-nav a.mitem:active{color:var(--green)}
+.mnav-contact{margin-top:auto;padding-top:20px}
+.mnav-contact a{display:flex;align-items:center;gap:9px;min-height:48px;font-size:14.5px;font-weight:600;
+  color:var(--gray);text-decoration:none;word-break:break-all}
+.mnav-contact svg{width:18px;height:18px;flex:0 0 auto;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.mnav-contact a:last-child svg{stroke:none;fill:currentColor}
+@media(prefers-reduced-motion:reduce){.mobile-nav,.nav-overlay{transition:none}}
+
+
+/* 푸터 사업자 정보 — 모바일에선 세로 스택(구분자 숨김) */
+footer .biz{display:flex;flex-wrap:wrap;gap:0}
+footer .biz .sep{color:var(--line)}
+@media(max-width:767px){footer .biz{flex-direction:column;gap:4px}footer .biz .sep{display:none}}
 footer{padding:48px 0;font-size:13px;color:var(--gray);border-top:1px solid var(--line);margin-top:40px}
 footer .foot-logo{height:42px;margin-bottom:14px;display:block}
 footer a{color:var(--gray);text-decoration:none;font-weight:700}
@@ -58,9 +94,33 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
       <a class="link" href="/about.html">수입 과정</a>
       <a class="link" href="/faq.html">FAQ</a>
       <a class="link keep btn-nav" href="/catalog.html">카탈로그</a>
+      <button class="hamburger" id="navToggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="mobileNav">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
     </nav>
   </div>
 </header>
+
+<!-- 모바일 메뉴 (768px 미만) -->
+<div class="nav-overlay" id="navOverlay" hidden></div>
+<nav class="mobile-nav" id="mobileNav" aria-label="모바일 메뉴" hidden>
+  <button class="mnav-close" id="navClose" aria-label="메뉴 닫기">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <a class="mitem" href="/about.html">수입 과정</a>
+  <a class="mitem" href="/faq.html">자주 묻는 질문</a>
+  <a class="mitem" href="/catalog.html">카탈로그</a>
+  <div class="mnav-contact">
+    <!-- 대표전화 확보 시 여기에 <a href="tel:..."> 추가 -->
+    <a href="mailto:info@open-garden.co.kr">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+      info@open-garden.co.kr</a>
+    <a href="https://pf.kakao.com/_lGfxhX/chat" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 2.8 1.9 5.3 4.7 6.7-.2.7-.7 2.6-.8 3 0 0 0 .3.2.4.1.1.3 0 .4 0 .3-.2 2.6-1.8 3.6-2.5.6.1 1.3.1 1.9.1 5.5 0 10-3.6 10-8S17.5 3 12 3z"/></svg>
+      카카오톡 상담</a>
+  </div>
+</nav>
+
 <main class="wrap">
   <h1>개인정보 처리방침</h1>
   <p class="date">시행일: 2026년 7월 28일</p>
@@ -157,12 +217,54 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <footer>
   <div class="wrap">
     <img class="foot-logo" src="/assets/logo.png" alt="오픈가든 Open Garden">
-    <p>대표 : 이시형 | 주소 : 충청남도 천안시 동남구 풍세면 보성리 64-6<br>사업자등록번호 : 495-28-01860 | 이메일 : <a href="mailto:info@open-garden.co.kr">info@open-garden.co.kr</a></p>
+    <p class="biz"><span>대표 : 이시형</span><span class="sep"> | </span><span>주소 : 충청남도 천안시 동남구 풍세면 보성리 64-6</span><span class="sep"> | </span><span>사업자등록번호 : 495-28-01860</span><span class="sep"> | </span><span>이메일 : <a href="mailto:info@open-garden.co.kr">info@open-garden.co.kr</a></span></p>
     <p style="margin-top:10px">
       <a href="https://pf.kakao.com/_lGfxhX/chat" target="_blank" rel="noopener">카카오톡 채널</a> · <a href="/catalog.html">카탈로그</a> · <a href="/faq.html">자주 묻는 질문</a> · <a href="/privacy.html"><strong>개인정보 처리방침</strong></a>
     </p>
     <p style="margin-top:10px">© 2026 OpenGarden. All rights reserved.</p>
   </div>
 </footer>
+<script>
+// 모바일 메뉴 — 열기/닫기 + 접근성(ESC·포커스 트랩·스크롤 잠금)
+(function(){
+  var btn=document.getElementById('navToggle'),panel=document.getElementById('mobileNav'),
+      ov=document.getElementById('navOverlay'),closeBtn=document.getElementById('navClose');
+  if(!btn||!panel||!ov)return;
+  var lastFocus=null;
+  function items(){return panel.querySelectorAll('a[href],button:not([disabled])');}
+  function onKey(e){
+    if(e.key==='Escape'){close();return;}
+    if(e.key!=='Tab')return;
+    var f=[].slice.call(items()); if(!f.length)return;
+    var first=f[0],last=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  }
+  function open(){
+    lastFocus=document.activeElement;
+    panel.hidden=false;ov.hidden=false;
+    requestAnimationFrame(function(){panel.classList.add('show');ov.classList.add('show');});
+    btn.setAttribute('aria-expanded','true');
+    btn.setAttribute('aria-label','메뉴 닫기');
+    document.body.style.overflow='hidden';
+    var f=items(); if(f.length)f[0].focus();
+    document.addEventListener('keydown',onKey);
+  }
+  function close(){
+    panel.classList.remove('show');ov.classList.remove('show');
+    btn.setAttribute('aria-expanded','false');
+    btn.setAttribute('aria-label','메뉴 열기');
+    document.body.style.overflow='';
+    document.removeEventListener('keydown',onKey);
+    setTimeout(function(){panel.hidden=true;ov.hidden=true;},280);
+    // 닫으면 항상 햄버거 버튼으로 포커스 복귀 (키보드 사용자 위치 유지)
+    if(btn&&btn.focus)btn.focus(); else if(lastFocus&&lastFocus.focus)lastFocus.focus();
+  }
+  btn.addEventListener('click',open);
+  ov.addEventListener('click',close);
+  if(closeBtn)closeBtn.addEventListener('click',close);
+  [].forEach.call(panel.querySelectorAll('a'),function(a){a.addEventListener('click',close);});
+})();
+</script>
 </body>
 </html>
