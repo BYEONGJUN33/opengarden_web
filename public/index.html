@@ -17,6 +17,27 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/assets/logo_green_notext.png" type="image/png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "오픈가든",
+  "alternateName": "OpenGarden",
+  "url": "https://open-garden.co.kr/",
+  "logo": "https://open-garden.co.kr/assets/logo.png",
+  "image": "https://open-garden.co.kr/assets/og.jpg",
+  "description": "정원수·관목·초화·그라스·구근을 세계 각지의 현지 농가에서 직수입해 국내 농가·조경회사·가든센터에 공급하는 B2B 공급사입니다.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "KR",
+    "addressRegion": "충청남도",
+    "addressLocality": "천안시 동남구",
+    "streetAddress": "풍세면 보성리 64-6"
+  },
+  "founder": { "@type": "Person", "name": "이시형" },
+  "sameAs": ["https://pf.kakao.com/_lGfxhX"]
+}
+</script>
 <style>
 :root{--green:#1F4D33;--green-dark:#123023;--ink:#111814;--gray:#6b746e;--bg:#fff;--bg-soft:#F4F6F3;--line:#E4E8E3;--kakao:#FEE500}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -75,7 +96,8 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
 @media(max-width:820px){.stats{grid-template-columns:repeat(2,1fr)}}
 .stat{text-align:center;padding:36px 16px;border-radius:16px;background:#fff;border:1px solid var(--line);box-shadow:0 1px 2px rgba(20,40,28,.04),0 10px 28px rgba(20,40,28,.06);transition:transform .25s ease,box-shadow .25s ease}
 .stat:hover{transform:translateY(-4px);box-shadow:0 2px 4px rgba(20,40,28,.05),0 18px 44px rgba(20,40,28,.1)}
-.stat .ico{font-size:30px}
+.stat .ico{display:flex;justify-content:center}
+.stat .ico svg{width:30px;height:30px;stroke:var(--green);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .stat .label{font-size:14.5px;color:var(--gray);margin-top:12px}
 .stat .num{font-size:clamp(24px,3vw,32px);font-weight:800;color:var(--green);margin-top:4px;letter-spacing:-.02em}
 
@@ -114,13 +136,14 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
 /* 8. FAQ */
 .faq-list{max-width:760px;margin:44px auto 0}
 .qa{border-bottom:1px solid var(--line)}
-.qa>button{width:100%;display:flex;gap:14px;align-items:baseline;background:none;border:0;padding:20px 4px;text-align:left}
+.qa>summary{display:flex;gap:14px;align-items:baseline;padding:20px 4px;cursor:pointer;list-style:none}
+.qa>summary::-webkit-details-marker{display:none}
 .qa .q{color:var(--green);font-weight:800;font-size:16px}
 .qa .t{font-size:15.5px;font-weight:700;color:var(--ink);flex:1}
-.qa>button::after{content:"+";font-size:19px;color:var(--gray)}
-.qa.open>button::after{content:"−"}
-.qa .a{overflow:hidden;max-height:0;opacity:0;padding:0 4px 0 34px;font-size:14px;color:var(--gray);transition:max-height .35s ease,opacity .3s ease,padding .35s ease}
-.qa.open .a{max-height:240px;opacity:1;padding-bottom:20px}
+.qa>summary::after{content:"+";font-size:19px;color:var(--gray)}
+.qa[open]>summary::after{content:"−"}
+.qa>summary:hover .t{color:var(--green)}
+.qa .a{padding:0 4px 20px 34px;font-size:14px;color:var(--gray);line-height:1.7}
 
 /* 9. 마지막 CTA */
 .final{background:var(--green-dark);color:#fff;text-align:center;padding:110px 0}
@@ -187,10 +210,10 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
     <div class="kicker-s">OVERVIEW</div>
     <h2>더 다양한 품종을,<br>더 확실한 품질로.</h2>
     <div class="stats">
-      <div class="stat"><div class="ico">🌿</div><div class="label">판매 품종</div><div class="num" id="statCount">국내·유럽</div></div>
-      <div class="stat"><div class="ico">🚢</div><div class="label">공급 방식</div><div class="num">현지 직거래</div></div>
-      <div class="stat"><div class="ico">❄️</div><div class="label">내한성 표기</div><div class="num">Zone 4–9</div></div>
-      <div class="stat"><div class="ico">🗂️</div><div class="label">취급 카테고리</div><div class="num">8개 분류</div></div>
+      <div class="stat"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21V9M12 9c0-3 2-5 5-5 0 3-2 5-5 5zM12 12C12 9 10 7 7 7c0 3 2 5 5 5z"/></svg></div><div class="label">판매 품종</div><div class="num" id="statCount">국내·유럽</div></div>
+      <div class="stat"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 16h13l4-6h-6l-2-4H6z"/><path d="M3 16l1 3h15l1-3"/></svg></div><div class="label">공급 방식</div><div class="num">현지 직거래</div></div>
+      <div class="stat"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19"/></svg></div><div class="label">내한성 표기</div><div class="num">Zone 4–9</div></div>
+      <div class="stat"><div class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></div><div class="label">취급 카테고리</div><div class="num">8개 분류</div></div>
     </div>
   </div>
 </section>
@@ -270,8 +293,26 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <!-- 8. FAQ (대표 질문만 — 전체는 /faq.html) -->
 <section class="proj" id="faq">
   <div class="wrap">
+    <div class="kicker-s center">FAQ</div>
     <h2 class="center">자주 묻는 질문</h2>
-    <div class="faq-list" id="flist"></div>
+    <div class="faq-list" id="flist">
+      <details class="qa">
+        <summary><span class="q">Q</span><span class="t">견적은 어떻게 요청하나요?</span></summary>
+        <div class="a">카탈로그에서 원하는 품종을 담고 연락처를 남겨주시면 접수가 완료됩니다. 담당자가 재고·시즌을 확인해 연락드립니다. 급하시면 카카오톡 채널로 바로 문의하셔도 됩니다.</div>
+      </details>
+      <details class="qa">
+        <summary><span class="q">Q</span><span class="t">가격은 왜 사이트에 없나요?</span></summary>
+        <div class="a">B2B 거래 특성상 수량·시기·규격에 따라 단가가 달라져 견적서로 안내드립니다.</div>
+      </details>
+      <details class="qa">
+        <summary><span class="q">Q</span><span class="t">즉시 출하와 사전 예약의 차이는 무엇인가요?</span></summary>
+        <div class="a">즉시 출하는 현재 재고에서 바로 공급 가능한 품목, 사전 예약은 시즌에 맞춰 수입·공급되는 품목입니다.</div>
+      </details>
+      <details class="qa">
+        <summary><span class="q">Q</span><span class="t">수입 식물의 검역은 어떻게 처리되나요?</span></summary>
+        <div class="a">수입 검역 및 관련 절차는 오픈가든이 관리하며, 필요한 서류를 함께 제공해드립니다.</div>
+      </details>
+    </div>
     <div class="center" style="margin-top:28px">
       <a href="/faq.html" class="btn" style="background:#fff;color:var(--green-dark);border:1.5px solid var(--line)">전체 FAQ 보기</a>
     </div>
@@ -310,24 +351,12 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 </footer>
 
 <script>
-// 홈에는 대표 질문 4개만 — 전체 목록은 /faq.html 에서 관리 (중복 수정 방지)
-const FAQ=[
- ["견적은 어떻게 요청하나요?","카탈로그에서 원하는 품종을 담고 연락처를 남겨주시면 접수가 완료됩니다. 담당자가 재고·시즌을 확인해 연락드립니다. 급하시면 카카오톡 채널로 바로 문의하셔도 됩니다."],
- ["가격은 왜 사이트에 없나요?","B2B 거래 특성상 수량·시기·규격에 따라 단가가 달라져 견적서로 안내드립니다."],
- ["즉시 출하와 사전 예약의 차이는 무엇인가요?","즉시 출하는 현재 재고에서 바로 공급 가능한 품목, 사전 예약은 시즌에 맞춰 수입·공급되는 품목입니다."],
- ["수입 식물의 검역은 어떻게 처리되나요?","수입 검역 및 관련 절차는 오픈가든이 관리하며, 필요한 서류를 함께 제공해드립니다."]
-];
-const flist=document.getElementById('flist');
-FAQ.forEach(([q,a])=>{
-  const d=document.createElement('div');d.className='qa';
-  d.innerHTML=`<button><span class="q">Q</span><span class="t">${q}</span></button><div class="a">${a}</div>`;
-  d.querySelector('button').onclick=()=>{
-    const was=d.classList.contains('open');
-    [...flist.children].forEach(x=>x.classList.remove('open')); // 한 번에 하나만 열림
-    if(!was)d.classList.add('open');
-  };
-  flist.appendChild(d);
-});
+// 대표 질문 4개는 서버 HTML(<details>)에 있음 — 여기선 '한 번에 하나만 열기'만 처리
+// (전체 목록은 /faq.html 에서 관리)
+const faqItems=[...document.querySelectorAll('#flist .qa')];
+faqItems.forEach(d=>d.addEventListener('toggle',()=>{
+  if(d.open)faqItems.forEach(x=>{if(x!==d)x.open=false;});
+}));
 
 // 스크롤 등장 페이드 (모션 최소화 설정 시 생략 — 그리드 자식은 시차를 두고 순차 등장)
 if(!matchMedia('(prefers-reduced-motion: reduce)').matches){

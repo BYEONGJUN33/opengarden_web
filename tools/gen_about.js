@@ -1,0 +1,305 @@
+const fs = require('fs');
+
+// ── 지도 좌표 프레임 (worldmap-dots.png와 동일해야 함) ──
+const W = 1600, latTop = 80, latBot = -45, centerLon = 127;
+const H = Math.round(W * (latTop - latBot) / 360); // 556
+const X = (lon) => { let s = ((lon - centerLon) % 360 + 540) % 360 - 180; return (s + 180) / 360 * W; };
+const Y = (lat) => (latTop - lat) / (latTop - latBot) * H;
+
+const KOR = { name: '대한민국', lon: 127, lat: 37.5, ly: 32 };
+
+// 거래 농가 지점 — 나라마다 여러 곳. 라벨은 표시하지 않으므로 좌표만 관리.
+// (나라·지점을 추가하려면 아래 배열에 { lon, lat } 만 넣으면 자동으로 선이 그려집니다)
+const origins = [
+  // 유럽
+  { lon: 4.66, lat: 52.08 },   // 네덜란드
+  { lon: 3.72, lat: 51.05 },   // 벨기에
+  { lon: 9.79, lat: 53.66 },   // 독일
+  { lon: 10.92, lat: 43.93 },  // 이탈리아
+  { lon: -0.38, lat: 39.47 },  // 스페인
+  // 중동·아프리카
+  { lon: 34.80, lat: 32.00 },  // 이스라엘
+  { lon: 36.80, lat: -1.30 },  // 케냐
+  { lon: 28.20, lat: -25.70 }, // 남아프리카
+  // 아시아
+  { lon: 77.60, lat: 12.97 },  // 인도
+  { lon: 100.50, lat: 13.70 }, // 태국
+  { lon: 121.40, lat: 31.20 }, // 중국
+  { lon: 120.50, lat: 24.00 }, // 대만
+  { lon: 135.50, lat: 34.70 }, // 일본
+  // 오세아니아
+  { lon: 151.20, lat: -33.80 },// 호주
+  { lon: 174.70, lat: -36.80 },// 뉴질랜드
+  // 아메리카
+  { lon: -122.80, lat: 45.30 },// 미국(오리건)
+  { lon: -81.40, lat: 28.50 }, // 미국(플로리다)
+  { lon: -122.80, lat: 49.20 },// 캐나다
+  { lon: -84.10, lat: 9.90 },  // 코스타리카
+  { lon: -74.10, lat: 4.70 },  // 콜롬비아
+];
+const kx = X(KOR.lon), ky = Y(KOR.lat);
+
+// 선이 겹쳐 뭉치지 않도록 곡률을 조금씩 다르게 준다
+function arc(x1, y1, i) {
+  const x2 = kx, y2 = ky;
+  const dist = Math.hypot(x2 - x1, y2 - y1);
+  const lift = 0.13 + (i % 4) * 0.035;
+  const cpx = (x1 + x2) / 2;
+  const cpy = Math.max(10, (y1 + y2) / 2 - dist * lift);
+  return `M ${x1.toFixed(1)} ${y1.toFixed(1)} Q ${cpx.toFixed(1)} ${cpy.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+}
+
+let arcs = '', marks = '';
+origins.forEach((o, i) => {
+  const x = X(o.lon), y = Y(o.lat);
+  arcs += `      <path class="arc" d="${arc(x, y, i)}"/>\n`;
+  marks += `      <g class="mk"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" class="mk-ring"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.7" class="mk-dot"/></g>\n`;
+});
+const labels = ''; // 출발지 국가명은 표시하지 않음 (대한민국만 강조)
+// 한국(중심) 마커 — 강조
+const korMark = `      <g class="mk-kor"><circle cx="${kx.toFixed(1)}" cy="${ky.toFixed(1)}" r="14" class="kor-pulse"/><circle cx="${kx.toFixed(1)}" cy="${ky.toFixed(1)}" r="9" class="kor-ring"/><circle cx="${kx.toFixed(1)}" cy="${ky.toFixed(1)}" r="4.8" class="kor-dot"/></g>\n`;
+const korLabel = `      <text class="lbl lbl-kor" x="${kx.toFixed(1)}" y="${(ky + KOR.ly).toFixed(1)}">${KOR.name}</text>\n`;
+
+// ── 수입 과정 (한국 식물검역·통관 실제 절차 기준) ──
+// [제목, [설명 줄], 아이콘 path, 사진, 사진 alt]
+const steps = [
+  ['현지 농가에서 품종을 고르고, 수입 가능 여부를 먼저 확인합니다.',
+    ['네덜란드·이탈리아·미국 등 현지 농가와 직접 거래해 품종을 선정합니다.',
+     '같은 품종이라도 생산 국가에 따라 수입 가능 여부가 달라, 주문 전에 반드시 확인합니다.'],
+    '<path d="M12 21V9M12 9c0-3 2-5 5-5 0 3-2 5-5 5zM12 12C12 9 10 7 7 7c0 3 2 5 5 5z"/>',
+    'p1-farm.jpg', '현지 농가에서 자라는 묘목'],
+
+  ['수출국 정부가 발급한 식물검역증명서를 갖춰 출발합니다.',
+    ['현지 검역기관의 검사를 거쳐 국제 규격의 식물검역증명서를 발급받습니다.',
+     '흙이 붙은 식물은 수입이 금지되어 있어, 뿌리를 세척한 상태로 포장합니다.'],
+    '<path d="M12 3l7 3v5c0 4.4-3 8-7 10-4-2-7-5.6-7-10V6z"/><path d="M9 11l2 2 4-4"/>',
+    'p2-cert.jpg', '현지에서 식물 상태를 검사하는 모습'],
+
+  ['항공·선박으로 온도 관리를 유지하며 운송합니다.',
+    ['품목과 시기에 맞춰 항공 또는 선박 운송을 선택합니다.',
+     '이동 중 온도 변화가 최소화되도록 포장과 보관 조건을 관리합니다.'],
+    '<path d="M3 16h13l4-6h-6l-2-4H6z"/><path d="M3 16l1 3h15l1-3"/>',
+    'p3-air.jpg', '공항에서 화물을 싣는 모습'],
+
+  ['국내 도착 후 식물검역을 받습니다.',
+    ['도착하면 농림축산검역본부에 신고하고 검역을 받습니다.',
+     '서류·현장·정밀 검역을 거치며, 묘목·구근 같은 재식용 식물은 격리재배 검역이 적용되기도 합니다.'],
+    '<path d="M11 4a7 7 0 100 14 7 7 0 000-14z"/><path d="M16.5 16.5L21 21"/>',
+    'p4-quarantine.jpg', '묘목 상태를 확인하는 모습'],
+
+  ['검역에 합격한 물량만 통관해 반입합니다.',
+    ['검역 합격 후에야 세관 통관이 진행됩니다.',
+     '오픈가든이 수입 절차를 직접 처리해 중간 유통 단계를 줄였습니다.'],
+    '<rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 9h6M9 13h6M9 17h3"/>',
+    'p5-customs.jpg', '창고에서 입고 물량을 확인하는 모습'],
+
+  ['국내 환경에 적응시킨 뒤 현장으로 납품합니다.',
+    ['들여온 식물을 국내 기후에 맞게 적응·재배하며 상태를 관리합니다.',
+     '요청하신 장소와 일정에 맞춰 현장으로 납품해드립니다.'],
+    '<path d="M3 7h11v8H3z"/><path d="M14 10h3.5L21 13v2h-7z"/><circle cx="7" cy="17.5" r="1.7"/><circle cx="17" cy="17.5" r="1.7"/>',
+    'p6-deliver.jpg', '국내에서 재배 중인 묘목'],
+];
+// 스캔용 명사형 단계 라벨
+const stepLabels = [
+  '품종 선정·수입 확인', '식물검역증명서 발급', '온도관리 운송',
+  '국내 식물검역', '검역 합격·통관', '국내 적응·현장 납품',
+];
+let stepHtml = '';
+steps.forEach((s, i) => {
+  const lines = s[1].map((t) => `<p>${t}</p>`).join('');
+  stepHtml += `      <div class="fstep">
+        <div class="fico"><svg viewBox="0 0 24 24">${s[2]}</svg></div>
+        <div class="fbody">
+          <div class="flabel">STEP ${i + 1} · ${stepLabels[i]}</div>
+          <h3>${s[0]}</h3>
+          ${lines}
+        </div>
+        <div class="fphoto"><img src="/assets/proc/${s[3]}" alt="${s[4]}" loading="lazy"></div>
+      </div>\n`;
+});
+
+const html = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회사 소개 | 오픈가든</title>
+<meta name="description" content="오픈가든은 네덜란드·이탈리아·미국·캐나다·중국·대만 등 글로벌 현지 농가에서 정원수를 직수입해 국내에 공급합니다.">
+<link rel="canonical" href="https://open-garden.co.kr/about.html">
+<meta property="og:url" content="https://open-garden.co.kr/about.html">
+<meta property="og:site_name" content="오픈가든">
+<meta property="og:type" content="website">
+<meta property="og:title" content="회사 소개 | 오픈가든">
+<meta property="og:description" content="세계 각지의 협력 농가와 직접 거래하는 글로벌 네트워크와 수입 과정을 소개합니다.">
+<meta property="og:image" content="https://open-garden.co.kr/assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/assets/logo_green_notext.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--green:#1F4D33;--green-dark:#123023;--ink:#111814;--gray:#6b746e;--bg:#fff;--bg-soft:#F4F6F3;--line:#E4E8E3;--kakao:#FEE500}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;font-size:16px;letter-spacing:-.01em}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+h2{font-size:clamp(26px,4vw,40px);font-weight:800;line-height:1.35;letter-spacing:-.03em}
+.sub{font-size:clamp(15px,2vw,18px);color:var(--gray);margin-top:14px}
+section{padding:88px 0}
+.center{text-align:center}
+button{font-family:inherit;cursor:pointer}
+.kicker-s{font-size:12px;font-weight:700;letter-spacing:.26em;color:var(--green);margin-bottom:12px}
+
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);transition:box-shadow .25s ease}
+header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:70px}
+.logo{display:inline-flex;align-items:center;text-decoration:none}
+.logo img{height:58px;width:auto;display:block}
+@media(max-width:640px){.logo img{height:48px}}
+.nav a.link{font-size:14.5px;font-weight:500;color:var(--ink);text-decoration:none;margin-left:22px}
+.nav a.link:hover{color:var(--green)}
+.nav a.link.on{color:var(--green);font-weight:700}
+.nav a.btn-nav{background:var(--green);color:#fff;font-weight:700;padding:9px 20px;border-radius:999px;box-shadow:0 2px 8px rgba(18,48,35,.15);transition:.2s}
+.nav a.btn-nav:hover{color:#fff;background:var(--green-dark);transform:translateY(-1px)}
+@media(max-width:700px){.nav a.link:not(.keep){display:none}}
+
+.page-head{padding:56px 0 0;text-align:center}
+.page-head .kicker-s{margin-bottom:10px}
+.page-head h1{font-size:clamp(28px,4.5vw,42px);font-weight:800;letter-spacing:-.03em}
+.page-head p{color:var(--gray);margin-top:12px;font-size:16px}
+
+/* 거래처 세계지도 */
+.mapsec{padding-top:64px}
+.mapwrap{position:relative;max-width:980px;margin:40px auto 0;aspect-ratio:1600/556}
+.mapdots{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:.85}
+.mapsvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.mapsvg .arc{fill:none;stroke:url(#ag);stroke-width:1.3;stroke-linecap:round;opacity:.6}
+.mapsvg .mk-ring{fill:#fff;stroke:var(--green);stroke-width:1.4}
+.mapsvg .mk-dot{fill:var(--green)}
+.mapsvg .kor-ring{fill:none;stroke:var(--green-dark);stroke-width:2.5}
+.mapsvg .kor-dot{fill:var(--green-dark)}
+.mapsvg .kor-pulse{fill:var(--green);opacity:.18;transform-origin:center;transform-box:fill-box;animation:pulse 2.2s ease-in-out infinite}
+.mapsvg .lbl{font-family:'Noto Sans KR',sans-serif;font-size:22px;font-weight:700;fill:var(--green-dark);text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.mapsvg .lbl-kor{font-size:26px;font-weight:800}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.18}50%{transform:scale(1.5);opacity:.05}}
+.mapnote{font-size:13px;color:var(--gray);margin-top:22px}
+
+/* 수입 과정 — 세로 타임라인(좌측 아이콘 · 본문 · 우측 사진) */
+.proc-sec{background:var(--bg-soft)}
+.process-head{max-width:720px;margin:0 auto;text-align:center}
+.flow{max-width:900px;margin:46px auto 0;position:relative;display:flex;flex-direction:column;gap:34px}
+/* 단계를 잇는 세로 연결선 */
+.flow::before{content:"";position:absolute;left:27px;top:34px;bottom:34px;width:2px;
+  background:repeating-linear-gradient(to bottom,#c3d2c5 0 7px,transparent 7px 14px)}
+.fstep{position:relative;display:grid;grid-template-columns:56px 1fr 220px;gap:24px;align-items:center}
+.fico{width:56px;height:56px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(31,77,51,.28);position:relative;z-index:1}
+.fico svg{width:28px;height:28px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fbody .flabel{font-size:11.5px;font-weight:700;letter-spacing:.12em;color:var(--green);margin-bottom:7px}
+.fbody h3{font-size:clamp(16px,2vw,19px);font-weight:800;letter-spacing:-.02em;line-height:1.45;color:var(--ink)}
+.fbody p{font-size:14px;color:var(--gray);margin-top:7px;line-height:1.6}
+.fbody p+p{margin-top:3px}
+.fphoto{aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:#e6ece6;box-shadow:0 2px 10px rgba(20,40,28,.08)}
+.fphoto img{width:100%;height:100%;object-fit:cover;display:block}
+@media(max-width:820px){
+  .fstep{grid-template-columns:48px 1fr;gap:18px;row-gap:14px}
+  .flow::before{left:23px}
+  .fico{width:48px;height:48px}.fico svg{width:24px;height:24px}
+  .fphoto{grid-column:2;max-width:420px}
+}
+
+footer{padding:48px 0;font-size:13px;color:var(--gray)}
+footer .foot-logo{height:42px;margin-bottom:14px;display:block}
+footer a{color:var(--gray);text-decoration:none;font-weight:700}
+
+.chat-fab{position:fixed;right:18px;bottom:20px;z-index:65;display:flex;align-items:center;gap:8px;background:var(--kakao);color:#191919;text-decoration:none;font-weight:800;font-size:14.5px;padding:13px 18px 13px 15px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.22);transition:.2s}
+.chat-fab:hover{transform:translateY(-2px)}
+.chat-fab svg{width:22px;height:22px}
+@media(max-width:640px){.chat-fab{padding:14px;bottom:calc(16px + env(safe-area-inset-bottom))}.chat-fab .lbl{display:none}}
+
+@media(prefers-reduced-motion:reduce){
+  .mapsvg .kor-pulse{animation:none}
+  .chat-fab{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="/"><img src="/assets/logo.png" alt="오픈가든 Open Garden"></a>
+    <nav>
+      <a class="link on" href="/about.html">소개</a>
+      <a class="link" href="/faq.html">FAQ</a>
+      <a class="link keep btn-nav" href="/catalog.html">카탈로그</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap page-head">
+  <div class="kicker-s">ABOUT</div>
+  <h1>회사 소개</h1>
+  <p>세계의 농장과 국내 현장을 직접 잇는 방법</p>
+</div>
+
+<!-- 거래처 세계지도 -->
+<section class="mapsec">
+  <div class="wrap center">
+    <div class="kicker-s">GLOBAL NETWORK</div>
+    <h2>세계 각지의 협력 농가와<br>직접 거래합니다.</h2>
+    <p class="sub">네덜란드·이탈리아·미국·캐나다·중국·대만 등 여러 나라의 협력 농가에서 직수입합니다.</p>
+    <div class="mapwrap">
+      <img class="mapdots" src="/assets/worldmap-dots.png" alt="오픈가든 글로벌 거래 네트워크 세계지도">
+      <svg class="mapsvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="거래처 국가에서 한국으로 이어지는 글로벌 네트워크 지도">
+        <defs>
+          <linearGradient id="ag" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#4e7a5e"/><stop offset="1" stop-color="#1F4D33"/>
+          </linearGradient>
+        </defs>
+${arcs}${marks}${korMark}${labels}${korLabel}      </svg>
+    </div>
+    <p class="mapnote">* 표시된 국가는 주요 거래·수입 지역입니다.</p>
+  </div>
+</section>
+
+<!-- 수입 과정 -->
+<section class="proc-sec">
+  <div class="wrap">
+    <div class="process-head">
+      <div class="kicker-s">PROCESS</div>
+      <h2>세계 각지의 농가에서<br>고객의 현장까지</h2>
+      <p class="sub">중간 유통 없이, 오픈가든이 수입 전 과정을 직접 관리합니다.</p>
+    </div>
+    <div class="flow">
+${stepHtml}    </div>
+  </div>
+</section>
+
+<!-- 오른쪽 아래 카카오 채팅 버튼 -->
+<a class="chat-fab" href="https://pf.kakao.com/_lGfxhX/chat" target="_blank" rel="noopener" aria-label="카카오톡 상담">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 2.8 1.9 5.3 4.7 6.7-.2.7-.7 2.6-.8 3 0 0 0 .3.2.4.1.1.3 0 .4 0 .3-.2 2.6-1.8 3.6-2.5.6.1 1.3.1 1.9.1 5.5 0 10-3.6 10-8S17.5 3 12 3z"/></svg>
+  <span class="lbl">카카오톡 상담</span>
+</a>
+
+<footer>
+  <div class="wrap">
+    <img class="foot-logo" src="/assets/logo.png" alt="오픈가든 Open Garden">
+    <p>대표 : 이시형 | 주소 : 충청남도 천안시 동남구 풍세면 보성리 64-6<br>사업자등록번호 : 495-28-01860</p>
+    <p style="margin-top:10px">
+      <a href="https://pf.kakao.com/_lGfxhX/chat" target="_blank" rel="noopener">카카오톡 채널</a> · <a href="/catalog.html">카탈로그</a> · <a href="/privacy.html">개인정보 처리방침</a>
+    </p>
+    <p style="margin-top:10px">© 2026 OpenGarden. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+const hd=document.querySelector('header');
+addEventListener('scroll',()=>hd.classList.toggle('scrolled',scrollY>8),{passive:true});
+</script>
+</body>
+</html>
+`;
+
+fs.writeFileSync(process.argv[2], html, 'utf8');
+// 좌표 로그
+console.log('한국', kx.toFixed(0), ky.toFixed(0));
+console.log('거래 농가 지점 수:', origins.length);
+console.log('about.html written,', html.length, 'chars, H=' + H);
