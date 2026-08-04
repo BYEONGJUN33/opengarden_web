@@ -39,7 +39,13 @@
 }
 </script>
 <style>
+/* 헤드라인 전용 부리체 — 마루 부리(네이버, 무료) */
+@font-face{font-family:"MaruBuri";src:url("https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri-SemiBold.woff2") format("woff2");font-weight:600 800;font-style:normal;font-display:swap}
+
 :root{--green:#1F4D33;--green-dark:#123023;--ink:#111814;--gray:#6b746e;--bg:#fff;--bg-soft:#F4F6F3;--line:#E4E8E3;--kakao:#FEE500}
+/* 헤드라인만 부리체 — 본문은 Noto Sans KR 유지 */
+h1,h2{font-family:"MaruBuri","Noto Sans KR",serif;letter-spacing:-.02em}
+
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;font-size:16px;letter-spacing:-.01em}
@@ -180,7 +186,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
   <div class="wrap nav">
     <a class="logo" href="/"><img src="/assets/logo.png" alt="오픈가든 Open Garden"></a>
     <nav>
-      <a class="link" href="/about.html">소개</a>
+      <a class="link" href="/about.html">수입 과정</a>
       <a class="link" href="/faq.html">FAQ</a>
       <a class="link keep btn-nav" href="/catalog.html">카탈로그</a>
     </nav>
@@ -207,7 +213,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <!-- 3. 지표 -->
 <section>
   <div class="wrap center">
-    <div class="kicker-s">OVERVIEW</div>
+    <div class="kicker-s">취급 품목</div>
     <h2>더 다양한 품종을,<br>더 확실한 품질로.</h2>
     <div class="stats">
       <div class="stat"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21V9M12 9c0-3 2-5 5-5 0 3-2 5-5 5zM12 12C12 9 10 7 7 7c0 3 2 5 5 5z"/></svg></div><div class="label">판매 품종</div><div class="num" id="statCount">국내·유럽</div></div>
@@ -222,7 +228,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <section class="about" id="about">
   <div class="wrap about-grid">
     <div>
-      <div class="kicker-s">ABOUT</div>
+      <div class="kicker-s">오픈가든</div>
       <h2>현지 농가와 직접 거래해,<br>검증된 품종만 현장으로.</h2>
       <p>네덜란드·이탈리아·미국·캐나다 등 여러 나라의 현지 농가에서 직수입한 정원수를 국내 농가·조경회사·가든센터에 공급합니다. 수입 품종에는 내한성(Zone)을 표기해, 우리 기후에 맞는 선택을 돕습니다.</p>
       <p>문의부터 제안서, 납품까지 담당자가 직접 챙깁니다. 찾는 품종이 목록에 없으면 말씀해 주세요. 한 팀이 되어 소싱해 드립니다.</p>
@@ -235,7 +241,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <!-- 5. 서비스 -->
 <section id="service">
   <div class="wrap">
-    <div class="kicker-s">SERVICE</div>
+    <div class="kicker-s">서비스</div>
     <h2>품종 선정부터 현장 납품까지,<br>전 과정을 오픈가든이 책임집니다.</h2>
     <div class="svc-grid">
       <div class="svc">
@@ -266,7 +272,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <section>
   <div class="wrap">
     <div class="process-head">
-      <div class="kicker-s">PROCESS</div>
+      <div class="kicker-s">이용 순서</div>
       <h2>견적부터 납품까지,<br>4단계면 끝납니다.</h2>
     </div>
     <div class="process">
@@ -293,7 +299,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <!-- 8. FAQ (대표 질문만 — 전체는 /faq.html) -->
 <section class="proj" id="faq">
   <div class="wrap">
-    <div class="kicker-s center">FAQ</div>
+    <div class="kicker-s center">자주 묻는 질문</div>
     <h2 class="center">자주 묻는 질문</h2>
     <div class="faq-list" id="flist">
       <details class="qa">

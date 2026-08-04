@@ -16,7 +16,13 @@
 <link rel="icon" href="/assets/logo_green_notext.png" type="image/png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
+/* 헤드라인 전용 부리체 — 마루 부리(네이버, 무료) */
+@font-face{font-family:"MaruBuri";src:url("https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri-SemiBold.woff2") format("woff2");font-weight:600 800;font-style:normal;font-display:swap}
+
 :root{--green:#1F4D33;--green-dark:#123023;--ink:#111814;--gray:#6b746e;--bg:#fff;--bg-soft:#F4F6F3;--line:#E4E8E3;--kakao:#FEE500}
+/* 헤드라인만 부리체 — 본문은 Noto Sans KR 유지 */
+h1,h2{font-family:"MaruBuri","Noto Sans KR",serif;letter-spacing:-.02em}
+
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;font-size:16px;letter-spacing:-.01em}
@@ -185,7 +191,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
   <div class="nav">
     <a class="logo" href="/"><img src="/assets/logo.png" alt="오픈가든 Open Garden"></a>
     <nav>
-      <a class="link" href="/about.html">소개</a>
+      <a class="link" href="/about.html">수입 과정</a>
       <a class="link on" href="/faq.html">FAQ</a>
       <a class="link keep btn-nav" href="/catalog.html">카탈로그</a>
     </nav>
@@ -193,7 +199,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 </header>
 
 <div class="wrap page-head">
-  <div class="kicker-s">FAQ</div>
+  <div class="kicker-s">자주 묻는 질문</div>
   <h1>자주 묻는 질문</h1>
   <p>궁금한 점을 카테고리별로 확인하세요.</p>
 </div>
@@ -260,7 +266,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
   <div class="faq-cta">
     <h3>원하는 답을 못 찾으셨나요?</h3>
     <p>카카오톡 채널로 문의하시면 담당자가 직접 안내해 드립니다.</p>
-    <a href="https://pf.kakao.com/_lGfxhX/chat" target="_blank" rel="noopener">💬 카카오톡 상담</a>
+    <a href="https://pf.kakao.com/_lGfxhX/chat" target="_blank" rel="noopener">카카오톡 상담</a>
   </div>
 </main>
 

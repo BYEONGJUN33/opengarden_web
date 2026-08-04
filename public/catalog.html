@@ -17,7 +17,13 @@
 <link rel="icon" href="/assets/logo_green_notext.png" type="image/png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
+/* 헤드라인 전용 부리체 — 마루 부리(네이버, 무료) */
+@font-face{font-family:"MaruBuri";src:url("https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri-SemiBold.woff2") format("woff2");font-weight:600 800;font-style:normal;font-display:swap}
+
 :root{--green:#1F4D33;--green-dark:#123023;--ink:#111814;--gray:#6b746e;--bg:#fff;--bg-soft:#F4F6F3;--line:#E4E8E3;--kakao:#FEE500}
+/* 헤드라인만 부리체 — 본문은 Noto Sans KR 유지 */
+h1,h2{font-family:"MaruBuri","Noto Sans KR",serif;letter-spacing:-.02em}
+
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;font-size:15px;letter-spacing:-.01em}
 .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
@@ -43,6 +49,7 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
 .toolbar{position:sticky;top:70px;z-index:40;background:var(--bg);padding:18px 0 14px;border-bottom:1px solid var(--line)}
 .toolbar .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .search{flex:1;min-width:200px;display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:999px;padding:10px 18px;background:var(--bg-soft)}
+.search .sico{width:17px;height:17px;flex:0 0 auto;stroke:var(--gray);fill:none;stroke-width:1.9;stroke-linecap:round}
 .search input{border:0;outline:0;background:transparent;font-family:inherit;font-size:14.5px;width:100%}
 select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font-family:inherit;font-size:14px;background:#fff;color:var(--ink)}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
@@ -171,7 +178,7 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
   <div class="wrap nav">
     <a class="logo" href="/"><img src="/assets/logo.png" alt="오픈가든 Open Garden"></a>
     <nav>
-      <a class="link" href="/about.html">소개</a>
+      <a class="link" href="/about.html">수입 과정</a>
       <a class="link" href="/faq.html">FAQ</a>
       <a class="link keep btn-nav" href="/catalog.html" aria-current="page">카탈로그</a>
     </nav>
@@ -186,7 +193,7 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 <div class="toolbar">
   <div class="wrap">
     <div class="row">
-      <div class="search">🔍 <input id="q" type="search" placeholder="국명 또는 학명 검색" aria-label="검색"></div>
+      <div class="search"><svg class="sico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg><input id="q" type="search" placeholder="국명 또는 학명 검색" aria-label="검색"></div>
       <select id="zone" aria-label="내한성 필터">
         <option value="">내한성 전체</option>
       </select>
@@ -252,10 +259,10 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
       <p class="send-note">* 접수 즉시 요청번호가 발급됩니다. 급하시면 접수 후 카카오톡으로 바로 상담할 수 있어요.</p>
     </div>
     <div id="qdone" style="display:none;text-align:center;padding:8px 0 4px">
-      <div style="font-size:42px">✅</div>
+      <svg viewBox="0 0 24 24" style="width:52px;height:52px;stroke:var(--green);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.2l2.7 2.7L16 9.6"/></svg>
       <h2 style="margin-top:6px">견적 요청이 접수되었습니다</h2>
       <p class="desc" style="margin-top:10px">요청번호 <b id="doneNo" style="color:var(--green)"></b><br>담당자가 확인 후 곧 연락드리겠습니다.</p>
-      <button class="send" onclick="openKakaoAfterDone()">💬 급하신가요? 카카오톡 상담</button>
+      <button class="send" onclick="openKakaoAfterDone()">급하신가요? 카카오톡 상담</button>
       <p class="send-note">버튼을 누르면 요청번호가 복사되고 오픈가든 채팅이 열립니다.</p>
     </div>
   </div>
