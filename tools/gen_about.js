@@ -122,7 +122,7 @@ const html = `<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>수입 과정 | 오픈가든</title>
 <meta name="description" content="현지 농가 선정부터 식물검역증명서·국제운송·국내 식물검역·통관·적응재배·현장 납품까지, 오픈가든이 수입 전 과정을 직접 처리하는 방식을 소개합니다.">
 <link rel="canonical" href="https://open-garden.co.kr/about.html">
@@ -140,6 +140,14 @@ const html = `<!DOCTYPE html>
 @font-face{font-family:"MaruBuri";src:url("https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri-SemiBold.woff2") format("woff2");font-weight:600 800;font-style:normal;font-display:swap}
 
 :root{--green:#1F4D33;--green-dark:#123023;--ink:#111814;--gray:#6b746e;--bg:#fff;--bg-soft:#F4F6F3;--line:#E4E8E3;--kakao:#FEE500}
+/* 한글 모바일 기본값 — 어절 단위 줄바꿈 + 긴 영문은 예외적으로 끊기 */
+body{word-break:keep-all;overflow-wrap:break-word}
+html{-webkit-text-size-adjust:100%}
+/* PC에서만 살리는 줄바꿈 (모바일에선 자연스럽게 흐르게) */
+@media(max-width:767px){.pc-br{display:none}}
+/* iOS Safari가 입력창 탭 시 확대하지 않도록 — 16px 미만 금지 */
+@media(max-width:767px){input,textarea,select{font-size:16px}}
+
 /* 헤드라인만 부리체 — 본문은 Noto Sans KR 유지 */
 h1,h2{font-family:"MaruBuri","Noto Sans KR",serif;letter-spacing:-.02em}
 
@@ -255,7 +263,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 
 <div class="wrap page-head">
   <div class="kicker-s">IMPORT PROCESS</div>
-  <h1>나무가 자란 곳부터,<br>심길 곳까지.</h1>
+  <h1>나무가 자란 곳부터,<br class="pc-br">심길 곳까지.</h1>
   <p>오픈가든은 세계 각지의 협력 농가에서 정원수를 직접 수입합니다.<br>
      품종 선정 · 검역 · 통관 · 국내 적응재배 · 현장 납품까지,<br>
      중간 유통 없이 전 과정을 직접 처리합니다.</p>
@@ -265,7 +273,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <section class="mapsec">
   <div class="wrap center">
     <div class="kicker-s">거래 농가</div>
-    <h2>세계 각지의 협력 농가와<br>직접 거래합니다.</h2>
+    <h2>세계 각지의 협력 농가와<br class="pc-br">직접 거래합니다.</h2>
     <p class="sub">네덜란드·이탈리아·미국·캐나다·중국·대만 등 여러 나라의 협력 농가에서 직수입합니다.</p>
     <div class="mapwrap">
       <img class="mapdots" src="/assets/worldmap-dots.png" alt="오픈가든 글로벌 거래 네트워크 세계지도">
@@ -290,7 +298,7 @@ ${arcs}${marks}${korMark}${labels}${korLabel}      </svg>
   <div class="wrap">
     <div class="process-head">
       <div class="kicker-s">수입 6단계</div>
-      <h2>세계 각지의 농가에서<br>고객의 현장까지</h2>
+      <h2>세계 각지의 농가에서<br class="pc-br">고객의 현장까지</h2>
       <p class="sub">중간 유통 없이, 오픈가든이 수입 전 과정을 직접 관리합니다.</p>
     </div>
     <div class="flow">

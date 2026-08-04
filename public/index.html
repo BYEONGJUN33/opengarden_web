@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="naver-site-verification" content="a29823b3e6feba7705d80a5ec77e93ed267443e9" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>오픈가든 — 글로벌 직수입 정원수 식물 B2B 공급</title>
 <meta name="description" content="정원수·관목·초화·그라스·구근을 글로벌 현지 농가에서 직수입해 공급합니다. 카탈로그에서 고르고 카카오톡으로 견적받으세요.">
 <!-- 카톡·SNS 공유 미리보기 -->
@@ -43,6 +43,14 @@
 @font-face{font-family:"MaruBuri";src:url("https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri-SemiBold.woff2") format("woff2");font-weight:600 800;font-style:normal;font-display:swap}
 
 :root{--green:#1F4D33;--green-dark:#123023;--ink:#111814;--gray:#6b746e;--bg:#fff;--bg-soft:#F4F6F3;--line:#E4E8E3;--kakao:#FEE500}
+/* 한글 모바일 기본값 — 어절 단위 줄바꿈 + 긴 영문은 예외적으로 끊기 */
+body{word-break:keep-all;overflow-wrap:break-word}
+html{-webkit-text-size-adjust:100%}
+/* PC에서만 살리는 줄바꿈 (모바일에선 자연스럽게 흐르게) */
+@media(max-width:767px){.pc-br{display:none}}
+/* iOS Safari가 입력창 탭 시 확대하지 않도록 — 16px 미만 금지 */
+@media(max-width:767px){input,textarea,select{font-size:16px}}
+
 /* 헤드라인만 부리체 — 본문은 Noto Sans KR 유지 */
 h1,h2{font-family:"MaruBuri","Noto Sans KR",serif;letter-spacing:-.02em}
 
@@ -196,8 +204,8 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <!-- 1. 히어로 -->
 <section class="hero" id="top">
   <div class="wrap">
-    <h1>세계의 농장에서,<br>당신의 현장까지.</h1>
-    <p>세계 각지의 협력 농가에서 직수입한 국내·유럽 라인업을 한 곳에서.<br>내한성(Zone)까지 표기합니다.</p>
+    <h1>세계의 농장에서,<br class="pc-br">당신의 현장까지.</h1>
+    <p>세계 각지의 협력 농가에서 직수입한 국내·유럽 라인업을 한 곳에서.<br class="pc-br">내한성(Zone)까지 표기합니다.</p>
     <a href="/catalog.html" class="btn">카탈로그에서 견적 받기</a>
   </div>
   <div class="scroll-hint" aria-hidden="true"></div>
@@ -206,7 +214,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <!-- 2. 한 줄 밴드 -->
 <div class="band">
   <div class="wrap">
-    <h2>고르고, 견적받고, 납품까지 —<br>식물 조달의 전 과정을 오픈가든 한 곳에서.</h2>
+    <h2>고르고, 견적받고, 납품까지 —<br class="pc-br">식물 조달의 전 과정을 오픈가든 한 곳에서.</h2>
   </div>
 </div>
 
@@ -214,7 +222,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <section>
   <div class="wrap center">
     <div class="kicker-s">취급 품목</div>
-    <h2>더 다양한 품종을,<br>더 확실한 품질로.</h2>
+    <h2>더 다양한 품종을,<br class="pc-br">더 확실한 품질로.</h2>
     <div class="stats">
       <div class="stat"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21V9M12 9c0-3 2-5 5-5 0 3-2 5-5 5zM12 12C12 9 10 7 7 7c0 3 2 5 5 5z"/></svg></div><div class="label">판매 품종</div><div class="num" id="statCount">국내·유럽</div></div>
       <div class="stat"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 16h13l4-6h-6l-2-4H6z"/><path d="M3 16l1 3h15l1-3"/></svg></div><div class="label">공급 방식</div><div class="num">현지 직거래</div></div>
@@ -229,7 +237,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
   <div class="wrap about-grid">
     <div>
       <div class="kicker-s">오픈가든</div>
-      <h2>현지 농가와 직접 거래해,<br>검증된 품종만 현장으로.</h2>
+      <h2>현지 농가와 직접 거래해,<br class="pc-br">검증된 품종만 현장으로.</h2>
       <p>네덜란드·이탈리아·미국·캐나다 등 여러 나라의 현지 농가에서 직수입한 정원수를 국내 농가·조경회사·가든센터에 공급합니다. 수입 품종에는 내한성(Zone)을 표기해, 우리 기후에 맞는 선택을 돕습니다.</p>
       <p>문의부터 제안서, 납품까지 담당자가 직접 챙깁니다. 찾는 품종이 목록에 없으면 말씀해 주세요. 한 팀이 되어 소싱해 드립니다.</p>
       <a href="/about.html" class="btn" style="margin-top:26px;padding:13px 28px;font-size:15px">거래 네트워크 · 수입 과정 보기</a>
@@ -242,7 +250,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <section id="service">
   <div class="wrap">
     <div class="kicker-s">서비스</div>
-    <h2>품종 선정부터 현장 납품까지,<br>전 과정을 오픈가든이 책임집니다.</h2>
+    <h2>품종 선정부터 현장 납품까지,<br class="pc-br">전 과정을 오픈가든이 책임집니다.</h2>
     <div class="svc-grid">
       <div class="svc">
         <div class="svc-ico"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></div>
@@ -273,7 +281,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
   <div class="wrap">
     <div class="process-head">
       <div class="kicker-s">이용 순서</div>
-      <h2>견적부터 납품까지,<br>4단계면 끝납니다.</h2>
+      <h2>견적부터 납품까지,<br class="pc-br">4단계면 끝납니다.</h2>
     </div>
     <div class="process">
       <div class="prow">
@@ -299,7 +307,6 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <!-- 8. FAQ (대표 질문만 — 전체는 /faq.html) -->
 <section class="proj" id="faq">
   <div class="wrap">
-    <div class="kicker-s center">자주 묻는 질문</div>
     <h2 class="center">자주 묻는 질문</h2>
     <div class="faq-list" id="flist">
       <details class="qa">
@@ -329,7 +336,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <section class="final" id="contact">
   <div class="wrap">
     <div class="small">서비스 문의</div>
-    <h2>필요한 품종,<br>지금 견적으로 확인하세요.</h2>
+    <h2>필요한 품종,<br class="pc-br">지금 견적으로 확인하세요.</h2>
     <div class="actions">
       <a href="/catalog.html" class="btn" style="background:#fff;color:var(--green-dark)">카탈로그에서 견적 받기</a>
       <a href="https://pf.kakao.com/_lGfxhX/chat" target="_blank" rel="noopener" class="btn btn-kakao">카카오톡 상담</a>

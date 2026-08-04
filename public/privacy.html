@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>개인정보 처리방침 | 오픈가든</title>
 <meta name="description" content="오픈가든의 개인정보 수집·이용 목적, 보유 기간, 처리 위탁, 정보주체의 권리에 관한 안내입니다.">
 <meta name="robots" content="noindex, follow">
@@ -14,6 +14,14 @@
 @font-face{font-family:"MaruBuri";src:url("https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri-SemiBold.woff2") format("woff2");font-weight:600 800;font-style:normal;font-display:swap}
 
 :root{--green:#1F4D33;--ink:#111814;--gray:#6b746e;--line:#E4E8E3}
+/* 한글 모바일 기본값 — 어절 단위 줄바꿈 + 긴 영문은 예외적으로 끊기 */
+body{word-break:keep-all;overflow-wrap:break-word}
+html{-webkit-text-size-adjust:100%}
+/* PC에서만 살리는 줄바꿈 (모바일에선 자연스럽게 흐르게) */
+@media(max-width:767px){.pc-br{display:none}}
+/* iOS Safari가 입력창 탭 시 확대하지 않도록 — 16px 미만 금지 */
+@media(max-width:767px){input,textarea,select{font-size:16px}}
+
 /* 헤드라인만 부리체 — 본문은 Noto Sans KR 유지 */
 h1,h2{font-family:"MaruBuri","Noto Sans KR",serif;letter-spacing:-.02em}
 

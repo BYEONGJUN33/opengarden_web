@@ -21,6 +21,15 @@
 @font-face{font-family:"MaruBuri";src:url("https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri-SemiBold.woff2") format("woff2");font-weight:600 800;font-style:normal;font-display:swap}
 
 :root{--green:#1F4D33;--green-dark:#123023;--ink:#111814;--gray:#6b746e;--bg:#fff;--bg-soft:#F4F6F3;--line:#E4E8E3;--kakao:#FEE500}
+/* 한글 모바일 기본값 — 어절 단위 줄바꿈 + 긴 영문은 예외적으로 끊기 */
+body{word-break:keep-all;overflow-wrap:break-word}
+html{-webkit-text-size-adjust:100%}
+/* PC에서만 살리는 줄바꿈 (모바일에선 자연스럽게 흐르게) */
+@media(max-width:767px){.pc-br{display:none}}
+/* iOS Safari가 입력창 탭 시 확대하지 않도록 — 16px 미만 금지
+   (아래 .field/.search 규칙보다 구체성이 높아야 해서 파일 끝에서 한 번 더 지정) */
+@media(max-width:767px){input,textarea,select{font-size:16px}}
+
 /* 헤드라인만 부리체 — 본문은 Noto Sans KR 유지 */
 h1,h2{font-family:"MaruBuri","Noto Sans KR",serif;letter-spacing:-.02em}
 
@@ -169,6 +178,11 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 @media(prefers-reduced-motion:reduce){
   .plant,.page-head h1,.page-head p{animation:none}
   .plant,.plant .ph img,.overlay,.modal,.quote-bar,.quote-bar .go,.send,.chip,.chat-fab{transition:none}
+}
+
+/* iOS 줌 방지 — 구체성 높은 선택자로 재지정 (반드시 스타일 끝부분) */
+@media(max-width:767px){
+  .field input,.field textarea,.search input,.toolbar select,#fallbackText,.qty input{font-size:16px}
 }
 </style>
 </head>
