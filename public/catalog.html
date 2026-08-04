@@ -114,6 +114,15 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 .field{margin-top:14px}
 .field label{font-size:12.5px;font-weight:700;color:var(--gray);display:block;margin-bottom:5px}
 .field label .hint{font-weight:500;color:#9aa39c}
+/* 개인정보 동의 */
+.consent{margin-top:18px;padding:14px 15px;background:var(--bg-soft);border:1px solid var(--line);border-radius:12px}
+.consent .agree{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;color:var(--ink);cursor:pointer;line-height:1.5}
+.consent .agree+.agree{margin-top:10px}
+.consent .agree input{width:17px;height:17px;margin-top:1px;accent-color:var(--green);flex:0 0 auto}
+.consent .agree b{color:var(--green);font-weight:800}
+.agree-detail{font-size:12px;color:var(--gray);line-height:1.6;margin:8px 0 12px 26px;padding-left:10px;border-left:2px solid var(--line)}
+.agree-detail a{color:var(--green);font-weight:700}
+.consent.err{border-color:#c9534a;background:#fdf3f2}
 .field input,.field textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;font-family:inherit;font-size:14px;outline:0}
 .field input:focus,.field textarea:focus{border-color:var(--green)}
 .send{width:100%;margin-top:20px;background:var(--kakao);color:#191919;border:0;border-radius:12px;padding:15px 0;font-size:15.5px;font-weight:800;transition:transform .2s ease,box-shadow .2s ease}
@@ -219,7 +228,22 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
       <div class="field"><label for="fphone">연락처 (필수) <span class="hint">· 견적 안내에만 사용합니다</span></label><input id="fphone" type="tel" inputmode="tel" placeholder="010-0000-0000"></div>
       <div class="field"><label for="fname">성함 / 소속 (선택) <span class="hint">· 기업 담당자시면 소속을 남겨주세요</span></label><input id="fname" placeholder="예: 홍길동 / ○○조경"></div>
       <div class="field"><label for="fmemo">요청 사항 (선택) <span class="hint">· 희망 규격·수량·납기를 적어주시면 더 빠릅니다</span></label><textarea id="fmemo" rows="2" placeholder="납품 희망 시기, 현장 위치 등"></textarea></div>
-      <button class="send" onclick="sendQuote()">📨 견적 요청 접수하기</button>
+
+      <!-- 개인정보 수집·이용 동의 (필수/선택 분리 — 묶어서 받으면 위법) -->
+      <div class="consent">
+        <label class="agree"><input type="checkbox" id="fagree">
+          <span><b>(필수)</b> 개인정보 수집·이용에 동의합니다.</span></label>
+        <div class="agree-detail">
+          수집 항목: 연락처, 성함/소속(선택), 요청 사항(선택), 요청 품목·수량<br>
+          이용 목적: 견적 상담 및 납품 진행 · 보유 기간: 수집일로부터 3년<br>
+          동의를 거부하실 수 있으나, 거부 시 견적 접수가 제한됩니다.
+          <a href="/privacy.html" target="_blank" rel="noopener">자세히 보기</a>
+        </div>
+        <label class="agree"><input type="checkbox" id="fmkt">
+          <span><b>(선택)</b> 신상품·시즌 입고 소식 수신에 동의합니다.</span></label>
+      </div>
+
+      <button class="send" onclick="sendQuote()">견적 요청 접수하기</button>
       <div id="fallback" style="display:none;margin-top:14px">
         <p style="font-size:12.5px;color:var(--gray);margin-bottom:6px">일시적으로 접수가 지연되고 있어요. 아래 목록을 복사해 카카오톡으로 보내주시면 바로 확인해 드릴게요.</p>
         <textarea id="fallbackText" rows="7" readonly style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;font-family:inherit;font-size:13px" onclick="this.select()"></textarea>
@@ -428,11 +452,23 @@ async function sendQuote(){
   const name=document.getElementById('fname').value.trim();
   const phone=document.getElementById('fphone').value.trim();
   const memo=document.getElementById('fmemo').value.trim();
+  const agree=document.getElementById('fagree').checked;
+  const marketing=document.getElementById('fmkt').checked;
   if(phone.replace(/\D/g,'').length<9){
     toast('연락처를 입력해주세요');
     document.getElementById('fphone').focus();
     return;
   }
+  // 개인정보 수집·이용 동의는 필수
+  if(!agree){
+    const box=document.querySelector('.consent');
+    box.classList.add('err');
+    box.scrollIntoView({block:'center',behavior:'smooth'});
+    toast('개인정보 수집·이용에 동의해주세요');
+    document.getElementById('fagree').focus();
+    return;
+  }
+  document.querySelector('.consent').classList.remove('err');
   const items=Object.keys(cart).map(id=>{
     const p=PLANTS.find(x=>x.id===id);
     return {sku:p.id,kname:p.kname,size:p.size,qty:cart[id]};
@@ -443,7 +479,7 @@ async function sendQuote(){
     const r=await fetch('/api/quote',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name,phone,memo,items,website:''})
+      body:JSON.stringify({name,phone,memo,items,agree,marketing,website:''})
     });
     if(!r.ok) throw new Error('quote-failed');
     const d=await r.json();

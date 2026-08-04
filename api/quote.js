@@ -70,11 +70,18 @@ module.exports = async (req, res) => {
     if (!BASE || !TOKEN) {
       return res.status(500).json({ error: '환경변수가 설정되지 않았습니다.' });
     }
-    const { name = '', phone = '', memo = '', items = [], website = '' } = req.body || {};
+    const {
+      name = '', phone = '', memo = '', items = [],
+      agree = false, marketing = false, website = '',
+    } = req.body || {};
 
     if (website) return res.status(200).json({ ok: true }); // 봇 무시
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: '담긴 품목이 없습니다.' });
+    }
+    // 개인정보 수집·이용 동의 없이는 접수 불가 (클라이언트 우회 방지)
+    if (agree !== true) {
+      return res.status(400).json({ error: '개인정보 수집·이용 동의가 필요합니다.' });
     }
     const cleanPhone = String(phone).replace(/[^\d\-+() ]/g, '').slice(0, 30);
     if (cleanPhone.replace(/\D/g, '').length < 9) {
@@ -120,6 +127,8 @@ module.exports = async (req, res) => {
                 품목JSON: JSON.stringify(clean),
                 상태: '신규',
                 접수일시: new Date().toISOString(), // 접수 시각 (에어테이블이 KST로 표시)
+                개인정보동의: true,            // 위에서 검증됨 (미동의 시 접수 차단)
+                마케팅수신동의: marketing === true,
               },
             },
           ],
