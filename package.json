@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "description": "OpenGarden 홈페이지 — 정적 사이트 + 서버리스 API (Airtable 연동)",
   "scripts": {
-    "dev": "node dev.js"
+    "dev": "node build.js && node dev.js",
+    "build": "node build.js"
   },
   "engines": {
     "node": ">=18"

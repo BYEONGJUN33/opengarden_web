@@ -28,7 +28,7 @@ const MIME = {
   '.xml': 'application/xml', '.json': 'application/json',
 };
 
-const PUB = path.join(__dirname, 'public');
+const PUB = path.join(__dirname, 'dist'); // build.js 산출물
 const PORT = process.env.PORT || 3000;
 
 http.createServer(async (req, res) => {
