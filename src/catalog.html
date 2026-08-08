@@ -337,29 +337,46 @@ let cat="전체", cart={}; // cart: {id: qty}
 try{cart=JSON.parse(localStorage.getItem('og_cart')||'{}')}catch(e){cart={}}
 function saveCart(){try{localStorage.setItem('og_cart',JSON.stringify(cart))}catch(e){}}
 
-// 카테고리 칩 — 에어테이블의 '속(屬)' 값을 그대로 쓰면 40개 가까이 나와 어지럽습니다.
-// 아래 표로 큰 분류(구근·숙근초·그라스·관목·교목·침엽수)로 묶어서 보여줍니다.
-// 새 속이 들어오면 여기 한 줄만 추가하면 됩니다. (미등록 속은 '기타'로 모입니다)
-const GROUP={
-  // 구근
-  '튤립':'구근','히아신스':'구근','크로커스':'구근','아이리스':'구근',
-  '알리움':'구근','수선화':'구근','무스카리':'구근',
-  // 숙근초
+// ── 대분류 자동 판별 ────────────────────────────────────────────────
+// 에어테이블의 '속(屬)' 값(튤립·조팝나무…)을 그대로 칩으로 쓰면 40개 가까이 나와 어지럽습니다.
+// 그래서 '속 → 대분류' 변환표를 두고 큰 분류로 묶습니다.
+//
+// 라인업 테이블에는 아무 필드도 추가하지 않습니다. 테이블이 몇 개로 늘어도
+// 이 표 하나만 공유하면 됩니다.
+//
+// 1순위 키는 **학명의 라틴 속명**입니다. 한글 속명은 표기가 흔들리지만
+// (딱총/딱총나무, 쥐똥나무/광나무) 라틴 속명은 국제 표준이라 안정적입니다.
+// 조경·원예에서 흔한 속을 미리 폭넓게 등록해 두었으므로, 새 품종을 추가해도
+// 대부분 자동으로 분류됩니다. 미등록 속만 '기타' 칩에 모여 눈에 띕니다.
+const LATIN={};
+[
+ ['구근','Tulipa Hyacinthus Narcissus Crocus Muscari Allium Iris Lilium Fritillaria Galanthus Scilla Chionodoxa Ranunculus Freesia Gladiolus Dahlia Canna Colchicum Camassia Eranthis Erythronium Hippeastrum Leucojum Ornithogalum Puschkinia Ipheion Nectaroscordum Zephyranthes Lycoris Amaryllis Nerine Sternbergia Cyclamen Caladium Alstroemeria Agapanthus Crocosmia Tigridia Triteleia Brodiaea Arisaema Eucomis Hymenocallis Sparaxis Ixia Babiana Watsonia Bletilla Convallaria Anemone Oxalis'],
+ ['숙근초','Echinacea Hosta Liriope Gaura Oenothera Rudbeckia Salvia Sedum Hylotelephium Astilbe Heuchera Heucherella Tiarella Geranium Nepeta Perovskia Achillea Agastache Alchemilla Aquilegia Aster Symphyotrichum Astrantia Baptisia Bergenia Brunnera Campanula Centranthus Actaea Cimicifuga Coreopsis Delphinium Dianthus Dicentra Lamprocapnos Digitalis Doronicum Echinops Epimedium Eryngium Eupatorium Eutrochium Euphorbia Filipendula Gaillardia Gentiana Geum Gypsophila Helenium Helleborus Hemerocallis Iberis Kniphofia Leucanthemum Ligularia Lobelia Lupinus Lychnis Lysimachia Lythrum Monarda Origanum Paeonia Papaver Penstemon Persicaria Phlox Physostegia Platycodon Polemonium Polygonatum Primula Pulmonaria Rodgersia Sanguisorba Saxifraga Scabiosa Solidago Stachys Thalictrum Thymus Tradescantia Trollius Verbascum Verbena Veronica Veronicastrum Vinca Viola Ajuga Aruncus Asarum Chrysanthemum Dendranthema Pachysandra Sempervivum Armeria Anaphalis Aconitum Adenophora Darmera Astilboides Dryopteris Athyrium Osmunda Polystichum Matteuccia Adiantum Farfugium Ophiopogon'],
+ ['그라스·사초','Miscanthus Carex Hakonechloa Pennisetum Calamagrostis Panicum Molinia Deschampsia Festuca Helictotrichon Sesleria Sporobolus Schizachyrium Andropogon Bouteloua Chasmanthium Imperata Muhlenbergia Stipa Nassella Eragrostis Elymus Leymus Koeleria Briza Luzula Juncus Scirpus Typha Phalaris Arundo Cortaderia Acorus Equisetum'],
+ ['관목','Ligustrum Physocarpus Weigela Spiraea Sambucus Hydrangea Berberis Euonymus Aucuba Rosa Caryopteris Nandina Cotinus Sorbaria Elaeagnus Yucca Diervilla Buxus Rhododendron Azalea Camellia Ilex Viburnum Forsythia Syringa Philadelphus Deutzia Kerria Chaenomeles Cornus Corylus Cotoneaster Pyracantha Mahonia Osmanthus Pieris Skimmia Sarcococca Daphne Abelia Callicarpa Clethra Fothergilla Hamamelis Hypericum Itea Leucothoe Potentilla Rhus Ribes Rubus Symphoricarpos Vaccinium Aronia Amelanchier Ceanothus Cistus Escallonia Fatsia Gardenia Hebe Lavandula Loropetalum Myrica Nerium Photinia Pittosporum Rosmarinus Santolina Stephanandra Ternstroemia Vitex Corylopsis Edgeworthia Enkianthus Exochorda Neillia Poncirus Punica Rhodotypos Serissa Stachyurus Zenobia Abeliophyllum Lespedeza Indigofera Rhaphiolepis Nandina'],
+ ['교목','Acer Quercus Prunus Betula Fagus Fraxinus Tilia Ulmus Zelkova Carpinus Ginkgo Liquidambar Liriodendron Magnolia Malus Platanus Populus Pyrus Salix Sorbus Styrax Cercidiphyllum Cercis Cladrastis Crataegus Davidia Diospyros Gleditsia Halesia Koelreuteria Lagerstroemia Maackia Morus Nyssa Ostrya Parrotia Paulownia Phellodendron Pistacia Pterocarya Robinia Styphnolobium Sophora Stewartia Toona Zanthoxylum Aesculus Ailanthus Albizia Alnus Castanea Catalpa Celtis Chionanthus Eucommia Firmiana Idesia Juglans Kalopanax Melia Oxydendrum Pterostyrax Sassafras Trachycarpus'],
+ ['침엽수','Thuja Juniperus Chamaecyparis Pinus Picea Abies Taxus Tsuga Cryptomeria Cedrus Larix Metasequoia Taxodium Sequoia Sequoiadendron Cupressus Cupressocyparis Platycladus Podocarpus Torreya Cephalotaxus Sciadopitys Pseudotsuga Thujopsis Microbiota Calocedrus'],
+ ['덩굴','Clematis Hedera Parthenocissus Wisteria Lonicera Campsis Trachelospermum Actinidia Akebia Celastrus Jasminum Passiflora Vitis Schisandra Aristolochia Humulus'],
+].forEach(([g,list])=>list.split(/\s+/).forEach(n=>{ if(n) LATIN[n]=g; }));
+
+// 학명이 없는 품목(현재 약 6%)을 위한 한글 속명 보조표
+const KOR={
+  '튤립':'구근','히아신스':'구근','크로커스':'구근','아이리스':'구근','알리움':'구근','수선화':'구근','무스카리':'구근',
   '에키네시아':'숙근초','호스타':'숙근초','맥문동':'숙근초','가우라':'숙근초',
-  // 그라스·사초
   '억새':'그라스·사초','밀사초':'그라스·사초','풍지초':'그라스·사초','수크령':'그라스·사초',
-  // 관목
-  '국수나무':'관목','쥐똥나무':'관목','병꽃나무':'관목','애기병꽃나무':'관목',
-  '조팝나무':'관목','딱총':'관목','산수국':'관목','목수국':'관목','매자나무':'관목',
-  '은사철':'관목','식나무':'관목','장미':'관목','층꽃나무':'관목','남천':'관목',
-  '안개나무':'관목','개쉬땅':'관목','보리수':'관목','실유카':'관목','말채나무':'관목',
-  // 교목
+  '국수나무':'관목','쥐똥나무':'관목','병꽃나무':'관목','애기병꽃나무':'관목','조팝나무':'관목',
+  '딱총':'관목','딱총나무':'관목','산수국':'관목','목수국':'관목','수국':'관목','매자나무':'관목',
+  '은사철':'관목','식나무':'관목','장미':'관목','층꽃나무':'관목','남천':'관목','안개나무':'관목',
+  '개쉬땅':'관목','보리수':'관목','실유카':'관목','말채나무':'관목',
   '배롱나무':'교목',
-  // 침엽수
   '측백나무':'침엽수','향나무':'침엽수','화백':'침엽수',
 };
-const GROUP_ORDER=["구근","숙근초","그라스·사초","관목","교목","침엽수","기타"];
-const groupOf=(p)=>GROUP[p.cat]||(p.cat?'기타':'');
+
+const GROUP_ORDER=["구근","숙근초","그라스·사초","관목","교목","침엽수","덩굴","기타"];
+function groupOf(p){
+  const latin=(p.sname||'').trim().split(/\s+/)[0];   // 학명 첫 단어 = 라틴 속명
+  return LATIN[latin] || KOR[p.cat] || ((p.cat||p.sname) ? '기타' : '');
+}
 
 const catsEl=document.getElementById('cats');
 function renderCats(){
