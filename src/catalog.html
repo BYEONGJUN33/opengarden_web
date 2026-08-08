@@ -95,6 +95,8 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 15px;font-size:13.5px;font-weight:500;color:var(--ink);transition:background .15s,border-color .15s,color .15s}
 .chip.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:700}
+.chip .cnum{font-size:11.5px;font-weight:700;color:var(--gray);margin-left:2px}
+.chip.on .cnum{color:#bfe3c8}
 .count{font-size:13px;color:var(--gray);margin-top:12px}
 
 /* 모바일: 필터가 화면을 덜 차지하도록 압축 (칩은 가로 스크롤 한 줄) */
@@ -335,19 +337,43 @@ let cat="전체", cart={}; // cart: {id: qty}
 try{cart=JSON.parse(localStorage.getItem('og_cart')||'{}')}catch(e){cart={}}
 function saveCart(){try{localStorage.setItem('og_cart',JSON.stringify(cart))}catch(e){}}
 
-// 카테고리 칩 — 데이터에서 자동 생성 (에어테이블에 새 카테고리가 생기면 필터도 자동 반영)
-// 순서는 에어테이블 실제 옵션명 기준. 목록에 없는 카테고리(추식구근/* 등)는 뒤에 자동 추가됨
-const CAT_ORDER=["침엽수","상록활엽수","낙엽활엽수","낙엽수","교목","관목","숙근초","초화","사초/그라스","덩굴식물","덩쿨성","구근"];
+// 카테고리 칩 — 에어테이블의 '속(屬)' 값을 그대로 쓰면 40개 가까이 나와 어지럽습니다.
+// 아래 표로 큰 분류(구근·숙근초·그라스·관목·교목·침엽수)로 묶어서 보여줍니다.
+// 새 속이 들어오면 여기 한 줄만 추가하면 됩니다. (미등록 속은 '기타'로 모입니다)
+const GROUP={
+  // 구근
+  '튤립':'구근','히아신스':'구근','크로커스':'구근','아이리스':'구근',
+  '알리움':'구근','수선화':'구근','무스카리':'구근',
+  // 숙근초
+  '에키네시아':'숙근초','호스타':'숙근초','맥문동':'숙근초','가우라':'숙근초',
+  // 그라스·사초
+  '억새':'그라스·사초','밀사초':'그라스·사초','풍지초':'그라스·사초','수크령':'그라스·사초',
+  // 관목
+  '국수나무':'관목','쥐똥나무':'관목','병꽃나무':'관목','애기병꽃나무':'관목',
+  '조팝나무':'관목','딱총':'관목','산수국':'관목','목수국':'관목','매자나무':'관목',
+  '은사철':'관목','식나무':'관목','장미':'관목','층꽃나무':'관목','남천':'관목',
+  '안개나무':'관목','개쉬땅':'관목','보리수':'관목','실유카':'관목','말채나무':'관목',
+  // 교목
+  '배롱나무':'교목',
+  // 침엽수
+  '측백나무':'침엽수','향나무':'침엽수','화백':'침엽수',
+};
+const GROUP_ORDER=["구근","숙근초","그라스·사초","관목","교목","침엽수","기타"];
+const groupOf=(p)=>GROUP[p.cat]||(p.cat?'기타':'');
+
 const catsEl=document.getElementById('cats');
 function renderCats(){
-  const found=[...new Set(PLANTS.map(p=>p.cat).filter(Boolean))];
-  const ordered=[...CAT_ORDER.filter(c=>found.includes(c)),...found.filter(c=>!CAT_ORDER.includes(c))];
+  const found=[...new Set(PLANTS.map(groupOf).filter(Boolean))];
+  const ordered=GROUP_ORDER.filter(c=>found.includes(c));
   if(cat!=="전체"&&!ordered.includes(cat))cat="전체";
   catsEl.innerHTML='';
   ["전체",...ordered].forEach(c=>{
+    const n=c==="전체"?PLANTS.length:PLANTS.filter(p=>groupOf(p)===c).length;
     const b=document.createElement('button');
-    b.className='chip'+(c===cat?' on':''); b.textContent=c;
-    b.onclick=()=>{cat=c;[...catsEl.children].forEach(x=>x.classList.toggle('on',x.textContent===c));render();};
+    b.className='chip'+(c===cat?' on':'');
+    b.innerHTML=c+' <span class="cnum">'+n+'</span>';
+    b.dataset.cat=c;
+    b.onclick=()=>{cat=c;[...catsEl.children].forEach(x=>x.classList.toggle('on',x.dataset.cat===c));render();};
     catsEl.appendChild(b);
   });
 }
@@ -375,7 +401,7 @@ function filtered(){
   const q=document.getElementById('q').value.trim().toLowerCase();
   const z=document.getElementById('zone').value, s=document.getElementById('status').value;
   return PLANTS.filter(p=>
-    (cat==="전체"||p.cat===cat)&&(!z||p.zone===z)&&(!s||p.status===s)&&
+    (cat==="전체"||groupOf(p)===cat)&&(!z||p.zone===z)&&(!s||p.status===s)&&
     (!q||p.kname.toLowerCase().includes(q)||p.sname.toLowerCase().includes(q)));
 }
 
