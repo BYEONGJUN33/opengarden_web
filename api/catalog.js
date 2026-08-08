@@ -59,6 +59,32 @@ async function fetchAll(src) {
   return records;
 }
 
+// 대분류 예외 표 (에어테이블 '속 분류' 테이블).
+// 평소엔 비어 있고, 카탈로그에 '기타'가 뜨거나 분류를 바꾸고 싶을 때만 한 줄 추가합니다.
+// 여기 적힌 값이 프론트의 기본 매핑보다 우선합니다.
+// 테이블이 없거나 조회에 실패해도 카탈로그는 정상 동작해야 하므로 조용히 {}를 돌려줍니다.
+const GROUP_TABLE = process.env.AIRTABLE_GROUP_TABLE || 'tbl7iGQoFTeGUTXyd';
+async function fetchGroupOverrides() {
+  try {
+    const url = new URL(`https://api.airtable.com/v0/${BASE}/${GROUP_TABLE}`);
+    url.searchParams.set('pageSize', '100');
+    const r = await fetch(url, { headers: { Authorization: `Bearer ${TOKEN}` } });
+    if (!r.ok) return {};
+    const { records = [] } = await r.json();
+    const map = {};
+    for (const rec of records) {
+      const f = rec.fields || {};
+      const key = String(f['속'] || '').trim();
+      const val = f['대분류'];
+      const name = typeof val === 'object' && val ? val.name : val;
+      if (key && name) map[key] = String(name);
+    }
+    return map;
+  } catch (e) {
+    return {};
+  }
+}
+
 module.exports = async (req, res) => {
   try {
     if (!BASE || !TOKEN) {
@@ -68,7 +94,7 @@ module.exports = async (req, res) => {
     const src = SOURCES[group];
     const F = src.fields;
 
-    const records = await fetchAll(src);
+    const [records, overrides] = await Promise.all([fetchAll(src), fetchGroupOverrides()]);
     const items = records.map(({ id, fields: f }) => {
       const att = Array.isArray(f[F.image]) && f[F.image][0];
       return {
@@ -91,7 +117,7 @@ module.exports = async (req, res) => {
 
     // 10분 캐시 → 에어테이블 API 한도(초당 5회) 보호 + 빠른 응답
     res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=1200');
-    res.status(200).json({ group, count: items.length, items });
+    res.status(200).json({ group, count: items.length, items, groupOverrides: overrides });
   } catch (e) {
     res.status(500).json({ error: '카탈로그를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.' });
   }
