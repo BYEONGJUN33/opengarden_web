@@ -188,8 +188,29 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 @keyframes skm{0%{background-position:100% 0}100%{background-position:0 0}}
 
 /* 품종 상세 모달 */
-.dphoto{aspect-ratio:4/3;background:linear-gradient(135deg,#dfe9de,#c0d3bd);border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--green);font-size:13px;font-weight:700}
+.dphoto{position:relative;aspect-ratio:4/3;background:linear-gradient(135deg,#dfe9de,#c0d3bd);border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--green);font-size:13px;font-weight:700}
 .dphoto img{width:100%;height:100%;object-fit:cover}
+
+/* 사진 갤러리 — 사진이 2장 이상일 때만 화살표·썸네일이 붙습니다 */
+.gnav{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border:0;border-radius:50%;
+  background:rgba(255,255,255,.92);color:var(--ink);font-size:17px;font-weight:800;line-height:1;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.18);transition:background .15s}
+.gnav:hover{background:#fff}
+.gnav.prev{left:10px}
+.gnav.next{right:10px}
+.gnav:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.gcount{position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;font-weight:700;
+  padding:4px 9px;border-radius:999px;letter-spacing:.02em}
+.gstrip{display:flex;gap:8px;margin-top:10px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.gstrip::-webkit-scrollbar{display:none}
+.gthumb{flex:0 0 62px;height:48px;padding:0;border:2px solid transparent;border-radius:9px;overflow:hidden;background:#eef1ed;transition:border-color .15s}
+.gthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.gthumb[aria-selected="true"]{border-color:var(--green)}
+.gthumb:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+/* 카드 위 장수 배지 */
+.ph .shots{position:absolute;right:9px;bottom:9px;background:rgba(0,0,0,.58);color:#fff;font-size:11.5px;font-weight:700;
+  padding:3px 8px;border-radius:999px;display:flex;align-items:center;gap:4px}
+.ph .shots svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2}
 .dk{font-size:20px;font-weight:800;margin-top:16px;letter-spacing:-.02em}
 .ds{font-size:13px;color:var(--gray);font-style:italic;margin-top:2px}
 .dmeta{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
@@ -209,7 +230,7 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 
 @media(prefers-reduced-motion:reduce){
   .plant,.page-head h1,.page-head p{animation:none}
-  .plant,.plant .ph img,.overlay,.modal,.quote-bar,.quote-bar .go,.send,.chip,.chat-fab{transition:none}
+  .plant,.plant .ph img,.overlay,.modal,.quote-bar,.quote-bar .go,.send,.chip,.chat-fab,.gnav,.gthumb{transition:none}
 }
 
 /* iOS 줌 방지 — 구체성 높은 선택자로 재지정 (반드시 스타일 끝부분) */
@@ -435,7 +456,7 @@ function render(){
     const el=document.createElement('div'); el.className='plant';
     el.style.setProperty('--d',Math.min(i*35,280)+'ms'); // 카드 순차 페이드인 (앞쪽 8줄까지만 시차)
     el.innerHTML=`
-      <div class="ph">${p.image?`<img src="${p.image}" alt="${p.kname}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`:'식물 사진'}<span class="badge ${p.status==='즉시 출하'?'now':'pre'}">${p.status}</span></div>
+      <div class="ph">${p.image?`<img src="${p.image}" alt="${p.kname}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`:'식물 사진'}<span class="badge ${p.status==='즉시 출하'?'now':'pre'}">${p.status}</span>${shotsOf(p)>1?`<span class="shots" aria-label="사진 ${shotsOf(p)}장"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M21 7v12a2 2 0 0 1-2 2H7"/></svg>${shotsOf(p)}</span>`:''}</div>
       <div class="pbody">
         <div class="kname">${p.kname}</div>
         <div class="sname">${p.sname}</div>
@@ -460,16 +481,65 @@ function toggle(id,btn){
 }
 
 // ── 품종 상세 모달 ──
+// 사진 목록 — 구버전 데이터(images 없음)도 image 하나짜리 배열로 취급
+function shotsOf(p){ return (p.images&&p.images.length)?p.images.length:(p.image?1:0) }
+function photosOf(p){ return (p.images&&p.images.length)?p.images:(p.image?[p.image]:[]) }
+
+// 갤러리 상태는 모달이 열려 있는 동안만 유효
+let gShots=[], gIdx=0;
+function gShow(i){
+  if(!gShots.length)return;
+  gIdx=(i+gShots.length)%gShots.length; // 양끝에서 순환
+  const img=document.getElementById('gMain'); if(img)img.src=gShots[gIdx];
+  const c=document.getElementById('gCount'); if(c)c.textContent=`${gIdx+1} / ${gShots.length}`;
+  document.querySelectorAll('.gthumb').forEach((t,n)=>{
+    const on=n===gIdx;
+    t.setAttribute('aria-selected',on?'true':'false');
+    if(on)t.scrollIntoView({block:'nearest',inline:'nearest'});
+  });
+}
+
 function openDetail(id){
   const p=PLANTS.find(x=>x.id===id); if(!p)return;
+  gShots=photosOf(p); gIdx=0;
+  const many=gShots.length>1;
+  // 첫 장만 즉시 로드하고 나머지는 썸네일 클릭 시 받아옴
+  const gallery=gShots.length
+    ? `<div class="dphoto">
+         <img id="gMain" src="${gShots[0]}" alt="${p.kname}">
+         ${many?`<button class="gnav prev" id="gPrev" aria-label="이전 사진">‹</button>
+                 <button class="gnav next" id="gNext" aria-label="다음 사진">›</button>
+                 <span class="gcount" id="gCount">1 / ${gShots.length}</span>`:''}
+       </div>
+       ${many?`<div class="gstrip" role="tablist" aria-label="사진 선택">
+         ${gShots.map((u,i)=>`<button class="gthumb" role="tab" data-i="${i}" aria-selected="${i===0}" aria-label="사진 ${i+1}"><img src="${u}" alt="" loading="lazy"></button>`).join('')}
+       </div>`:''}`
+    : `<div class="dphoto">식물 사진 준비 중</div>`;
   document.getElementById('dBody').innerHTML=`
-    <div class="dphoto">${p.image?`<img src="${p.image}" alt="${p.kname}">`:'식물 사진 준비 중'}</div>
+    ${gallery}
     <div class="dk">${p.kname}</div>
     <div class="ds">${p.sname||''}</div>
     <div class="dmeta">${[p.status,p.size,p.zone,p.cat,p.moq?`최소 주문 ${p.moq}개`:'',p.use].filter(Boolean).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
     ${p.desc?`<p class="ddesc">${p.desc}</p>`:''}
     <button class="dadd${cart[p.id]?' added':''}" id="dAdd">${cart[p.id]?'✓ 견적 목록에 담김':'견적에 담기'}</button>
     <button class="dshare" id="dShare">🔗 이 품종 링크 복사</button>`;
+  // 갤러리 조작 — 화살표 / 썸네일 / 모바일 스와이프
+  if(gShots.length>1){
+    document.getElementById('gPrev').onclick=()=>gShow(gIdx-1);
+    document.getElementById('gNext').onclick=()=>gShow(gIdx+1);
+    document.querySelectorAll('.gthumb').forEach(t=>{
+      t.onclick=()=>gShow(+t.dataset.i);
+    });
+    const ph=document.querySelector('#dBody .dphoto');
+    let x0=null;
+    ph.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
+    ph.addEventListener('touchend',e=>{
+      if(x0===null)return;
+      const dx=e.changedTouches[0].clientX-x0;
+      if(Math.abs(dx)>40)gShow(gIdx+(dx<0?1:-1)); // 40px 이상만 넘김 — 탭과 구분
+      x0=null;
+    },{passive:true});
+  }
   document.getElementById('dAdd').onclick=()=>{
     toggle(p.id,document.querySelector(`.add[data-id="${p.id}"]`));
     const on=!!cart[p.id],d=document.getElementById('dAdd');
@@ -490,10 +560,18 @@ function openDetail(id){
 function itemUrl(id){return location.origin+location.pathname+'?item='+encodeURIComponent(id)}
 function closeDetail(){
   document.getElementById('dOverlay').classList.remove('show');
+  gShots=[]; gIdx=0;
   history.replaceState(null,'',location.pathname);
 }
 document.getElementById('dOverlay').onclick=e=>{if(e.target.id==='dOverlay')closeDetail()};
-addEventListener('keydown',e=>{if(e.key==='Escape'){closeDetail();closeModal();}});
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeDetail();closeModal();return;}
+  // 상세 모달이 열려 있고 사진이 여러 장일 때만 좌우 키를 갤러리에 넘김
+  if(gShots.length>1&&document.getElementById('dOverlay').classList.contains('show')){
+    if(e.key==='ArrowLeft'){e.preventDefault();gShow(gIdx-1);}
+    else if(e.key==='ArrowRight'){e.preventDefault();gShow(gIdx+1);}
+  }
+});
 
 function updateBar(){
   const n=Object.keys(cart).length;
@@ -626,6 +704,8 @@ addEventListener('scroll',()=>hd.classList.toggle('scrolled',scrollY>8),{passive
       id:x.sku||x.id, kname:x.kname, sname:x.sname, size:x.size,
       zone:x.zone, cat:Array.isArray(x.cat)?(x.cat[0]||''):x.cat,
       status:x.status, image:x.image||null,
+      // 구버전 API(images 없음)와도 섞여 돌 수 있어 image 하나로 되돌릴 수 있게 둠
+      images:Array.isArray(x.images)&&x.images.length?x.images:(x.image?[x.image]:[]),
       desc:x.desc||'', use:x.use||'', moq:x.moq||null
     }));
     if(live.length){ PLANTS.length=0; PLANTS.push(...live); }

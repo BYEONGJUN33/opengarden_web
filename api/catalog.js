@@ -95,8 +95,14 @@ module.exports = async (req, res) => {
     const F = src.fields;
 
     const [records, overrides] = await Promise.all([fetchAll(src), fetchGroupOverrides()]);
+    // 첨부는 여러 장 등록될 수 있습니다(국내 라인업의 약 절반이 2~4장).
+    // 카드용으로는 원본(수 MB) 대신 large 썸네일(~512px)을 우선 씁니다.
+    const pickUrl = (a) =>
+      (a && ((a.thumbnails && a.thumbnails.large && a.thumbnails.large.url) || a.url)) || null;
+
     const items = records.map(({ id, fields: f }) => {
-      const att = Array.isArray(f[F.image]) && f[F.image][0];
+      const atts = Array.isArray(f[F.image]) ? f[F.image] : [];
+      const images = atts.map(pickUrl).filter(Boolean);
       return {
         id,
         sku: (F.sku && f[F.sku]) || '',
@@ -108,9 +114,9 @@ module.exports = async (req, res) => {
         desc: (F.desc && f[F.desc]) || '',
         use: (F.use && f[F.use]) || '',
         moq: (F.moq && f[F.moq]) || null, // 최소주문수량 (국내 라인업만)
-        // 카드용으로는 원본(수 MB) 대신 large 썸네일(~512px) 우선.
         // 첨부 URL은 수 시간 뒤 만료되지만 캐시(10분)가 더 짧아 항상 유효한 URL이 나감.
-        image: (att && ((att.thumbnails && att.thumbnails.large && att.thumbnails.large.url) || att.url)) || null,
+        image: images[0] || null, // 대표 사진 — 기존 소비자 호환용으로 계속 내보냄
+        images,                   // 전체 사진 (상세 모달 갤러리용)
         group,
       };
     });
