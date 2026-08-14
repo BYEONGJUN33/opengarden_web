@@ -10,32 +10,22 @@ const KOR = { name: '대한민국', lon: 127, lat: 37.5, ly: 32 };
 
 // 거래 농가 지점 — 나라마다 여러 곳. 라벨은 표시하지 않으므로 좌표만 관리.
 // (나라·지점을 추가하려면 아래 배열에 { lon, lat } 만 넣으면 자동으로 선이 그려집니다)
+// 2026-08-12 지시: 해외 소싱은 네덜란드·이탈리아·스페인·북미 4개 권역.
+// (이전엔 인상 위주로 20개 지점을 찍었으나, 메인의 "해외 4개국" 표기와 어긋나 정리함)
 const origins = [
-  // 유럽
-  { lon: 4.66, lat: 52.08 },   // 네덜란드
-  { lon: 3.72, lat: 51.05 },   // 벨기에
-  { lon: 9.79, lat: 53.66 },   // 독일
-  { lon: 10.92, lat: 43.93 },  // 이탈리아
-  { lon: -0.38, lat: 39.47 },  // 스페인
-  // 중동·아프리카
-  { lon: 34.80, lat: 32.00 },  // 이스라엘
-  { lon: 36.80, lat: -1.30 },  // 케냐
-  { lon: 28.20, lat: -25.70 }, // 남아프리카
-  // 아시아
-  { lon: 77.60, lat: 12.97 },  // 인도
-  { lon: 100.50, lat: 13.70 }, // 태국
-  { lon: 121.40, lat: 31.20 }, // 중국
-  { lon: 120.50, lat: 24.00 }, // 대만
-  { lon: 135.50, lat: 34.70 }, // 일본
-  // 오세아니아
-  { lon: 151.20, lat: -33.80 },// 호주
-  { lon: 174.70, lat: -36.80 },// 뉴질랜드
-  // 아메리카
-  { lon: -122.80, lat: 45.30 },// 미국(오리건)
-  { lon: -81.40, lat: 28.50 }, // 미국(플로리다)
-  { lon: -122.80, lat: 49.20 },// 캐나다
-  { lon: -84.10, lat: 9.90 },  // 코스타리카
-  { lon: -74.10, lat: 4.70 },  // 콜롬비아
+  // 네덜란드 — 주요 육묘 지역
+  { lon: 4.66, lat: 52.08 },
+  { lon: 5.63, lat: 51.93 },
+  // 이탈리아 — 피스토이아 일대
+  { lon: 10.92, lat: 43.93 },
+  { lon: 10.50, lat: 45.30 },
+  // 스페인
+  { lon: -0.38, lat: 39.47 },
+  { lon: -3.70, lat: 40.42 },
+  // 북미
+  { lon: -122.80, lat: 45.30 }, // 미국(오리건)
+  { lon: -81.40, lat: 28.50 },  // 미국(플로리다)
+  { lon: -122.80, lat: 49.20 }, // 캐나다(BC)
 ];
 const kx = X(KOR.lon), ky = Y(KOR.lat);
 
@@ -64,7 +54,7 @@ const korLabel = `      <text class="lbl lbl-kor" x="${kx.toFixed(1)}" y="${(ky 
 // [제목, [설명 줄], 아이콘 path, 사진, 사진 alt]
 const steps = [
   ['현지 농가에서 직접 고릅니다',
-    ['네덜란드·이탈리아·미국 등 현지 농가와 직접 거래해 품종을 선정합니다.',
+    ['네덜란드·이탈리아·스페인·북미의 현지 농가와 직접 거래해 품종을 선정합니다.',
      '같은 품종이라도 생산 국가에 따라 수입 가능 여부가 달라, 주문 전에 반드시 확인합니다.'],
     '<path d="M12 21V9M12 9c0-3 2-5 5-5 0 3-2 5-5 5zM12 12C12 9 10 7 7 7c0 3 2 5 5 5z"/>',
     'p1-farm.jpg', '현지 농가에서 자라는 묘목'],
@@ -130,14 +120,13 @@ const html = `<!DOCTYPE html>
 <meta property="og:site_name" content="오픈가든">
 <meta property="og:type" content="website">
 <meta property="og:title" content="수입 과정 | 오픈가든">
-<meta property="og:description" content="세계 각지의 협력 농가에서 국내 현장까지, 오픈가든의 수입 6단계를 소개합니다.">
+<meta property="og:description" content="국내 농가 매칭부터 해외 직수입·검역·현장 납품까지, 오픈가든의 조달 과정을 소개합니다.">
 <meta property="og:image" content="https://open-garden.co.kr/assets/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/assets/logo_green_notext.png" type="image/png">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&family=Noto+Serif+KR:wght@700;900&display=swap" rel="stylesheet">
 <style>
 /* 헤드라인 전용 부리체 — 마루 부리(네이버, 무료) */
-@font-face{font-family:"MaruBuri";src:url("https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri-SemiBold.woff2") format("woff2");font-weight:600 800;font-style:normal;font-display:swap}
 
 :root{--green:#1F4D33;--green-dark:#123023;--ink:#111814;--gray:#6b746e;--bg:#fff;--bg-soft:#F4F6F3;--line:#E4E8E3;--kakao:#FEE500}
 /* 한글 모바일 기본값 — 어절 단위 줄바꿈 + 긴 영문은 예외적으로 끊기 */
@@ -156,13 +145,13 @@ p,li,dd{text-wrap:pretty}
 @media(max-width:767px){input,textarea,select{font-size:16px}}
 
 /* 헤드라인만 부리체 — 본문은 Noto Sans KR 유지 */
-h1,h2{font-family:"MaruBuri","Noto Sans KR",serif;letter-spacing:-.02em}
+h1,h2{font-family:"Noto Serif KR","Noto Sans KR",serif;letter-spacing:-.02em}
 
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;font-size:16px;letter-spacing:-.01em}
 .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-h2{font-size:clamp(26px,4vw,40px);font-weight:800;line-height:1.35;letter-spacing:-.03em}
+h2{font-size:clamp(26px,4vw,40px);font-weight:700;line-height:1.35;letter-spacing:-.03em}
 .sub{font-size:clamp(15px,2vw,18px);color:var(--gray);margin-top:14px}
 section{padding:88px 0}
 .center{text-align:center}
@@ -287,7 +276,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <div class="wrap page-head">
   <div class="kicker-s">IMPORT PROCESS</div>
   <h1>나무가 자란 곳부터,심길 곳까지.</h1>
-  <p>오픈가든은 세계 각지의 협력 농가에서 정원수를 직접 수입합니다.<br>
+  <p>오픈가든은 전국 거래 농가와 해외 현지 농장을 함께 운용합니다.<br>
      품종 선정 · 검역 · 통관 · 국내 적응재배 · 현장 납품까지,<br>
      중간 유통 없이 전 과정을 직접 처리합니다.</p>
 </div>
@@ -296,8 +285,8 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <section class="mapsec">
   <div class="wrap center">
     <div class="kicker-s">거래 농가</div>
-    <h2>세계 각지의 협력 농가와직접 거래합니다.</h2>
-    <p class="sub">네덜란드·이탈리아·미국·캐나다·중국·대만 등 여러 나라의 협력 농가에서 직수입합니다.</p>
+    <h2>국내에 없으면, 해외에서 찾아옵니다.</h2>
+    <p class="sub">네덜란드·이탈리아·스페인·북미의 협력 농가와 직접 거래합니다. 국내에 있는 품목은 전국 거래 농가에서 바로 매칭합니다.</p>
     <div class="mapwrap">
       <img class="mapdots" src="/assets/worldmap-dots.png" alt="오픈가든 글로벌 거래 네트워크 세계지도">
       <svg class="mapsvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="거래처 국가에서 한국으로 이어지는 글로벌 네트워크 지도">
@@ -309,8 +298,8 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 ${arcs}${marks}${korMark}${labels}${korLabel}      </svg>
     </div>
     <ul class="countries" aria-label="주요 거래 국가">
-      <li>네덜란드</li><li>이탈리아</li><li>미국</li><li>캐나다</li><li>중국</li><li>대만</li>
-      <li class="more">외 여러 나라</li>
+      <li>네덜란드</li><li>이탈리아</li><li>스페인</li><li>미국</li><li>캐나다</li>
+      <li class="more">국내 전국 거래 농가</li>
     </ul>
     <p class="mapnote">* 지도의 표시는 주요 거래·수입 지역을 나타냅니다.</p>
   </div>
@@ -333,11 +322,11 @@ ${stepHtml}    </div>
 <section class="endcta">
   <div class="wrap center">
     <h2>찾으시는 품종이 있으신가요?</h2>
-    <p>카탈로그에서 직접 고르시거나, 목록에 없는 품종은 바로 문의해 주세요.<br>
+    <p>카탈로그에서 직접 고르시거나, 목록에 없는 품종은 바로 요청해 주세요.<br>
        현지 농가에 수급 가능 여부를 확인해 드립니다.</p>
     <div class="actions">
       <a href="/catalog.html" class="btn">카탈로그에서 견적 받기</a>
-      <a href="https://pf.kakao.com/_lGfxhX/chat" target="_blank" rel="noopener" class="btn btn-kakao">카카오톡 상담</a>
+      <a href="https://pf.kakao.com/_lGfxhX/chat" target="_blank" rel="noopener" class="btn btn-kakao">카카오톡 채널로 견적 받기</a>
     </div>
   </div>
 </section>

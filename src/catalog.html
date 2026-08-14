@@ -15,10 +15,9 @@
 <meta property="og:image" content="https://open-garden.co.kr/assets/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/assets/logo_green_notext.png" type="image/png">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&family=Noto+Serif+KR:wght@700;900&display=swap" rel="stylesheet">
 <style>
 /* 헤드라인 전용 부리체 — 마루 부리(네이버, 무료) */
-@font-face{font-family:"MaruBuri";src:url("https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri-SemiBold.woff2") format("woff2");font-weight:600 800;font-style:normal;font-display:swap}
 
 :root{--green:#1F4D33;--green-dark:#123023;--ink:#111814;--gray:#6b746e;--bg:#fff;--bg-soft:#F4F6F3;--line:#E4E8E3;--kakao:#FEE500}
 /* 한글 모바일 기본값 — 어절 단위 줄바꿈 + 긴 영문은 예외적으로 끊기 */
@@ -38,7 +37,7 @@ p,li,dd{text-wrap:pretty}
 @media(max-width:767px){input,textarea,select{font-size:16px}}
 
 /* 헤드라인만 부리체 — 본문은 Noto Sans KR 유지 */
-h1,h2{font-family:"MaruBuri","Noto Sans KR",serif;letter-spacing:-.02em}
+h1,h2{font-family:"Noto Serif KR","Noto Sans KR",serif;letter-spacing:-.02em}
 
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;font-size:15px;letter-spacing:-.01em}
@@ -226,7 +225,7 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 
 <div class="wrap page-head">
   <h1>식물 카탈로그</h1>
-  <p>원하는 품종을 담고 '견적 요청'을 누르면 카카오톡으로 바로 문의할 수 있습니다.</p>
+  <p>원하는 품종을 담고 '견적 요청'을 누르면 카카오톡으로 바로 요청할 수 있습니다.</p>
 </div>
 
 <div class="toolbar">
@@ -276,9 +275,8 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
         <label class="agree"><input type="checkbox" id="fagree">
           <span><b>(필수)</b> 개인정보 수집·이용에 동의합니다.</span></label>
         <div class="agree-detail">
-          수집 항목: 연락처, 성함/소속(선택), 요청 사항(선택), 요청 품목·수량<br>
-          이용 목적: 견적 상담 및 납품 진행 · 보유 기간: 수집일로부터 3년<br>
-          동의를 거부하실 수 있으나, 거부 시 견적 접수가 제한됩니다.
+          연락처·성함/소속·요청 사항·품목을 견적 및 납품 진행 목적으로 3년간 보관합니다.
+          거부하실 수 있으며 이 경우 접수가 제한됩니다.
           <a href="/privacy.html" target="_blank" rel="noopener">자세히 보기</a>
         </div>
         <label class="agree"><input type="checkbox" id="fmkt">
@@ -291,13 +289,13 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
         <textarea id="fallbackText" rows="7" readonly style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;font-family:inherit;font-size:13px" onclick="this.select()"></textarea>
         <button class="send" style="margin-top:10px" onclick="window.open(KAKAO_URL,'_blank')">복사했어요 — 카카오톡 열기</button>
       </div>
-      <p class="send-note">* 접수 즉시 요청번호가 발급됩니다. 급하시면 접수 후 카카오톡으로 바로 상담할 수 있어요.</p>
+      <p class="send-note">* 접수 즉시 요청번호가 발급됩니다. 급하시면 접수 후 카카오톡으로 바로 요청할 수 있어요.</p>
     </div>
     <div id="qdone" style="display:none;text-align:center;padding:8px 0 4px">
       <svg viewBox="0 0 24 24" style="width:52px;height:52px;stroke:var(--green);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.2l2.7 2.7L16 9.6"/></svg>
       <h2 style="margin-top:6px">견적 요청이 접수되었습니다</h2>
       <p class="desc" style="margin-top:10px">요청번호 <b id="doneNo" style="color:var(--green)"></b><br>담당자가 확인 후 곧 연락드리겠습니다.</p>
-      <button class="send" onclick="openKakaoAfterDone()">급하신가요? 카카오톡 상담</button>
+      <button class="send" onclick="openKakaoAfterDone()">급하신가요? 카카오톡 채널로 요청</button>
       <p class="send-note">버튼을 누르면 요청번호가 복사되고 오픈가든 채팅이 열립니다.</p>
     </div>
   </div>
@@ -477,7 +475,7 @@ function openDetail(id){
     const on=!!cart[p.id],d=document.getElementById('dAdd');
     d.classList.toggle('added',on);d.textContent=on?'✓ 견적 목록에 담김':'견적에 담기';
   };
-  // 품종 링크 공유 — 카톡 상담 중 특정 품종을 콕 집어 보낼 때 사용
+  // 품종 링크 공유 — 카톡으로 특정 품종을 콕 집어 보낼 때 사용
   document.getElementById('dShare').onclick=()=>{
     const url=itemUrl(p.id);
     navigator.clipboard.writeText(url)
@@ -579,7 +577,7 @@ async function sendQuote(){
     document.getElementById('qdone').style.display='block';
     cart={};saveCart();updateBar();render();
   }catch(e){
-    // 접수 서버 연결 실패(오프라인·미배포 등) → 예비 경로: 목록 복사 + 카카오톡 직접 문의
+    // 접수 서버 연결 실패(오프라인·미배포 등) → 예비 경로: 목록 복사 + 카카오톡으로 직접 요청
     const lines=items.map((it,i)=>`${i+1}. ${it.kname} · ${it.size} · ${it.qty}개`);
     const msg=[
       `[오픈가든 견적 요청]`,
@@ -595,7 +593,7 @@ async function sendQuote(){
 }
 
 function openKakaoAfterDone(){
-  const t=`[오픈가든 견적 문의 · ${lastRequestNo}] 방금 접수한 견적 관련 문의드립니다.`;
+  const t=`[오픈가든 견적 요청 · ${lastRequestNo}] 방금 접수한 견적 관련 요청드립니다.`;
   try{navigator.clipboard.writeText(t);toast('요청번호가 복사되었습니다 — 채팅창에 붙여넣어주세요');}catch(e){}
   setTimeout(()=>window.open(KAKAO_URL,'_blank'),600);
 }
