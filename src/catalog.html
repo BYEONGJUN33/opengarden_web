@@ -96,6 +96,12 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 .chip.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:700}
 .chip .cnum{font-size:11.5px;font-weight:700;color:var(--gray);margin-left:2px}
 .chip.on .cnum{color:#bfe3c8}
+/* 2단(세부 분류) — 대분류를 고르면 나타납니다.
+   관목처럼 하위가 19개까지 가는 대분류가 있어 칩으로 늘어놓으면 화면을 잡아먹어
+   높이가 고정되는 드롭다운으로 처리합니다. */
+.subrow{display:flex;align-items:center;gap:9px;margin-top:11px}
+.subrow[hidden]{display:none}
+.sublbl{font-size:12.5px;font-weight:700;color:var(--gray);flex:0 0 auto}
 .count{font-size:13px;color:var(--gray);margin-top:12px}
 
 /* 모바일: 필터가 화면을 덜 차지하도록 압축 (칩은 가로 스크롤 한 줄) */
@@ -107,6 +113,7 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
   .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-top:10px;padding-bottom:2px}
   .chips::-webkit-scrollbar{display:none}
   .chip{flex:0 0 auto}
+  .subrow select{flex:1;min-width:0}
   .count{margin-top:8px}
 }
 
@@ -263,7 +270,11 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
       </select>
     </div>
     <div class="chips" id="cats" role="group" aria-label="카테고리 필터"></div>
-    <div class="count" id="count"></div>
+    <div class="subrow" id="subrow" hidden>
+      <label class="sublbl" for="sub">세부 분류</label>
+      <select id="sub" aria-label="세부 분류"></select>
+    </div>
+    <div class="count" id="count" aria-live="polite"></div>
   </div>
 </div>
 
@@ -351,7 +362,7 @@ const PLANTS=[
 ];
 const KAKAO_URL="https://pf.kakao.com/_lGfxhX/chat"; // 오픈가든 카카오톡 채널 채팅
 
-let cat="전체", cart={}; // cart: {id: qty}
+let cat="전체", sub="전체", cart={}; // cat=대분류, sub=세부 분류, cart: {id: qty}
 // 견적 목록은 localStorage에 유지 — 새로고침·페이지 이동에도 안 사라짐
 try{cart=JSON.parse(localStorage.getItem('og_cart')||'{}')}catch(e){cart={}}
 function saveCart(){try{localStorage.setItem('og_cart',JSON.stringify(cart))}catch(e){}}
@@ -403,6 +414,50 @@ function groupOf(p){
       || ((p.cat||p.sname) ? '기타' : '');             // ③ 미등록 → 기타
 }
 
+// ── 2단(세부 분류) ──
+// 에어테이블 선택지에 '조팝'과 '조팝나무'가 함께 남아 있어, 앞으로 어느 쪽을
+// 고르더라도 칩이 갈라지지 않도록 코드에서 같은 키로 흡수합니다.
+// (산수국·목수국·수국은 정규화해도 서로 다른 키라 합쳐지지 않습니다 — 의도한 동작)
+const subKey=s=>String(s||'').replace(/\s+/g,'').replace(/나무$/,'');
+// 카테고리가 비어 있으면 학명의 라틴 속명으로 대체
+const subRaw=p=>String(p.cat||'').trim()||String(p.sname||'').trim().split(/\s+/)[0]||'';
+function subOf(p){ return subKey(subRaw(p)) }
+
+// 표시 라벨은 실제 데이터에 나타난 변형 중 가장 긴 표기를 씁니다.
+// ('조팝'과 '조팝나무'가 섞여 있으면 '조팝나무' — 조경 현장 표기에 가까움)
+function subLabels(list){
+  const m={};
+  list.forEach(p=>{
+    const k=subOf(p); if(!k)return;
+    const raw=subRaw(p);
+    if(!m[k]||raw.length>m[k].length)m[k]=raw;
+  });
+  return m;
+}
+
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+
+function renderSubs(){
+  const row=document.getElementById('subrow'), sel=document.getElementById('sub');
+  const hide=()=>{row.hidden=true;sub="전체";sel.innerHTML='';};
+  if(cat==="전체")return hide();
+
+  const inCat=PLANTS.filter(p=>groupOf(p)===cat);
+  const labels=subLabels(inCat), counts={};
+  inCat.forEach(p=>{const k=subOf(p); if(k)counts[k]=(counts[k]||0)+1;});
+  const keys=Object.keys(counts).sort((a,b)=>labels[a].localeCompare(labels[b],'ko'));
+
+  // 하위가 하나뿐이면(교목 등) 고를 게 없으므로 줄 자체를 띄우지 않습니다
+  if(keys.length<2)return hide();
+
+  if(!keys.includes(sub))sub="전체";
+  sel.innerHTML=`<option value="전체">전체 (${inCat.length})</option>`+
+    keys.map(k=>`<option value="${esc(k)}">${esc(labels[k])} (${counts[k]})</option>`).join('');
+  sel.value=sub;
+  row.hidden=false;
+}
+document.getElementById('sub').onchange=e=>{sub=e.target.value;render();};
+
 const catsEl=document.getElementById('cats');
 function renderCats(){
   const found=[...new Set(PLANTS.map(groupOf).filter(Boolean))];
@@ -415,7 +470,11 @@ function renderCats(){
     b.className='chip'+(c===cat?' on':'');
     b.innerHTML=c+' <span class="cnum">'+n+'</span>';
     b.dataset.cat=c;
-    b.onclick=()=>{cat=c;[...catsEl.children].forEach(x=>x.classList.toggle('on',x.dataset.cat===c));render();};
+    b.setAttribute('aria-pressed',c===cat?'true':'false');
+    // 대분류를 바꾸면 세부 분류는 항상 '전체'로 되돌립니다
+    b.onclick=()=>{cat=c;sub="전체";
+      [...catsEl.children].forEach(x=>{const on=x.dataset.cat===c;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on?'true':'false');});
+      renderSubs();render();};
     catsEl.appendChild(b);
   });
 }
@@ -443,7 +502,8 @@ function filtered(){
   const q=document.getElementById('q').value.trim().toLowerCase();
   const z=document.getElementById('zone').value, s=document.getElementById('status').value;
   return PLANTS.filter(p=>
-    (cat==="전체"||groupOf(p)===cat)&&(!z||p.zone===z)&&(!s||p.status===s)&&
+    (cat==="전체"||groupOf(p)===cat)&&(sub==="전체"||subOf(p)===sub)&&
+    (!z||p.zone===z)&&(!s||p.status===s)&&
     (!q||p.kname.toLowerCase().includes(q)||p.sname.toLowerCase().includes(q)));
 }
 
@@ -714,6 +774,7 @@ addEventListener('scroll',()=>hd.classList.toggle('scrolled',scrollY>8),{passive
   Object.keys(cart).forEach(id=>{ if(!PLANTS.find(p=>p.id===id)) delete cart[id]; });
   saveCart(); updateBar();
   renderCats();
+  renderSubs();
   renderZones();
   render();
   // 공유 링크(?item=…)로 들어왔으면 해당 품종 상세를 바로 연다
