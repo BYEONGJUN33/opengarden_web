@@ -218,6 +218,17 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 .ph .shots{position:absolute;right:9px;bottom:9px;background:rgba(0,0,0,.58);color:#fff;font-size:11.5px;font-weight:700;
   padding:3px 8px;border-radius:999px;display:flex;align-items:center;gap:4px}
 .ph .shots svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2}
+/* 규격 선택 — 규격이 1개든 6개든 모달 높이가 같아야 하므로
+   줄바꿈 없이 한 줄로 두고, 넘치면 가로 스크롤합니다.
+   (호버는 모바일에서 동작하지 않으므로 선택 상태는 색으로만 구분) */
+.dsizes{display:flex;align-items:center;gap:10px;margin-top:14px}
+.dsz-lbl{font-size:12.5px;font-weight:700;color:var(--gray);flex:0 0 auto}
+.dsz-list{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.dsz-list::-webkit-scrollbar{display:none}
+.dsz{flex:0 0 auto;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;
+  font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;transition:background .15s,border-color .15s,color .15s}
+.dsz.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:700}
+.dsz:focus-visible{outline:3px solid var(--green);outline-offset:2px}
 .dk{font-size:20px;font-weight:800;margin-top:16px;letter-spacing:-.02em}
 .ds{font-size:13px;color:var(--gray);font-style:italic;margin-top:2px}
 .dmeta{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
@@ -237,7 +248,7 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 
 @media(prefers-reduced-motion:reduce){
   .plant,.page-head h1,.page-head p{animation:none}
-  .plant,.plant .ph img,.overlay,.modal,.quote-bar,.quote-bar .go,.send,.chip,.chat-fab,.gnav,.gthumb{transition:none}
+  .plant,.plant .ph img,.overlay,.modal,.quote-bar,.quote-bar .go,.send,.chip,.chat-fab,.gnav,.gthumb,.dsz{transition:none}
 }
 
 /* iOS 줌 방지 — 구체성 높은 선택자로 재지정 (반드시 스타일 끝부분) */
@@ -442,7 +453,7 @@ function renderSubs(){
   const hide=()=>{row.hidden=true;sub="전체";sel.innerHTML='';};
   if(cat==="전체")return hide();
 
-  const inCat=PLANTS.filter(p=>groupOf(p)===cat);
+  const inCat=ITEMS.filter(p=>groupOf(p)===cat);
   const labels=subLabels(inCat), counts={};
   inCat.forEach(p=>{const k=subOf(p); if(k)counts[k]=(counts[k]||0)+1;});
   const keys=Object.keys(counts).sort((a,b)=>labels[a].localeCompare(labels[b],'ko'));
@@ -458,14 +469,47 @@ function renderSubs(){
 }
 document.getElementById('sub').onchange=e=>{sub=e.target.value;render();};
 
+// ── 품종 묶기 ──
+// 에어테이블은 규격마다 별도 레코드입니다(SKU·단가가 규격별로 달라 구조상 옳음).
+// 화면에서는 같은 품종을 카드 1장으로 묶고, 규격은 상세에서 고르게 합니다.
+// PLANTS(레코드 단위)는 그대로 두고 ITEMS(품종 단위)를 따로 만듭니다 —
+// 장바구니·견적 전송이 레코드ID 기준이라 그쪽 로직을 건드리지 않기 위함입니다.
+let ITEMS=[];
+
+// 규격 정렬: 앞의 숫자를 뽑아 오름차순. (에어테이블 선택지 순서는 뒤죽박죽)
+// '14/15 규격'→14, '5치'→5, '19/+ 규격'→19, 숫자가 없으면 맨 뒤로
+function sizeNum(s){ const m=String(s||'').match(/\d+/); return m?+m[0]:Number.MAX_SAFE_INTEGER }
+const sizeText=v=>Array.isArray(v)?v.join(', '):String(v||'');
+
+function buildItems(){
+  const m=new Map();
+  PLANTS.forEach(p=>{
+    const key=((p.kname||'')+'|'+(p.sname||'')).trim().toLowerCase();
+    let it=m.get(key);
+    if(!it){ it={key,kname:p.kname,sname:p.sname,cat:p.cat,desc:p.desc,use:p.use,variants:[]}; m.set(key,it); }
+    it.variants.push(p);
+  });
+  ITEMS=[...m.values()];
+  ITEMS.forEach(it=>{
+    it.variants.sort((a,b)=>sizeNum(sizeText(a.size))-sizeNum(sizeText(b.size)));
+    it.zones=[...new Set(it.variants.map(v=>v.zone).filter(Boolean))];
+    it.statuses=[...new Set(it.variants.map(v=>v.status).filter(Boolean))];
+    it.status=it.statuses[0]||'';
+    // 대표 사진은 사진이 가장 많은 규격에서 가져옵니다
+    const best=it.variants.reduce((a,b)=>(shotsOf(b)>shotsOf(a)?b:a),it.variants[0]);
+    it.image=best.image||null; it.images=best.images||[];
+  });
+}
+const inCartCount=it=>it.variants.filter(v=>cart[v.id]).length;
+
 const catsEl=document.getElementById('cats');
 function renderCats(){
-  const found=[...new Set(PLANTS.map(groupOf).filter(Boolean))];
+  const found=[...new Set(ITEMS.map(groupOf).filter(Boolean))];
   const ordered=GROUP_ORDER.filter(c=>found.includes(c));
   if(cat!=="전체"&&!ordered.includes(cat))cat="전체";
   catsEl.innerHTML='';
   ["전체",...ordered].forEach(c=>{
-    const n=c==="전체"?PLANTS.length:PLANTS.filter(p=>groupOf(p)===c).length;
+    const n=c==="전체"?ITEMS.length:ITEMS.filter(p=>groupOf(p)===c).length;
     const b=document.createElement('button');
     b.className='chip'+(c===cat?' on':'');
     b.innerHTML=c+' <span class="cnum">'+n+'</span>';
@@ -478,13 +522,14 @@ function renderCats(){
     catsEl.appendChild(b);
   });
 }
+buildItems(); // 샘플 데이터 기준으로 먼저 구성 — 실데이터 도착 시 init에서 다시 만듭니다
 renderCats();
 
 // 내한성 필터 — 값 형식이 제각각(Zone 5, Zone 4-8, -20℃ 등)이라 데이터에서 자동 생성
 function renderZones(){
   const sel=document.getElementById('zone');
   const cur=sel.value;
-  const zones=[...new Set(PLANTS.map(p=>p.zone).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko'));
+  const zones=[...new Set(PLANTS.map(p=>p.zone).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko')); // 규격 단위 원본에서 수집
   sel.innerHTML='<option value="">내한성 전체</option>'+zones.map(z=>`<option>${z}</option>`).join('');
   if(zones.includes(cur))sel.value=cur;
 }
@@ -501,9 +546,10 @@ renderSkeleton(8);
 function filtered(){
   const q=document.getElementById('q').value.trim().toLowerCase();
   const z=document.getElementById('zone').value, s=document.getElementById('status').value;
-  return PLANTS.filter(p=>
+  // 내한성·공급구분은 규격마다 다를 수 있어, 하나라도 맞으면 그 품종을 남깁니다
+  return ITEMS.filter(p=>
     (cat==="전체"||groupOf(p)===cat)&&(sub==="전체"||subOf(p)===sub)&&
-    (!z||p.zone===z)&&(!s||p.status===s)&&
+    (!z||p.zones.includes(z))&&(!s||p.statuses.includes(s))&&
     (!q||p.kname.toLowerCase().includes(q)||p.sname.toLowerCase().includes(q)));
 }
 
@@ -512,19 +558,27 @@ function render(){
   document.getElementById('count').textContent=`${list.length}개 품종 표시 중`;
   grid.innerHTML=list.length?"":"<div class='empty'>조건에 맞는 품종이 없습니다.<br>필터를 조정해보세요.</div>";
   list.forEach((p,i)=>{
-    const inCart=cart[p.id];
+    const n=inCartCount(p), multi=p.variants.length>1;
     const el=document.createElement('div'); el.className='plant';
     el.style.setProperty('--d',Math.min(i*35,280)+'ms'); // 카드 순차 페이드인 (앞쪽 8줄까지만 시차)
+    // 규격이 여러 개면 개수만 적습니다 — 카드에 다 늘어놓으면 그리드가 흔들립니다
+    const sizeTag=multi?`규격 ${p.variants.length}종`:sizeText(p.variants[0].size);
+    const moq=multi?null:p.variants[0].moq;
+    const label=n?(multi?`✓ ${n}개 규격 담김`:'✓ 담김'):'견적에 담기';
     el.innerHTML=`
       <div class="ph">${p.image?`<img src="${p.image}" alt="${p.kname}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`:'식물 사진'}<span class="badge ${p.status==='즉시 출하'?'now':'pre'}">${p.status}</span>${shotsOf(p)>1?`<span class="shots" aria-label="사진 ${shotsOf(p)}장"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M21 7v12a2 2 0 0 1-2 2H7"/></svg>${shotsOf(p)}</span>`:''}</div>
       <div class="pbody">
         <div class="kname">${p.kname}</div>
         <div class="sname">${p.sname}</div>
-        <div class="meta">${[p.size,p.zone,p.cat,p.moq?`최소 ${p.moq}개`:''].filter(Boolean).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
-        <button class="add${inCart?' added':''}" data-id="${p.id}">${inCart?'✓ 담김':'견적에 담기'}</button>
+        <div class="meta">${[sizeTag,p.zones[0],p.cat,moq?`최소 ${moq}개`:''].filter(Boolean).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        <button class="add${n?' added':''}" data-key="${esc(p.key)}">${label}</button>
       </div>`;
-    el.querySelector('.add').onclick=e=>toggle(p.id,e.target);
-    el.querySelector('.ph').onclick=()=>openDetail(p.id);
+    // 규격이 여러 개면 어느 SKU인지 알 수 없으므로 바로 담지 않고 상세를 엽니다
+    el.querySelector('.add').onclick=e=>{
+      if(multi)openDetail(p.key);
+      else toggle(p.variants[0].id,e.target);
+    };
+    el.querySelector('.ph').onclick=()=>openDetail(p.key);
     grid.appendChild(el);
   });
 }
@@ -559,9 +613,30 @@ function gShow(i){
   });
 }
 
-function openDetail(id){
-  const p=PLANTS.find(x=>x.id===id); if(!p)return;
-  gShots=photosOf(p); gIdx=0;
+// 상세는 '품종' 단위로 열고, 규격은 그 안에서 고릅니다
+let dItem=null, dVar=0;
+
+function openDetail(idOrKey){
+  let it=ITEMS.find(x=>x.key===idOrKey), vi=0;
+  if(!it){
+    // 기존 공유 링크(?item=레코드ID) 호환 — 해당 규격이 선택된 채로 열립니다
+    for(const x of ITEMS){
+      const i=x.variants.findIndex(v=>v.id===idOrKey);
+      if(i>=0){ it=x; vi=i; break; }
+    }
+  }
+  if(!it)return;
+  dItem=it; dVar=vi;
+  renderDetail();
+  document.getElementById('dOverlay').classList.add('show');
+  document.querySelector('#dOverlay .modal').focus();
+}
+
+function renderDetail(){
+  const it=dItem; if(!it)return;
+  const p=it.variants[dVar];
+  // 선택한 규격의 사진, 없으면 대표 사진으로 대체
+  gShots=photosOf(p).length?photosOf(p):photosOf(it); gIdx=0;
   const many=gShots.length>1;
   // 첫 장만 즉시 로드하고 나머지는 썸네일 클릭 시 받아옴
   const gallery=gShots.length
@@ -577,12 +652,21 @@ function openDetail(id){
     : `<div class="dphoto">식물 사진 준비 중</div>`;
   document.getElementById('dBody').innerHTML=`
     ${gallery}
-    <div class="dk">${p.kname}</div>
-    <div class="ds">${p.sname||''}</div>
-    <div class="dmeta">${[p.status,p.size,p.zone,p.cat,p.moq?`최소 주문 ${p.moq}개`:'',p.use].filter(Boolean).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
-    ${p.desc?`<p class="ddesc">${p.desc}</p>`:''}
+    <div class="dk">${it.kname}</div>
+    <div class="ds">${it.sname||''}</div>
+    <div class="dsizes" role="group" aria-label="규격 선택">
+      <span class="dsz-lbl">규격</span>
+      <div class="dsz-list">${it.variants.map((v,i)=>
+        `<button class="dsz${i===dVar?' on':''}" data-i="${i}" aria-pressed="${i===dVar}">${esc(sizeText(v.size))}${cart[v.id]?' ✓':''}</button>`).join('')}</div>
+    </div>
+    <div class="dmeta">${[p.status,p.zone,it.cat,p.moq?`최소 주문 ${p.moq}개`:'',it.use].filter(Boolean).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    ${it.desc?`<p class="ddesc">${it.desc}</p>`:''}
     <button class="dadd${cart[p.id]?' added':''}" id="dAdd">${cart[p.id]?'✓ 견적 목록에 담김':'견적에 담기'}</button>
     <button class="dshare" id="dShare">🔗 이 품종 링크 복사</button>`;
+  // 규격 전환 — 사진·최소주문수량·담기 상태가 함께 바뀝니다
+  document.querySelectorAll('#dBody .dsz').forEach(b=>{
+    b.onclick=()=>{ if(+b.dataset.i===dVar)return; dVar=+b.dataset.i; renderDetail(); };
+  });
   // 갤러리 조작 — 화살표 / 썸네일 / 모바일 스와이프
   if(gShots.length>1){
     document.getElementById('gPrev').onclick=()=>gShow(gIdx-1);
@@ -601,11 +685,12 @@ function openDetail(id){
     },{passive:true});
   }
   document.getElementById('dAdd').onclick=()=>{
-    toggle(p.id,document.querySelector(`.add[data-id="${p.id}"]`));
-    const on=!!cart[p.id],d=document.getElementById('dAdd');
-    d.classList.toggle('added',on);d.textContent=on?'✓ 견적 목록에 담김':'견적에 담기';
+    toggle(p.id,null);
+    renderDetail(); // 규격 칩의 ✓ 표시까지 함께 갱신
+    render();       // 그리드 카드의 담김 표시 갱신
   };
   // 품종 링크 공유 — 카톡으로 특정 품종을 콕 집어 보낼 때 사용
+  // 규격까지 지정된 레코드ID를 넘겨 상대방도 같은 규격을 보게 합니다
   document.getElementById('dShare').onclick=()=>{
     const url=itemUrl(p.id);
     navigator.clipboard.writeText(url)
@@ -614,13 +699,11 @@ function openDetail(id){
   };
   // 주소창에 품종을 반영해 두면 새로고침·뒤로가기·주소 복사 모두 자연스럽게 동작
   history.replaceState(null,'',itemUrl(p.id));
-  document.getElementById('dOverlay').classList.add('show');
-  document.querySelector('#dOverlay .modal').focus();
 }
 function itemUrl(id){return location.origin+location.pathname+'?item='+encodeURIComponent(id)}
 function closeDetail(){
   document.getElementById('dOverlay').classList.remove('show');
-  gShots=[]; gIdx=0;
+  gShots=[]; gIdx=0; dItem=null; dVar=0;
   history.replaceState(null,'',location.pathname);
 }
 document.getElementById('dOverlay').onclick=e=>{if(e.target.id==='dOverlay')closeDetail()};
@@ -773,6 +856,7 @@ addEventListener('scroll',()=>hd.classList.toggle('scrolled',scrollY>8),{passive
   // 저장돼 있던 견적 목록 중 현재 카탈로그에 없는 품목은 정리
   Object.keys(cart).forEach(id=>{ if(!PLANTS.find(p=>p.id===id)) delete cart[id]; });
   saveCart(); updateBar();
+  buildItems();
   renderCats();
   renderSubs();
   renderZones();
