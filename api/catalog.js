@@ -95,6 +95,16 @@ module.exports = async (req, res) => {
     const F = src.fields;
 
     const [records, overrides] = await Promise.all([fetchAll(src), fetchGroupOverrides()]);
+    // 규격이 미확정인 품목은 카탈로그에서 감춥니다.
+    // 에어테이블에서 규격을 채우면 별도 배포 없이 자동으로 다시 노출됩니다.
+    const BAD_SIZE = ['확인필요', '??', '확인중', '미정'];
+    const cleanSize = (v) => {
+      if (Array.isArray(v)) return v.filter((s) => s && !BAD_SIZE.includes(String(s).trim()));
+      const s = String(v || '').trim();
+      return !s || BAD_SIZE.includes(s) ? '' : s;
+    };
+    const hasSize = (v) => (Array.isArray(v) ? v.length > 0 : !!v);
+
     // 첨부는 여러 장 등록될 수 있습니다(국내 라인업의 약 절반이 2~4장).
     // 카드용으로는 원본(수 MB) 대신 large 썸네일(~512px)을 우선 씁니다.
     const pickUrl = (a) =>
@@ -108,7 +118,7 @@ module.exports = async (req, res) => {
         sku: (F.sku && f[F.sku]) || '',
         kname: f[F.kname] || '',
         sname: f[F.sname] || '',
-        size: f[F.size] || '',
+        size: cleanSize(f[F.size]),
         cat: f[F.cat] ? [f[F.cat]] : [],
         zone: (F.zone && f[F.zone]) || '',
         desc: (F.desc && f[F.desc]) || '',
@@ -121,9 +131,17 @@ module.exports = async (req, res) => {
       };
     });
 
+    const shown = items.filter((it) => hasSize(it.size));
+
     // 10분 캐시 → 에어테이블 API 한도(초당 5회) 보호 + 빠른 응답
     res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=1200');
-    res.status(200).json({ group, count: items.length, items, groupOverrides: overrides });
+    res.status(200).json({
+      group,
+      count: shown.length,
+      items: shown,
+      hidden: items.length - shown.length, // 규격 미확정으로 감춘 건수
+      groupOverrides: overrides,
+    });
   } catch (e) {
     res.status(500).json({ error: '카탈로그를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.' });
   }
