@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>수입 과정 | 오픈가든</title>
-<meta name="description" content="현지 농가 선정부터 식물검역증명서·국제운송·국내 식물검역·통관·적응재배·현장 납품까지, 오픈가든이 수입 전 과정을 직접 처리하는 방식을 소개합니다.">
+<title>회사 소개 | 오픈가든</title>
+<meta name="description" content="오픈가든은 전국 거래 농가와 유럽·북미 현지 농장을 함께 운용하는 조경 식물 공급사입니다. 현지 농가 선정부터 식물검역증명서·국제운송·국내 식물검역·통관·적응재배·현장 납품까지, 오픈가든이 수입 전 과정을 직접 처리하는 방식을 소개합니다.">
 <link rel="canonical" href="https://open-garden.co.kr/about.html">
 <meta property="og:url" content="https://open-garden.co.kr/about.html">
 <meta property="og:site_name" content="오픈가든">
 <meta property="og:type" content="website">
-<meta property="og:title" content="수입 과정 | 오픈가든">
-<meta property="og:description" content="국내 농가 매칭부터 해외 직수입·검역·현장 납품까지, 오픈가든의 조달 과정을 소개합니다.">
+<meta property="og:title" content="회사 소개 | 오픈가든">
+<meta property="og:description" content="오픈가든이 어떤 회사인지, 그리고 국내 매칭부터 해외 직수입·검역·현장 납품까지 어떻게 일하는지 소개합니다.">
 <meta property="og:image" content="https://open-garden.co.kr/assets/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/assets/logo_green_notext.png" type="image/png">
@@ -90,25 +90,41 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
 .page-head h1{font-size:clamp(28px,4.5vw,42px);font-weight:800;letter-spacing:-.03em}
 .page-head p{color:var(--gray);margin-top:12px;font-size:16px}
 
+/* 회사 소개 */
+.intro{padding-top:66px;padding-bottom:0}
+.intro-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(28px,4vw,52px);align-items:center}
+.intro-text h2{font-size:clamp(23px,3.4vw,34px)}
+.intro-text p{color:#3d4a41;margin-top:16px;font-size:15.5px;line-height:1.75}
+.intro-photo{margin:0;border-radius:18px;overflow:hidden;background:#e6ece6;aspect-ratio:3/2;
+  box-shadow:0 2px 12px rgba(20,40,28,.1)}
+.intro-photo img{width:100%;height:100%;object-fit:cover;display:block}
+@media(max-width:860px){.intro-grid{grid-template-columns:1fr}}
+.facts{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:clamp(28px,4vw,46px) 0 0;padding:0}
+.facts li{background:var(--bg-soft);border:1px solid var(--line);border-radius:16px;padding:22px 20px}
+.facts b{display:block;font-size:15.5px;font-weight:800;color:var(--green-dark);letter-spacing:-.02em;line-height:1.5}
+.facts span{display:block;font-size:14px;color:var(--gray);margin-top:8px;line-height:1.65}
+@media(max-width:860px){.facts{grid-template-columns:1fr;gap:12px}.facts li{padding:18px}}
+
 /* 거래처 세계지도 */
-.mapsec{padding-top:64px}
-.mapwrap{position:relative;max-width:980px;margin:40px auto 0;aspect-ratio:1600/556}
-.mapdots{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:.85}
-.mapsvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.mapsvg .arc{fill:none;stroke:url(#ag);stroke-width:1.3;stroke-linecap:round;opacity:.6}
-.mapsvg .mk-ring{fill:#fff;stroke:var(--green);stroke-width:1.4}
-.mapsvg .mk-dot{fill:var(--green)}
-.mapsvg .kor-ring{fill:none;stroke:var(--green-dark);stroke-width:2.5}
-.mapsvg .kor-dot{fill:var(--green-dark)}
-.mapsvg .kor-pulse{fill:var(--green);opacity:.18;transform-origin:center;transform-box:fill-box;animation:pulse 2.2s ease-in-out infinite}
-.mapsvg .lbl{font-family:'Noto Sans KR',sans-serif;font-size:22px;font-weight:700;fill:var(--green-dark);text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
-.mapsvg .lbl-kor{font-size:26px;font-weight:800}
-@keyframes pulse{0%,100%{transform:scale(1);opacity:.18}50%{transform:scale(1.5);opacity:.05}}
-.mapnote{font-size:13px;color:var(--gray);margin-top:14px}
-/* 거래 국가 — 텍스트로도 존재해야 검색·스크린리더가 읽습니다 */
-.countries{list-style:none;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:26px;padding:0}
-.countries li{font-size:14px;font-weight:700;color:var(--green-dark);background:var(--bg-soft);border:1px solid var(--line);border-radius:999px;padding:7px 16px}
-.countries li.more{background:transparent;border-style:dashed;color:var(--gray);font-weight:500}
+.mapsec{padding-top:72px}
+.mapwrap{position:relative;max-width:980px;margin:clamp(28px,4vw,44px) auto 0;aspect-ratio:1600/556}
+.mapdots{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:.7}
+.mapsvg{position:absolute;inset:0;width:100%;height:100%}
+/* 선 굵기를 화면 픽셀로 고정 — 지도가 줄어도 얇아져 사라지지 않습니다 */
+.mapsvg .arc{fill:none;stroke:url(#ag);stroke-width:2;stroke-linecap:round;vector-effect:non-scaling-stroke}
+/* 마커는 SVG가 아니라 HTML — 크기가 px로 고정돼 모바일에서도 그대로 보입니다 */
+.mk{position:absolute;width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border-radius:50%;
+  background:#fff;border:2.5px solid var(--green);box-shadow:0 1px 4px rgba(20,40,28,.28)}
+.mk-kor{width:19px;height:19px;margin:-9.5px 0 0 -9.5px;background:var(--green-dark);border-color:#fff;border-width:3px;
+  box-shadow:0 0 0 3px rgba(31,77,51,.2),0 2px 9px rgba(20,40,28,.38)}
+.mk-kor::after{content:"";position:absolute;inset:-10px;border-radius:50%;background:var(--green);
+  animation:pulse 2.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(.68);opacity:.22}50%{transform:scale(1.35);opacity:.03}}
+@media(max-width:560px){
+  .mk{width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-width:2px}
+  .mk-kor{width:16px;height:16px;margin:-8px 0 0 -8px;border-width:2.5px}
+}
+.mapnote{font-size:13px;color:var(--gray);margin-top:24px}
 
 /* 수입 과정 — 세로 타임라인(좌측 아이콘 · 본문 · 우측 사진) */
 .proc-sec{background:var(--bg-soft)}
@@ -117,7 +133,7 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
 /* 단계를 잇는 세로 연결선 */
 .flow::before{content:"";position:absolute;left:27px;top:34px;bottom:34px;width:2px;
   background:repeating-linear-gradient(to bottom,#c3d2c5 0 7px,transparent 7px 14px)}
-.fstep{position:relative;display:grid;grid-template-columns:56px 1fr 220px;gap:24px;align-items:center}
+.fstep{position:relative;display:grid;grid-template-columns:56px 1fr 300px;gap:28px;align-items:center}
 .fico{width:56px;height:56px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;
   box-shadow:0 4px 14px rgba(31,77,51,.28);position:relative;z-index:1}
 .fico svg{width:28px;height:28px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -125,13 +141,14 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
 .fbody h3{font-size:clamp(16px,2vw,19px);font-weight:800;letter-spacing:-.02em;line-height:1.45;color:var(--ink)}
 .fbody p{font-size:14px;color:var(--gray);margin-top:7px;line-height:1.6}
 .fbody p+p{margin-top:3px}
-.fphoto{aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:#e6ece6;box-shadow:0 2px 10px rgba(20,40,28,.08)}
+.fphoto{aspect-ratio:3/2;border-radius:14px;overflow:hidden;background:#e6ece6;box-shadow:0 2px 10px rgba(20,40,28,.08)}
 .fphoto img{width:100%;height:100%;object-fit:cover;display:block}
-@media(max-width:820px){
-  .fstep{grid-template-columns:48px 1fr;gap:18px;row-gap:14px}
+@media(min-width:561px) and (max-width:860px){.fphoto{max-width:460px}}
+@media(max-width:860px){
+  .fstep{grid-template-columns:48px 1fr;gap:18px;row-gap:16px}
   .flow::before{left:23px}
   .fico{width:48px;height:48px}.fico svg{width:24px;height:24px}
-  .fphoto{grid-column:2;max-width:420px}
+  .fphoto{grid-column:2;max-width:none}
 }
 
 /* 마무리 CTA */
@@ -153,7 +170,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 @media(max-width:640px){.chat-fab{padding:14px;bottom:calc(16px + env(safe-area-inset-bottom))}.chat-fab .lbl{display:none}}
 
 @media(prefers-reduced-motion:reduce){
-  .mapsvg .kor-pulse{animation:none}
+  .mk-kor::after{animation:none}
   .chat-fab{transition:none}
 }
 </style>
@@ -164,53 +181,69 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 
 
 <div class="wrap page-head">
-  <div class="kicker-s">IMPORT PROCESS</div>
-  <h1>나무가 자란 곳부터,심길 곳까지.</h1>
-  <p>오픈가든은 전국 거래 농가와 해외 현지 농장을 함께 운용합니다.<br>
-     품종 선정 · 검역 · 통관 · 국내 적응재배 · 현장 납품까지,<br>
+  <div class="kicker-s">ABOUT OPEN GARDEN</div>
+  <h1>나무가 자란 곳부터, 심길 곳까지.</h1>
+  <p>오픈가든은 전국 거래 농가와 해외 현지 농장을 함께 운용합니다.<br class="pc-br">
+     품종 선정 · 검역 · 통관 · 국내 적응재배 · 현장 납품까지,<br class="pc-br">
      중간 유통 없이 전 과정을 직접 처리합니다.</p>
 </div>
+
+<!-- 회사 소개 -->
+<section class="intro">
+  <div class="wrap intro-grid">
+    <div class="intro-text">
+      <div class="kicker-s">회사 소개</div>
+      <h2>어디에 있든, 필요한 식물을 찾아냅니다.</h2>
+      <p>현장에 필요한 식물이 한 농장에 다 있는 경우는 거의 없습니다. 오픈가든은 전국 거래 농가와
+         네덜란드·이탈리아·스페인·북미의 현지 농장을 함께 운용해, 국내에 있는 품목은 바로 매칭하고
+         없는 품목은 직접 들여옵니다.</p>
+      <p>들여온 뒤가 더 중요합니다. 수입 품종은 자체 농장에서 우리 기후에 적응시킨 뒤 출하하고,
+         수입 원가 구조는 그대로 공개합니다. 목록에 없는 품종도 말씀만 주세요.</p>
+    </div>
+    <figure class="intro-photo">
+      <img src="/assets/about.jpg" alt="국내 기후에 적응시키는 중인 수입 묘목 — 오픈가든 자체 농장"
+           width="1280" height="853" loading="lazy">
+    </figure>
+  </div>
+  <div class="wrap">
+    <ul class="facts">
+      <li><b>유럽·북미 직수입</b><span>네덜란드·이탈리아·스페인·미국·캐나다의 현지 농가와 직접 거래합니다.</span></li>
+      <li><b>Hoogenraad 공식 한국 에이전시</b><span>유럽 최대 관목 생산농가의 국내 창구이자, 라이선스 품종(PBR) 도입 계약을 진행 중입니다.</span></li>
+      <li><b>국내 순화 후 출하</b><span>수입 품종은 자체 농장에서 우리 기후에 적응시킨 뒤 현장으로 보냅니다.</span></li>
+    </ul>
+  </div>
+</section>
 
 <!-- 거래처 세계지도 -->
 <section class="mapsec">
   <div class="wrap center">
     <div class="kicker-s">거래 농가</div>
     <h2>국내에 없으면, 해외에서 찾아옵니다.</h2>
-    <p class="sub">네덜란드·이탈리아·스페인·북미의 협력 농가와 직접 거래합니다. 국내에 있는 품목은 전국 거래 농가에서 바로 매칭합니다.</p>
+    <p class="sub">네덜란드·이탈리아·스페인·미국·캐나다의 협력 농가와 직접 거래합니다. 국내에 있는 품목은 전국 거래 농가에서 바로 매칭합니다.</p>
+    <!-- 마커 좌표는 등장방형도법(1600px = 경도 360°, 경도 0°=x239.9, 위도 0°=y354.2) 기준.
+         % 값 = 좌표 / 1600(또는 556). 지점을 추가할 땐 같은 식으로 환산하세요. -->
     <div class="mapwrap">
-      <img class="mapdots" src="/assets/worldmap-dots.png" alt="오픈가든 글로벌 거래 네트워크 세계지도">
-      <svg class="mapsvg" viewBox="0 0 1600 556" role="img" aria-label="거래처 국가에서 한국으로 이어지는 글로벌 네트워크 지도">
+      <img class="mapdots" src="/assets/worldmap-dots.png" alt="" width="1600" height="556">
+      <svg class="mapsvg" viewBox="0 0 1600 556" aria-hidden="true" focusable="false">
         <defs>
-          <linearGradient id="ag" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stop-color="#4e7a5e"/><stop offset="1" stop-color="#1F4D33"/>
-          </linearGradient>
+          <radialGradient id="ag" gradientUnits="userSpaceOnUse" cx="804.3" cy="187.2" r="720">
+            <stop offset="0" stop-color="#1F4D33" stop-opacity=".95"/>
+            <stop offset="1" stop-color="#1F4D33" stop-opacity=".22"/>
+          </radialGradient>
         </defs>
-      <path class="arc" d="M 256.3 124.2 Q 528.1 85.4 800.0 189.0"/>
-      <path class="arc" d="M 260.6 124.9 Q 530.3 67.3 800.0 189.0"/>
-      <path class="arc" d="M 284.1 160.4 Q 542.0 71.4 800.0 189.0"/>
-      <path class="arc" d="M 282.2 154.3 Q 541.1 49.7 800.0 189.0"/>
-      <path class="arc" d="M 233.9 180.3 Q 516.9 111.1 800.0 189.0"/>
-      <path class="arc" d="M 219.1 176.1 Q 509.6 86.7 800.0 189.0"/>
-      <path class="arc" d="M 1289.8 154.3 Q 1044.9 73.5 800.0 189.0"/>
-      <path class="arc" d="M 1473.8 229.1 Q 1136.9 50.4 800.0 189.0"/>
-      <path class="arc" d="M 1289.8 137.0 Q 1044.9 99.0 800.0 189.0"/>
-      <g class="mk"><circle cx="256.3" cy="124.2" r="4" class="mk-ring"/><circle cx="256.3" cy="124.2" r="1.7" class="mk-dot"/></g>
-      <g class="mk"><circle cx="260.6" cy="124.9" r="4" class="mk-ring"/><circle cx="260.6" cy="124.9" r="1.7" class="mk-dot"/></g>
-      <g class="mk"><circle cx="284.1" cy="160.4" r="4" class="mk-ring"/><circle cx="284.1" cy="160.4" r="1.7" class="mk-dot"/></g>
-      <g class="mk"><circle cx="282.2" cy="154.3" r="4" class="mk-ring"/><circle cx="282.2" cy="154.3" r="1.7" class="mk-dot"/></g>
-      <g class="mk"><circle cx="233.9" cy="180.3" r="4" class="mk-ring"/><circle cx="233.9" cy="180.3" r="1.7" class="mk-dot"/></g>
-      <g class="mk"><circle cx="219.1" cy="176.1" r="4" class="mk-ring"/><circle cx="219.1" cy="176.1" r="1.7" class="mk-dot"/></g>
-      <g class="mk"><circle cx="1289.8" cy="154.3" r="4" class="mk-ring"/><circle cx="1289.8" cy="154.3" r="1.7" class="mk-dot"/></g>
-      <g class="mk"><circle cx="1473.8" cy="229.1" r="4" class="mk-ring"/><circle cx="1473.8" cy="229.1" r="1.7" class="mk-dot"/></g>
-      <g class="mk"><circle cx="1289.8" cy="137.0" r="4" class="mk-ring"/><circle cx="1289.8" cy="137.0" r="1.7" class="mk-dot"/></g>
-      <g class="mk-kor"><circle cx="800.0" cy="189.0" r="14" class="kor-pulse"/><circle cx="800.0" cy="189.0" r="9" class="kor-ring"/><circle cx="800.0" cy="189.0" r="4.8" class="kor-dot"/></g>
-      <text class="lbl lbl-kor" x="800.0" y="221.0">대한민국</text>
+        <path class="arc" d="M 260.6 122.7 Q 532.5 20 804.3 187.2"/>
+        <path class="arc" d="M 288.4 159.0 Q 546.4 62 804.3 187.2"/>
+        <path class="arc" d="M 238.2 178.8 Q 521.3 96 804.3 187.2"/>
+        <path class="arc" d="M 1293.2 154.6 Q 1048.8 46 804.3 187.2"/>
+        <path class="arc" d="M 1487.0 162.6 Q 1145.7 6 804.3 187.2"/>
       </svg>
+      <span class="mk" style="left:16.29%;top:22.07%" title="네덜란드"></span>
+      <span class="mk" style="left:18.03%;top:28.59%" title="이탈리아"></span>
+      <span class="mk" style="left:14.89%;top:32.15%" title="스페인"></span>
+      <span class="mk" style="left:80.83%;top:27.81%" title="미국"></span>
+      <span class="mk" style="left:92.94%;top:29.25%" title="캐나다"></span>
+      <span class="mk mk-kor" style="left:50.27%;top:33.67%" title="대한민국"></span>
     </div>
-    <ul class="countries" aria-label="주요 거래 국가">
-      <li>네덜란드</li><li>이탈리아</li><li>스페인</li><li>미국</li><li>캐나다</li>
-      <li class="more">국내 전국 거래 농가</li>
-    </ul>
     <p class="mapnote">* 지도의 표시는 주요 거래·수입 지역을 나타냅니다.</p>
   </div>
 </section>
@@ -220,7 +253,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
   <div class="wrap">
     <div class="process-head">
       <div class="kicker-s">수입 6단계</div>
-      <h2>세계 각지의 농가에서고객의 현장까지</h2>
+      <h2>세계 각지의 농가에서 고객의 현장까지</h2>
       <p class="sub">중간 유통 없이, 오픈가든이 수입 전 과정을 직접 관리합니다.</p>
     </div>
     <div class="flow">
@@ -231,7 +264,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
           <h3>현지 농가에서 직접 고릅니다</h3>
           <p>네덜란드·이탈리아·스페인·북미의 현지 농가와 직접 거래해 품종을 선정합니다.</p><p>같은 품종이라도 생산 국가에 따라 수입 가능 여부가 달라, 주문 전에 반드시 확인합니다.</p>
         </div>
-        <div class="fphoto"><img src="/assets/proc/p1-farm.jpg" alt="현지 농가에서 자라는 묘목" loading="lazy"></div>
+        <div class="fphoto"><img width="760" height="500" src="/assets/proc/p1-farm.jpg" alt="현지 농가에서 자라는 묘목" loading="lazy"></div>
       </div>
       <div class="fstep">
         <div class="fico"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.4-3 8-7 10-4-2-7-5.6-7-10V6z"/><path d="M9 11l2 2 4-4"/></svg></div>
@@ -240,7 +273,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
           <h3>검역증명서를 갖춰 출발합니다</h3>
           <p>현지 검역기관의 검사를 거쳐 국제 규격의 식물검역증명서를 발급받습니다.</p><p>흙이 붙은 식물은 수입이 금지되어 있어, 뿌리를 세척한 상태로 포장합니다.</p>
         </div>
-        <div class="fphoto"><img src="/assets/proc/p2-cert.jpg" alt="현지에서 식물 상태를 검사하는 모습" loading="lazy"></div>
+        <div class="fphoto"><img width="760" height="500" src="/assets/proc/p2-cert.jpg" alt="현지에서 식물 상태를 검사하는 모습" loading="lazy"></div>
       </div>
       <div class="fstep">
         <div class="fico"><svg viewBox="0 0 24 24"><path d="M3 16h13l4-6h-6l-2-4H6z"/><path d="M3 16l1 3h15l1-3"/></svg></div>
@@ -249,7 +282,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
           <h3>온도를 지키며 운송합니다</h3>
           <p>품목과 시기에 맞춰 항공 또는 선박 운송을 선택합니다.</p><p>이동 중 온도 변화가 최소화되도록 포장과 보관 조건을 관리합니다.</p>
         </div>
-        <div class="fphoto"><img src="/assets/proc/p3-air.jpg" alt="공항에서 화물을 싣는 모습" loading="lazy"></div>
+        <div class="fphoto"><img width="760" height="500" src="/assets/proc/p3-air.jpg" alt="공항에서 화물을 싣는 모습" loading="lazy"></div>
       </div>
       <div class="fstep">
         <div class="fico"><svg viewBox="0 0 24 24"><path d="M11 4a7 7 0 100 14 7 7 0 000-14z"/><path d="M16.5 16.5L21 21"/></svg></div>
@@ -258,7 +291,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
           <h3>국내 도착 후 검역을 받습니다</h3>
           <p>도착하면 농림축산검역본부에 신고하고 검역을 받습니다.</p><p>서류·현장·정밀 검역을 거치며, 묘목·구근 같은 재식용 식물은 격리재배 검역이 적용되기도 합니다.</p>
         </div>
-        <div class="fphoto"><img src="/assets/proc/p4-quarantine.jpg" alt="묘목 상태를 확인하는 모습" loading="lazy"></div>
+        <div class="fphoto"><img width="760" height="500" src="/assets/proc/p4-quarantine.jpg" alt="묘목 상태를 확인하는 모습" loading="lazy"></div>
       </div>
       <div class="fstep">
         <div class="fico"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 9h6M9 13h6M9 17h3"/></svg></div>
@@ -267,7 +300,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
           <h3>합격한 물량만 통관합니다</h3>
           <p>검역 합격 후에야 세관 통관이 진행됩니다.</p><p>오픈가든이 수입 절차를 직접 처리해 중간 유통 단계를 줄였습니다.</p>
         </div>
-        <div class="fphoto"><img src="/assets/proc/p5-customs.jpg" alt="창고에서 입고 물량을 확인하는 모습" loading="lazy"></div>
+        <div class="fphoto"><img width="760" height="500" src="/assets/proc/p5-customs.jpg" alt="창고에서 입고 물량을 확인하는 모습" loading="lazy"></div>
       </div>
       <div class="fstep">
         <div class="fico"><svg viewBox="0 0 24 24"><path d="M3 7h11v8H3z"/><path d="M14 10h3.5L21 13v2h-7z"/><circle cx="7" cy="17.5" r="1.7"/><circle cx="17" cy="17.5" r="1.7"/></svg></div>
@@ -276,7 +309,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
           <h3>적응시킨 뒤 현장으로 납품합니다</h3>
           <p>들여온 식물을 국내 기후에 맞게 적응·재배하며 상태를 관리합니다.</p><p>요청하신 장소와 일정에 맞춰 현장으로 납품해드립니다.</p>
         </div>
-        <div class="fphoto"><img src="/assets/proc/p6-deliver.jpg" alt="국내에서 재배 중인 묘목" loading="lazy"></div>
+        <div class="fphoto"><img width="760" height="500" src="/assets/proc/p6-deliver.jpg" alt="국내에서 재배 중인 묘목" loading="lazy"></div>
       </div>
     </div>
   </div>

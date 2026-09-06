@@ -172,6 +172,29 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
 .svc h3{font-size:clamp(19px,2.4vw,23px);font-weight:800;margin:0 0 8px;letter-spacing:-.02em}
 .svc p{font-size:14.5px;color:var(--gray)}
 
+/* 6. 납품 사례 — 카드가 화면을 채우고 남을 때만 자동으로 흐르는 캐러셀 */
+.cases{background:var(--bg-soft)}
+.marquee{position:relative;overflow:hidden;margin-top:clamp(28px,4vw,48px)}
+.marquee.rolling{-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+.mq-track{display:flex;justify-content:center;padding:6px 0}
+.marquee.rolling .mq-track{justify-content:flex-start;will-change:transform;animation:mqroll linear infinite}
+.marquee.rolling:hover .mq-track,.marquee.rolling:focus-within .mq-track{animation-play-state:paused}
+@keyframes mqroll{from{transform:translateX(0)}to{transform:translateX(var(--mq-shift,0px))}}
+.case{flex:0 0 296px;margin-right:20px}
+.case>a{display:flex;flex-direction:column;height:100%;background:#fff;border:1px solid var(--line);
+  border-radius:18px;overflow:hidden;text-decoration:none;color:inherit;
+  box-shadow:0 1px 2px rgba(20,40,28,.04),0 10px 28px rgba(20,40,28,.06);
+  transition:transform .25s ease,box-shadow .25s ease}
+.case>a:hover{transform:translateY(-4px);box-shadow:0 2px 4px rgba(20,40,28,.05),0 18px 44px rgba(20,40,28,.1)}
+.case-img{aspect-ratio:16/9;background:#e6ece6}
+.case-img img{width:100%;height:100%;object-fit:cover;display:block}
+.case-body{padding:20px 20px 22px;text-align:left}
+.case-client{font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--green);margin-bottom:8px}
+.case h3{font-size:18px;font-weight:800;letter-spacing:-.02em;line-height:1.4}
+.case-meta{font-size:13.5px;color:var(--gray);margin-top:7px;line-height:1.55}
+@media(max-width:520px){.case{flex:0 0 min(78vw,300px);margin-right:14px}}
+
 /* FAQ 섹션 배경 (구 프로젝트 섹션과 공유) */
 .proj{background:var(--bg-soft)}
 
@@ -227,7 +250,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 
 @media(prefers-reduced-motion:reduce){
   .reveal{opacity:1}
-  .reveal.in,.hero h1,.hero p,.hero .btn,.scroll-hint{animation:none}
+  .reveal.in,.hero h1,.hero p,.hero .btn,.scroll-hint,.mq-track{animation:none}
   .stat,.svc,.card,.step .ico,.btn,.chat-fab{transition:none}
 }
 </style>
@@ -273,7 +296,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
       <h2>오픈가든</h2>
       <p>현장에 필요한 식물이 한 농장에 다 있는 경우는 거의 없습니다. 오픈가든은 전국 거래 농가와 네덜란드·이탈리아·스페인·북미의 현지 농장을 함께 운용해, 국내에 있는 품목은 바로 매칭하고 없는 품목은 직접 들여옵니다. 유럽 최대 관목 생산농가 Hoogenraad의 공식 한국 에이전시이자, 라이선스 품종(PBR) 도입 계약을 진행 중입니다.</p>
       <p>들여온 뒤가 더 중요합니다. 수입 품종은 자체 농장에서 우리 기후에 적응시킨 뒤 출하하고, 수입 원가 구조는 그대로 공개합니다. 목록에 없는 품종도 말씀만 주세요.</p>
-      <a href="/about.html" class="btn" style="margin-top:26px;padding:13px 28px;font-size:15px">납품 과정 보기</a>
+      <a href="/about.html" class="btn" style="margin-top:26px;padding:13px 28px;font-size:15px">오픈가든 소개 보기</a>
     </div>
     <div class="img-ph"><img src="/assets/about.jpg" alt="국내 순화 중인 수입 묘목 — 오픈가든 자체 농장" loading="lazy"></div>
   </div>
@@ -304,6 +327,33 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
         <div class="svc-ico"><svg viewBox="0 0 24 24"><path d="M12 21V9M12 9c0-3 2-5 5-5 0 3-2 5-5 5zM12 12C12 9 10 7 7 7c0 3 2 5 5 5z"/></svg></div>
         <h3>국내 순화 완료</h3>
         <p>자체 농장에서 최소 1시즌 적응시킨 개체만 출하합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. 납품 사례 -->
+<section class="cases" id="cases">
+  <div class="wrap center">
+    <div class="kicker-s">납품 사례</div>
+    <h2>오픈가든이 식물을 채운 현장입니다.</h2>
+    <p class="sub">실제로 납품한 현장과 공급 내역을 소개합니다.</p>
+  </div>
+  <div class="wrap">
+    <!-- 사례를 늘리려면 아래 <article class="case"> 블록을 복사해 사진·문구만 바꾸세요.
+         카드가 화면 폭을 넘어서면 자동으로 흐르기 시작합니다 (그 전까지는 가운데 정렬). -->
+    <div class="marquee" id="caseMarquee">
+      <div class="mq-track" id="caseTrack">
+        <article class="case">
+          <a href="/docent/ipark.html">
+            <div class="case-img"><img src="/docent/images/og-cover.jpg" alt="아이파크 언베일가든 정원 전경" width="1920" height="1080" loading="lazy"></div>
+            <div class="case-body">
+              <div class="case-client">HDC 아이파크</div>
+              <h3>아이파크 언베일가든</h3>
+              <p class="case-meta">2026 국제정원박람회 · 정원 식물 공급</p>
+            </div>
+          </a>
+        </article>
       </div>
     </div>
   </div>
@@ -405,6 +455,48 @@ if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
   }),{threshold:.1,rootMargin:'0px 0px -36px 0px'});
   els.forEach(el=>io.observe(el));
 }
+
+// 납품 사례 캐러셀 — 카드가 화면 폭을 넘길 때만 흐르게 합니다.
+// 한두 개뿐일 땐 가운데 정렬로 그대로 두는 게 자연스러워서 애니메이션을 걸지 않습니다.
+(function(){
+  var mq=document.getElementById('caseMarquee'), tr=document.getElementById('caseTrack');
+  if(!mq||!tr)return;
+  var originals=[].slice.call(tr.children);
+  if(!originals.length)return;
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)');
+  function layout(){
+    [].slice.call(tr.querySelectorAll('[data-clone]')).forEach(function(n){tr.removeChild(n);});
+    mq.classList.remove('rolling');
+    tr.style.removeProperty('--mq-shift');
+    tr.style.animationDuration='';
+    if(reduce.matches)return;
+    var unit=0;
+    originals.forEach(function(n){
+      var mr=parseFloat(getComputedStyle(n).marginRight);
+      unit+=n.getBoundingClientRect().width+(isNaN(mr)?0:mr);
+    });
+    if(!unit||unit<=mq.clientWidth+24)return;
+    // 원본 뒤에 복제본을 이어 붙이고 정확히 원본 1벌만큼 밀면 이음매가 보이지 않습니다
+    var total=unit;
+    while(total<unit+mq.clientWidth+4){
+      originals.forEach(function(n){
+        var c=n.cloneNode(true);
+        c.setAttribute('data-clone','');
+        c.setAttribute('aria-hidden','true');
+        [].slice.call(c.querySelectorAll('a')).forEach(function(a){a.tabIndex=-1;});
+        tr.appendChild(c);
+      });
+      total+=unit;
+    }
+    mq.classList.add('rolling');
+    tr.style.setProperty('--mq-shift',(-unit)+'px');
+    tr.style.animationDuration=Math.max(18,unit/55)+'s';
+  }
+  layout();
+  var t;
+  addEventListener('resize',function(){clearTimeout(t);t=setTimeout(layout,180);},{passive:true});
+  if(reduce.addEventListener)reduce.addEventListener('change',layout);
+})();
 
 // 스크롤 시 헤더 그림자
 const hd=document.querySelector('header');
