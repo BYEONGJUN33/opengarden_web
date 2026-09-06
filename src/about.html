@@ -108,10 +108,10 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
 /* 거래처 세계지도 */
 .mapsec{padding-top:72px}
 .mapwrap{position:relative;max-width:980px;margin:clamp(28px,4vw,44px) auto 0;aspect-ratio:1600/556}
-.mapdots{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:.7}
+.mapdots{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .mapsvg{position:absolute;inset:0;width:100%;height:100%}
 /* 선 굵기를 화면 픽셀로 고정 — 지도가 줄어도 얇아져 사라지지 않습니다 */
-.mapsvg .arc{fill:none;stroke:url(#ag);stroke-width:2;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.mapsvg .arc{fill:none;stroke:url(#ag);stroke-width:2.2;stroke-linecap:round;vector-effect:non-scaling-stroke}
 /* 마커는 SVG가 아니라 HTML — 크기가 px로 고정돼 모바일에서도 그대로 보입니다 */
 .mk{position:absolute;width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border-radius:50%;
   background:#fff;border:2.5px solid var(--green);box-shadow:0 1px 4px rgba(20,40,28,.28)}
@@ -125,6 +125,7 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
   .mk-kor{width:16px;height:16px;margin:-8px 0 0 -8px;border-width:2.5px}
 }
 .mapnote{font-size:13px;color:var(--gray);margin-top:24px}
+.procnote{font-size:13px;color:var(--gray);max-width:900px;margin:34px auto 0;line-height:1.7}
 
 /* 수입 과정 — 세로 타임라인(좌측 아이콘 · 본문 · 우측 사진) */
 .proc-sec{background:var(--bg-soft)}
@@ -141,11 +142,12 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
 .fbody h3{font-size:clamp(16px,2vw,19px);font-weight:800;letter-spacing:-.02em;line-height:1.45;color:var(--ink)}
 .fbody p{font-size:14px;color:var(--gray);margin-top:7px;line-height:1.6}
 .fbody p+p{margin-top:3px}
+.fstep.nophoto{grid-template-columns:56px 1fr}
 .fphoto{aspect-ratio:3/2;border-radius:14px;overflow:hidden;background:#e6ece6;box-shadow:0 2px 10px rgba(20,40,28,.08)}
 .fphoto img{width:100%;height:100%;object-fit:cover;display:block}
 @media(min-width:561px) and (max-width:860px){.fphoto{max-width:460px}}
 @media(max-width:860px){
-  .fstep{grid-template-columns:48px 1fr;gap:18px;row-gap:16px}
+  .fstep,.fstep.nophoto{grid-template-columns:48px 1fr;gap:18px;row-gap:16px}
   .flow::before{left:23px}
   .fico{width:48px;height:48px}.fico svg{width:24px;height:24px}
   .fphoto{grid-column:2;max-width:none}
@@ -223,19 +225,21 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
     <!-- 마커 좌표는 등장방형도법(1600px = 경도 360°, 경도 0°=x239.9, 위도 0°=y354.2) 기준.
          % 값 = 좌표 / 1600(또는 556). 지점을 추가할 땐 같은 식으로 환산하세요. -->
     <div class="mapwrap">
-      <img class="mapdots" src="/assets/worldmap-dots.png" alt="" width="1600" height="556">
+      <img class="mapdots" src="/assets/worldmap.svg" alt="" width="1600" height="556">
       <svg class="mapsvg" viewBox="0 0 1600 556" aria-hidden="true" focusable="false">
         <defs>
-          <radialGradient id="ag" gradientUnits="userSpaceOnUse" cx="804.3" cy="187.2" r="720">
-            <stop offset="0" stop-color="#1F4D33" stop-opacity=".95"/>
-            <stop offset="1" stop-color="#1F4D33" stop-opacity=".22"/>
+          <radialGradient id="ag" gradientUnits="userSpaceOnUse" cx="804.3" cy="187.2" r="780">
+            <stop offset="0" stop-color="#123023" stop-opacity="1"/>
+            <stop offset="1" stop-color="#1F4D33" stop-opacity=".3"/>
           </radialGradient>
         </defs>
-        <path class="arc" d="M 260.6 122.7 Q 532.5 20 804.3 187.2"/>
-        <path class="arc" d="M 288.4 159.0 Q 546.4 62 804.3 187.2"/>
-        <path class="arc" d="M 238.2 178.8 Q 521.3 96 804.3 187.2"/>
-        <path class="arc" d="M 1293.2 154.6 Q 1048.8 46 804.3 187.2"/>
-        <path class="arc" d="M 1487.0 162.6 Q 1145.7 6 804.3 187.2"/>
+        <!-- 유럽 3개 노선은 북·중앙·남으로 갈라 놓았습니다. 남쪽 곡선은 실제 해상 경로(수에즈→인도양→말라카)에 가깝습니다 -->
+        <path class="arc" d="M 260.6 122.7 C 413 40, 652 45, 804.3 187.2"/>
+        <path class="arc" d="M 288.4 159.0 C 433 100, 660 100, 804.3 187.2"/>
+        <path class="arc" d="M 238.2 178.8 C 400 330, 660 330, 804.3 187.2"/>
+        <!-- 북미 2개 노선 — 하나는 북태평양 고위도, 하나는 태평양 중위도 -->
+        <path class="arc" d="M 1487.0 162.6 C 1300 45, 990 40, 804.3 187.2"/>
+        <path class="arc" d="M 1293.2 154.6 C 1150 215, 950 225, 804.3 187.2"/>
       </svg>
       <span class="mk" style="left:16.29%;top:22.07%" title="네덜란드"></span>
       <span class="mk" style="left:18.03%;top:28.59%" title="이탈리아"></span>
@@ -252,66 +256,76 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 <section class="proc-sec">
   <div class="wrap">
     <div class="process-head">
-      <div class="kicker-s">수입 6단계</div>
+      <div class="kicker-s">수입 7단계</div>
       <h2>세계 각지의 농가에서 고객의 현장까지</h2>
       <p class="sub">중간 유통 없이, 오픈가든이 수입 전 과정을 직접 관리합니다.</p>
     </div>
     <div class="flow">
+      <div class="fstep nophoto">
+        <div class="fico"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 9h6M9 13h6M9 17h3"/></svg></div>
+        <div class="fbody">
+          <div class="flabel">STEP 1 · 수입 가능 여부 확인</div>
+          <h3>주문 전에, 들여올 수 있는 품목인지부터 봅니다</h3>
+          <p>수입금지식물은 품목과 생산 국가를 묶어서 지정됩니다. 같은 품종이라도 어느 나라에서 오느냐에 따라 수입 가능 여부가 갈립니다.</p><p>그래서 견적 단계에서 먼저 확인하고, 막히는 조합은 들여올 수 있는 산지로 바꿔 제안드립니다.</p>
+        </div>
+      </div>
       <div class="fstep">
         <div class="fico"><svg viewBox="0 0 24 24"><path d="M12 21V9M12 9c0-3 2-5 5-5 0 3-2 5-5 5zM12 12C12 9 10 7 7 7c0 3 2 5 5 5z"/></svg></div>
         <div class="fbody">
-          <div class="flabel">STEP 1 · 품종 선정·수입 확인</div>
-          <h3>현지 농가에서 직접 고릅니다</h3>
-          <p>네덜란드·이탈리아·스페인·북미의 현지 농가와 직접 거래해 품종을 선정합니다.</p><p>같은 품종이라도 생산 국가에 따라 수입 가능 여부가 달라, 주문 전에 반드시 확인합니다.</p>
+          <div class="flabel">STEP 2 · 현지 농가 선정</div>
+          <h3>자란 자리를 보고 고릅니다</h3>
+          <p>네덜란드·이탈리아·스페인·미국·캐나다의 현지 농가와 직접 거래해 품종·규격·수량을 확정합니다.</p><p>중간 상인을 거치지 않아, 어느 농장에서 자란 개체인지 그대로 남습니다.</p>
         </div>
         <div class="fphoto"><img width="760" height="500" src="/assets/proc/p1-farm.jpg" alt="현지 농가에서 자라는 묘목" loading="lazy"></div>
       </div>
       <div class="fstep">
         <div class="fico"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.4-3 8-7 10-4-2-7-5.6-7-10V6z"/><path d="M9 11l2 2 4-4"/></svg></div>
         <div class="fbody">
-          <div class="flabel">STEP 2 · 식물검역증명서 발급</div>
-          <h3>검역증명서를 갖춰 출발합니다</h3>
-          <p>현지 검역기관의 검사를 거쳐 국제 규격의 식물검역증명서를 발급받습니다.</p><p>흙이 붙은 식물은 수입이 금지되어 있어, 뿌리를 세척한 상태로 포장합니다.</p>
+          <div class="flabel">STEP 3 · 수출국 식물검역증명서</div>
+          <h3>수출국 정부가 발급한 증명서를 갖춰 출발합니다</h3>
+          <p>수출국 정부 검역기관의 검사를 거쳐, 국제식물보호협약(IPPC) 서식의 식물검역증명서를 발급받습니다.</p><p>흙이 붙은 식물은 수입이 제한됩니다. 피트모스·코코피트·바크 같은 유기물 배지도 같은 규제를 받아, 뿌리를 씻어낸 상태로 포장합니다.</p>
         </div>
         <div class="fphoto"><img width="760" height="500" src="/assets/proc/p2-cert.jpg" alt="현지에서 식물 상태를 검사하는 모습" loading="lazy"></div>
       </div>
       <div class="fstep">
         <div class="fico"><svg viewBox="0 0 24 24"><path d="M3 16h13l4-6h-6l-2-4H6z"/><path d="M3 16l1 3h15l1-3"/></svg></div>
         <div class="fbody">
-          <div class="flabel">STEP 3 · 온도관리 운송</div>
-          <h3>온도를 지키며 운송합니다</h3>
-          <p>품목과 시기에 맞춰 항공 또는 선박 운송을 선택합니다.</p><p>이동 중 온도 변화가 최소화되도록 포장과 보관 조건을 관리합니다.</p>
+          <div class="flabel">STEP 4 · 국제 운송</div>
+          <h3>뿌리가 마르지 않게 옮깁니다</h3>
+          <p>품목과 시기에 맞춰 항공과 선박 중에서 고릅니다.</p><p>뿌리를 씻어낸 상태로 이동하는 만큼 보습 포장에 신경 쓰고, 구간 내내 온도 조건을 관리합니다.</p>
         </div>
         <div class="fphoto"><img width="760" height="500" src="/assets/proc/p3-air.jpg" alt="공항에서 화물을 싣는 모습" loading="lazy"></div>
       </div>
       <div class="fstep">
         <div class="fico"><svg viewBox="0 0 24 24"><path d="M11 4a7 7 0 100 14 7 7 0 000-14z"/><path d="M16.5 16.5L21 21"/></svg></div>
         <div class="fbody">
-          <div class="flabel">STEP 4 · 국내 식물검역</div>
-          <h3>국내 도착 후 검역을 받습니다</h3>
-          <p>도착하면 농림축산검역본부에 신고하고 검역을 받습니다.</p><p>서류·현장·정밀 검역을 거치며, 묘목·구근 같은 재식용 식물은 격리재배 검역이 적용되기도 합니다.</p>
-        </div>
-        <div class="fphoto"><img width="760" height="500" src="/assets/proc/p4-quarantine.jpg" alt="묘목 상태를 확인하는 모습" loading="lazy"></div>
-      </div>
-      <div class="fstep">
-        <div class="fico"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 9h6M9 13h6M9 17h3"/></svg></div>
-        <div class="fbody">
-          <div class="flabel">STEP 5 · 검역 합격·통관</div>
-          <h3>합격한 물량만 통관합니다</h3>
-          <p>검역 합격 후에야 세관 통관이 진행됩니다.</p><p>오픈가든이 수입 절차를 직접 처리해 중간 유통 단계를 줄였습니다.</p>
+          <div class="flabel">STEP 5 · 도착 신고·수입 검역</div>
+          <h3>도착 즉시 신고하고 검역을 받습니다</h3>
+          <p>공항·항만에 도착하면 지체 없이 농림축산검역본부에 신고하고, 지정된 검역 장소로 물량을 반입합니다.</p><p>서류검역·현장검역·정밀검역을 거쳐 규제 병해충이 있는지 확인합니다.</p>
         </div>
         <div class="fphoto"><img width="760" height="500" src="/assets/proc/p5-customs.jpg" alt="창고에서 입고 물량을 확인하는 모습" loading="lazy"></div>
       </div>
       <div class="fstep">
+        <div class="fico"><svg viewBox="0 0 24 24"><path d="M3 21v-8a9 9 0 0118 0v8"/><path d="M3 21h18"/><path d="M12 21v-5"/><path d="M12 16c0-1.7 1.3-3 3-3 0 1.7-1.3 3-3 3z"/></svg></div>
+        <div class="fbody">
+          <div class="flabel">STEP 6 · 격리재배 검역</div>
+          <h3>심어서 키우는 식물은 한 번 더 지켜봅니다</h3>
+          <p>씨앗·묘목·알뿌리처럼 재식용·번식용 식물은 도착 시점의 검사만으로 병해충 유무를 판정하기 어렵습니다. 이런 품목은 격리된 재배지에서 자라는 동안 검역이 이어집니다.</p><p>묘목·접수·삽수류는 1년 이내 범위에서 진행되며, 수입 일정이 길어지는 이유가 대부분 이 단계에 있습니다.</p>
+        </div>
+        <div class="fphoto"><img width="760" height="500" src="/assets/proc/p4-quarantine.jpg" alt="격리 재배 중인 묘목을 살피는 모습" loading="lazy"></div>
+      </div>
+      <div class="fstep">
         <div class="fico"><svg viewBox="0 0 24 24"><path d="M3 7h11v8H3z"/><path d="M14 10h3.5L21 13v2h-7z"/><circle cx="7" cy="17.5" r="1.7"/><circle cx="17" cy="17.5" r="1.7"/></svg></div>
         <div class="fbody">
-          <div class="flabel">STEP 6 · 국내 적응·현장 납품</div>
-          <h3>적응시킨 뒤 현장으로 납품합니다</h3>
-          <p>들여온 식물을 국내 기후에 맞게 적응·재배하며 상태를 관리합니다.</p><p>요청하신 장소와 일정에 맞춰 현장으로 납품해드립니다.</p>
+          <div class="flabel">STEP 7 · 합격·통관 후 납품</div>
+          <h3>합격한 물량만 통관해, 적응시킨 뒤 보냅니다</h3>
+          <p>검역에 합격해야 통관이 진행됩니다. 요청하시면 검역합격증명서와 수입신고필증 사본을 함께 드려, 원산지와 통관 이력을 직접 확인하실 수 있습니다.</p><p>통관한 식물은 자체 농장에서 우리 기후에 적응시킨 뒤, 요청하신 장소와 일정에 맞춰 현장으로 납품합니다.</p>
         </div>
         <div class="fphoto"><img width="760" height="500" src="/assets/proc/p6-deliver.jpg" alt="국내에서 재배 중인 묘목" loading="lazy"></div>
       </div>
     </div>
+    <p class="procnote">* 검역 방법(서류·현장·정밀·격리재배)과 격리재배 기간은 「식물방역법」과 농림축산검역본부 고시에 따릅니다.
+       품목·생산 국가·시기에 따라 달라질 수 있어, 견적 시 해당 품목 기준으로 예상 일정을 안내드립니다.</p>
   </div>
 </section>
 
