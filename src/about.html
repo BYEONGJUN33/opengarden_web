@@ -120,26 +120,9 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
 }
 .mapdots{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .mapsvg{position:absolute;inset:0;width:100%;height:100%}
-/* 선 굵기를 화면 픽셀로 고정 — 지도가 줄어도 얇아져 사라지지 않습니다 */
-.mapsvg .arc{fill:none;stroke:url(#ag);stroke-width:2.4;stroke-linecap:round;vector-effect:non-scaling-stroke}
-.mapsvg .arc-s{stroke-width:1.4;stroke-dasharray:5 6;opacity:.85}
-/* 마커는 SVG가 아니라 HTML — 크기가 px로 고정돼 모바일에서도 그대로 보입니다 */
-.mk{position:absolute;width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border-radius:50%;
-  background:#fff;border:2.5px solid var(--green);box-shadow:0 1px 4px rgba(20,40,28,.28)}
-.mk-s{width:10px;height:10px;margin:-5px 0 0 -5px;border-width:2px;border-color:#7BA98A}
-/* 한국은 속이 빈 링 — 점으로 덮으면 반도가 가려집니다 */
-.mk-kor{width:34px;height:34px;margin:-17px 0 0 -17px;background:transparent;
-  border:3.5px solid var(--green-dark);
-  box-shadow:0 0 0 3px rgba(255,255,255,.9),inset 0 0 0 3px rgba(255,255,255,.9),0 2px 10px rgba(20,40,28,.3)}
-.mk-kor::after{content:"";position:absolute;inset:-12px;border-radius:50%;border:2px solid var(--green);
-  animation:pulse 2.8s ease-in-out infinite}
-@keyframes pulse{0%,100%{transform:scale(.72);opacity:.5}60%{transform:scale(1.3);opacity:0}}
-@media(max-width:560px){
-  .mk{width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-width:2px}
-  .mk-s{width:8px;height:8px;margin:-4px 0 0 -4px;border-width:1.5px}
-  .mk-kor{width:24px;height:24px;margin:-12px 0 0 -12px;border-width:2.5px}
-  .mk-kor::after{inset:-8px}
-}
+/* 수입 경로 화살표 — 굵기를 화면 픽셀로 고정해 지도가 줄어도 얇아지지 않습니다 */
+.mapsvg .rshaft{fill:none;stroke:var(--green-dark);stroke-width:2.6;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.mapsvg .rhead{fill:var(--green-dark);stroke:none}
 .mapnote{font-size:13px;color:var(--gray);max-width:900px;margin:26px auto 0;line-height:1.7}
 .swipe-hint{display:none}
 @media(max-width:700px){.swipe-hint{display:block;margin-top:4px}}
@@ -190,7 +173,6 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 @media(max-width:640px){.chat-fab{padding:14px;bottom:calc(16px + env(safe-area-inset-bottom))}.chat-fab .lbl{display:none}}
 
 @media(prefers-reduced-motion:reduce){
-  .mk-kor::after{animation:none}
   .chat-fab{transition:none}
 }
 
@@ -207,18 +189,15 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
   background:var(--green);transform:scaleY(var(--fp,0));transform-origin:top;
   transition:transform .7s cubic-bezier(.22,.61,.36,1)}
 
-/* 지도 — 지점이 찍히고 항로가 순서대로 이어집니다.
+/* 지도 — 화살표가 순서대로 나타납니다.
    .anim은 JS가 붙이므로 JS가 없으면 처음부터 다 보입니다 */
-.mapwrap.anim .arc{opacity:0;transition:opacity .8s ease var(--ad,0ms)}
-.mapwrap.anim .mk{opacity:0;transform:scale(.3);
-  transition:opacity .35s ease var(--ad,0ms),transform .5s cubic-bezier(.34,1.56,.64,1) var(--ad,0ms)}
-.mapwrap.anim.in .arc{opacity:1}
-.mapwrap.anim.in .mk{opacity:1;transform:none}
+.mapwrap.anim .route{opacity:0;transition:opacity .7s ease var(--ad,0ms)}
+.mapwrap.anim.in .route{opacity:1}
 
 @media(prefers-reduced-motion:reduce){
   [data-reveal],[data-reveal].in{opacity:1;transform:none;transition:none}
   .flow::after{transition:none;transform:scaleY(1)}
-  .mapwrap.anim .arc,.mapwrap.anim .mk{opacity:1;transform:none;transition:none}
+  .mapwrap.anim .route{opacity:1;transition:none}
 }
 </style>
 </head>
@@ -266,52 +245,38 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
   <div class="wrap center">
     <div class="kicker-s">소싱 네트워크</div>
     <h2>국내에 없으면, 해외에서 찾아옵니다.</h2>
-    <p class="sub">네덜란드·이탈리아·스페인·미국·캐나다의 협력 농가와 직접 거래하고,
-       독일·벨기에·폴란드·뉴질랜드·남아프리카공화국·칠레 등 주요 원예 산지도 요청에 따라 수급을 확인합니다.
+    <p class="sub">유럽·북미·중국·일본의 현지 농가와 거래합니다.
        국내에 있는 품목은 전국 거래 농가에서 바로 매칭합니다.</p>
   </div>
   <div class="mapouter">
     <!-- 좌표는 등장방형도법(1600px = 경도 360°, 경도 0° = x239.9, 위도 0° = y354.2, 세로 600px) 기준.
          마커의 % 값 = 좌표 / 1600(또는 600). 지점을 추가할 땐 같은 식으로 환산하세요.
-         각 지점은 실제 원예·묘목 산지(보스코프·피스토이아·오리건 등)로 잡았고
-         Natural Earth 국경 데이터로 해당 국가 안에 들어오는지 확인했습니다. -->
+         강조 지역은 유럽(네덜란드·벨기에·독일·덴마크·폴란드·프랑스·이탈리아·스페인)·
+         북미(미국·캐나다)·중국·일본이며, 국경 도형은 Natural Earth 자료로 그렸습니다.
+         화살표는 각 지역에서 한국으로 향하고, 한국 바로 앞에서 멈춰 나라 색을 가리지 않습니다. -->
     <div class="mapscroll">
       <div class="mapwrap">
         <img class="mapdots" src="/assets/worldmap.svg" alt="" width="1600" height="600">
-        <svg class="mapsvg" viewBox="0 0 1600 600" aria-hidden="true" focusable="false">
-        <defs>
-          <radialGradient id="ag" gradientUnits="userSpaceOnUse" cx="804.4" cy="187.2" r="900">
-            <stop offset="0" stop-color="#123023" stop-opacity="1"/>
-            <stop offset="1" stop-color="#1F4D33" stop-opacity=".32"/>
-          </radialGradient>
-        </defs>
-        <path class="arc" d="M 260.7 122.7 C 411.1 16.5, 683.0 48.8, 804.4 187.2"/>
-        <path class="arc arc-s" d="M 256.5 127.3 C 404.6 40.9, 678.5 70.9, 804.4 187.2"/>
-        <path class="arc arc-s" d="M 275.6 118.0 C 418.1 56.0, 682.5 90.6, 804.4 187.2"/>
-        <path class="arc arc-s" d="M 331.1 123.1 C 456.8 84.7, 693.4 116.8, 804.4 187.2"/>
-        <path class="arc" d="M 288.5 159.0 C 419.9 122.2, 677.8 136.3, 804.4 187.2"/>
-        <path class="arc" d="M 238.3 178.8 C 380.2 155.4, 663.2 159.6, 804.4 187.2"/>
-        <path class="arc" d="M 1487.1 162.6 C 1311.0 18.6, 969.6 30.9, 804.4 187.2"/>
-        <path class="arc" d="M 1293.3 154.6 C 1166.4 91.9, 921.9 108.2, 804.4 187.2"/>
-        <path class="arc arc-s" d="M 1019.1 522.2 C 1052.5 382.6, 945.1 215.1, 804.4 187.2"/>
-        <path class="arc arc-s" d="M 324.0 504.9 C 390.1 343.8, 630.3 185.0, 804.4 187.2"/>
-        <path class="arc arc-s" d="M 1525.8 502.6 C 1386.4 330.0, 1025.7 172.3, 804.4 187.2"/>
+          <svg class="mapsvg" viewBox="0 0 1600 600" aria-hidden="true" focusable="false">
+        <g class="route" data-r="유럽">
+          <path class="rshaft" d="M 273.3 125.3 C 406.9 60.2, 655.5 89.2, 752.0 168.1"/>
+          <path class="rhead" d="M 770.6 183.3 L 746.2 175.2 L 757.8 161.0 Z"/>
+        </g>
+        <g class="route" data-r="북미">
+          <path class="rshaft" d="M 1404.4 172.0 C 1260.2 68.0, 977.1 75.2, 857.1 171.4"/>
+          <path class="rhead" d="M 838.3 186.4 L 851.4 164.2 L 862.8 178.5 Z"/>
+        </g>
+        <g class="route" data-r="중국">
+          <path class="rshaft" d="M 684.4 207.5 C 709.8 226.3, 753.0 219.0, 759.0 210.3"/>
+          <path class="rhead" d="M 770.8 192.9 L 765.6 214.8 L 752.4 205.8 Z"/>
+        </g>
+        <g class="route" data-r="일본">
+          <path class="rshaft" d="M 875.6 160.9 C 861.4 152.7, 841.7 160.0, 840.2 164.1"/>
+          <path class="rhead" d="M 836.2 175.4 L 835.9 162.6 L 844.5 165.6 Z"/>
+        </g>
         </svg>
-        <span class="mk" style="left:16.29%;top:20.46%" title="네덜란드"></span>
-        <span class="mk mk-s" style="left:16.03%;top:21.22%" title="벨기에"></span>
-        <span class="mk mk-s" style="left:17.22%;top:19.66%" title="독일"></span>
-        <span class="mk mk-s" style="left:20.69%;top:20.51%" title="폴란드"></span>
-        <span class="mk" style="left:18.03%;top:26.49%" title="이탈리아"></span>
-        <span class="mk" style="left:14.89%;top:29.80%" title="스페인"></span>
-        <span class="mk" style="left:92.94%;top:27.11%" title="캐나다"></span>
-        <span class="mk" style="left:80.83%;top:25.77%" title="미국"></span>
-        <span class="mk mk-s" style="left:63.69%;top:87.03%" title="뉴질랜드"></span>
-        <span class="mk mk-s" style="left:20.25%;top:84.14%" title="남아공"></span>
-        <span class="mk mk-s" style="left:95.36%;top:83.77%" title="칠레"></span>
-        <span class="mk mk-kor" style="left:50.27%;top:31.20%" title="대한민국"></span>
       </div>
-    </div>
-    <p class="mapnote">* 진한 표시는 현재 거래 중인 국가, 옅은 표시는 요청 시 수급을 확인하는 주요 원예 산지입니다.<span class="swipe-hint">화면이 좁으면 지도를 옆으로 밀어 볼 수 있습니다.</span></p>
+    <p class="mapnote">* 지도의 진한 표시는 주요 수입 지역, 화살표는 국내로 들어오는 경로를 나타냅니다.<span class="swipe-hint">화면이 좁으면 지도를 옆으로 밀어 볼 수 있습니다.</span></p>
   </div>
 </section>
 
@@ -470,16 +435,13 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
   },{passive:true});
 })();
 
-// 지도 — 화면에 들어오면 지점이 먼저 찍히고 항로가 이어집니다
+// 지도 — 화면에 들어오면 화살표가 순서대로 나타납니다
 (function(){
   var wrap=document.querySelector('.mapwrap'); if(!wrap)return;
   if(matchMedia('(prefers-reduced-motion: reduce)').matches||!('IntersectionObserver' in window))return;
-  var arcs=[].slice.call(wrap.querySelectorAll('.arc'));
-  var mks=[].slice.call(wrap.querySelectorAll('.mk:not(.mk-kor)'));
-  var kor=wrap.querySelector('.mk-kor');
-  if(kor)kor.style.setProperty('--ad','0ms');           // 도착지부터
-  mks.forEach(function(m,i){m.style.setProperty('--ad',(120+i*70)+'ms');});
-  arcs.forEach(function(a,i){a.style.setProperty('--ad',(260+i*70)+'ms');});
+  var routes=[].slice.call(wrap.querySelectorAll('.route'));
+  if(!routes.length)return;
+  routes.forEach(function(r,i){r.style.setProperty('--ad',(120+i*140)+'ms');});
   wrap.classList.add('anim');
   var io=new IntersectionObserver(function(es){
     es.forEach(function(e){ if(e.isIntersecting){wrap.classList.add('in');io.disconnect();} });
