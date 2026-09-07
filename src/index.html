@@ -240,9 +240,19 @@ footer{padding:48px 0;font-size:13px;color:var(--gray)}
 footer .foot-logo{height:42px;margin-bottom:14px;display:block}
 footer a{color:var(--gray);text-decoration:none;font-weight:700}
 
-/* 스크롤 등장 페이드 — .reveal은 JS가 부여하므로 JS가 꺼져 있어도 내용은 항상 보임 */
-.reveal{opacity:0}
-.reveal.in{opacity:1;animation:rise .7s cubic-bezier(.22,.61,.36,1) var(--d,0s) backwards}
+/* ── 스크롤 등장 ──────────────────────────────────────────────────────
+   화면에 들어온 항목부터 하나씩 나타납니다. 스크롤을 가로채지 않으므로
+   모바일 주소창이 접혔다 펴져도, 카톡 인앱 브라우저에서도 어긋나지 않습니다.
+   data-reveal은 JS가 붙입니다 — JS가 없거나 실패하면 처음부터 전부 보입니다.
+   transform·opacity만 바꿔 레이아웃 계산 없이 그려집니다. */
+[data-reveal]{opacity:0;transform:translate3d(0,16px,0);
+  transition:opacity .5s ease var(--rd,0ms),transform .55s cubic-bezier(.22,.61,.36,1) var(--rd,0ms)}
+[data-reveal].in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){[data-reveal],[data-reveal].in{opacity:1;transform:none;transition:none}}
+/* 답변을 펼칠 때 살짝 밀려 올라오며 나타납니다 */
+.qa[open] .a{animation:qaIn .3s ease}
+@keyframes qaIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.qa[open] .a{animation:none}}
 
 /* 오른쪽 아래 카카오 채팅 플로팅 버튼 */
 .chat-fab{position:fixed;right:18px;bottom:20px;z-index:65;display:flex;align-items:center;gap:8px;background:var(--kakao);color:#191919;text-decoration:none;font-weight:800;font-size:14.5px;padding:13px 18px 13px 15px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.22);transition:transform .2s ease,box-shadow .2s ease}
@@ -252,8 +262,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 @media(max-width:640px){.chat-fab{padding:14px;bottom:calc(16px + env(safe-area-inset-bottom))}.chat-fab .lbl{display:none}}
 
 @media(prefers-reduced-motion:reduce){
-  .reveal{opacity:1}
-  .reveal.in,.hero h1,.hero p,.hero .btn,.scroll-hint,.mq-track{animation:none}
+  .hero h1,.hero p,.hero .btn,.scroll-hint,.mq-track{animation:none}
   .stat,.svc,.card,.step .ico,.btn,.chat-fab{transition:none}
 }
 </style>
@@ -449,58 +458,36 @@ faqItems.forEach(d=>d.addEventListener('toggle',()=>{
   if(d.open)faqItems.forEach(x=>{if(x!==d)x.open=false;});
 }));
 
-// 스크롤 등장 페이드 (모션 최소화 설정 시 생략 — 그리드 자식은 시차를 두고 순차 등장)
-if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
-  const els=[...document.querySelectorAll('h2,.sub,.kicker-s,.stat,.svc,.prow,.about-grid>div,.qa,.final .actions')];
-  els.forEach(el=>el.classList.add('reveal'));
-  document.querySelectorAll('.stats,.svc-grid,.process').forEach(g=>
-    [...g.children].forEach((c,i)=>c.style.setProperty('--d',Math.min(i*90,360)+'ms')));
-  const io=new IntersectionObserver(es=>es.forEach(e=>{
-    if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}
-  }),{threshold:.1,rootMargin:'0px 0px -36px 0px'});
-  els.forEach(el=>io.observe(el));
-}
-
-// 납품 사례 캐러셀 — 카드가 화면 폭을 넘길 때만 흐르게 합니다.
-// 한두 개뿐일 땐 가운데 정렬로 그대로 두는 게 자연스러워서 애니메이션을 걸지 않습니다.
+// 스크롤 등장 — 화면에 들어온 항목부터 하나씩. 스크롤을 가로채지 않습니다.
 (function(){
-  var mq=document.getElementById('caseMarquee'), tr=document.getElementById('caseTrack');
-  if(!mq||!tr)return;
-  var originals=[].slice.call(tr.children);
-  if(!originals.length)return;
-  var reduce=matchMedia('(prefers-reduced-motion: reduce)');
-  function layout(){
-    [].slice.call(tr.querySelectorAll('[data-clone]')).forEach(function(n){tr.removeChild(n);});
-    mq.classList.remove('rolling');
-    tr.style.removeProperty('--mq-shift');
-    tr.style.animationDuration='';
-    if(reduce.matches)return;
-    var unit=0;
-    originals.forEach(function(n){
-      var mr=parseFloat(getComputedStyle(n).marginRight);
-      unit+=n.getBoundingClientRect().width+(isNaN(mr)?0:mr);
-    });
-    if(!unit||unit<=mq.clientWidth+24)return;
-    // 원본 뒤에 복제본을 이어 붙이고 정확히 원본 1벌만큼 밀면 이음매가 보이지 않습니다
-    var total=unit;
-    while(total<unit+mq.clientWidth+4){
-      originals.forEach(function(n){
-        var c=n.cloneNode(true);
-        c.setAttribute('data-clone','');
-        c.setAttribute('aria-hidden','true');
-        [].slice.call(c.querySelectorAll('a')).forEach(function(a){a.tabIndex=-1;});
-        tr.appendChild(c);
-      });
-      total+=unit;
-    }
-    mq.classList.add('rolling');
-    tr.style.setProperty('--mq-shift',(-unit)+'px');
-    tr.style.animationDuration=Math.max(18,unit/55)+'s';
+  var SOLO='.kicker-s, h2, .sub, .about-grid > div, .marquee, .final .small, .final .actions', GROUP='.stats, .svc-grid, .process, .faq-list';
+  if(!('IntersectionObserver' in window))return;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  var all=[];
+  function mark(el,delay){
+    if(el.hasAttribute('data-reveal'))return;
+    el.setAttribute('data-reveal','');
+    if(delay)el.style.setProperty('--rd',delay+'ms');
+    all.push(el);
   }
-  layout();
-  var t;
-  addEventListener('resize',function(){clearTimeout(t);t=setTimeout(layout,180);},{passive:true});
-  if(reduce.addEventListener)reduce.addEventListener('change',layout);
+  // 묶음이 먼저 — 같은 줄에 놓인 카드들은 약간씩 시차를 두고 나타납니다
+  if(GROUP)[].forEach.call(document.querySelectorAll(GROUP),function(g){
+    [].forEach.call(g.children,function(c,i){mark(c,Math.min(i*70,280));});
+  });
+  [].forEach.call(document.querySelectorAll(SOLO),function(el){mark(el,0);});
+  if(!all.length)return;
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+  },{threshold:.08,rootMargin:'0px 0px -8% 0px'});
+  all.forEach(function(el){io.observe(el);});
+  // 안전장치 — 관측이 어긋나는 브라우저에서도 화면 안에 있는 내용은 반드시 보이게
+  setTimeout(function(){
+    all.forEach(function(el){
+      if(el.classList.contains('in'))return;
+      var r=el.getBoundingClientRect();
+      if(r.top<innerHeight&&r.bottom>0){el.classList.add('in');io.unobserve(el);}
+    });
+  },2500);
 })();
 
 // 스크롤 시 헤더 그림자

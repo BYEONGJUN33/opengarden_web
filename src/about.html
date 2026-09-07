@@ -166,7 +166,7 @@ header.scrolled{box-shadow:0 6px 24px rgba(20,40,28,.08)}
 @media(min-width:561px) and (max-width:860px){.fphoto{max-width:460px}}
 @media(max-width:860px){
   .fstep,.fstep.nophoto{grid-template-columns:48px 1fr;gap:18px;row-gap:16px}
-  .flow::before{left:23px}
+  .flow::before,.flow::after{left:23px}
   .fico{width:48px;height:48px}.fico svg{width:24px;height:24px}
   .fphoto{grid-column:2;max-width:none}
 }
@@ -192,6 +192,33 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 @media(prefers-reduced-motion:reduce){
   .mk-kor::after{animation:none}
   .chat-fab{transition:none}
+}
+
+/* ── 스크롤 등장 ──────────────────────────────────────────────────────
+   화면에 들어온 항목부터 하나씩 나타납니다. 스크롤을 가로채지 않으므로
+   모바일 주소창이 접혔다 펴져도, 카톡 인앱 브라우저에서도 어긋나지 않습니다.
+   data-reveal은 JS가 붙입니다 — JS가 없거나 실패하면 처음부터 전부 보입니다. */
+[data-reveal]{opacity:0;transform:translate3d(0,16px,0);
+  transition:opacity .5s ease var(--rd,0ms),transform .55s cubic-bezier(.22,.61,.36,1) var(--rd,0ms)}
+[data-reveal].in{opacity:1;transform:none}
+
+/* 지나온 만큼 차오르는 진행선 — 점선 위에 실선이 덮이며 어디까지 왔는지 보여줍니다 */
+.flow::after{content:"";position:absolute;left:27px;top:34px;width:2px;height:calc(100% - 68px);
+  background:var(--green);transform:scaleY(var(--fp,0));transform-origin:top;
+  transition:transform .7s cubic-bezier(.22,.61,.36,1)}
+
+/* 지도 — 지점이 찍히고 항로가 순서대로 이어집니다.
+   .anim은 JS가 붙이므로 JS가 없으면 처음부터 다 보입니다 */
+.mapwrap.anim .arc{opacity:0;transition:opacity .8s ease var(--ad,0ms)}
+.mapwrap.anim .mk{opacity:0;transform:scale(.3);
+  transition:opacity .35s ease var(--ad,0ms),transform .5s cubic-bezier(.34,1.56,.64,1) var(--ad,0ms)}
+.mapwrap.anim.in .arc{opacity:1}
+.mapwrap.anim.in .mk{opacity:1;transform:none}
+
+@media(prefers-reduced-motion:reduce){
+  [data-reveal],[data-reveal].in{opacity:1;transform:none;transition:none}
+  .flow::after{transition:none;transform:scaleY(1)}
+  .mapwrap.anim .arc,.mapwrap.anim .mk{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
@@ -386,6 +413,80 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 // 좁은 화면에서 지도는 가로 스크롤이라, 처음부터 한국(가운데)이 보이게 맞춥니다
 (function(){var sc=document.querySelector('.mapscroll');
  if(sc)sc.scrollLeft=Math.max(0,(sc.scrollWidth-sc.clientWidth)/2);})();
+// 스크롤 등장 — 화면에 들어온 항목부터 하나씩. 스크롤을 가로채지 않습니다.
+(function(){
+  var SOLO='.page-head > *, .intro-text > *, .intro-photo, .mapsec .wrap.center > *, .mapscroll, .mapnote, .process-head > *, .fstep, .procnote, .endcta .wrap > *';
+  var GROUP='.facts';
+  if(!('IntersectionObserver' in window))return;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  var all=[];
+  function mark(el,delay){
+    if(el.hasAttribute('data-reveal'))return;
+    el.setAttribute('data-reveal','');
+    if(delay)el.style.setProperty('--rd',delay+'ms');
+    all.push(el);
+  }
+  [].forEach.call(document.querySelectorAll(GROUP),function(g){
+    [].forEach.call(g.children,function(c,i){mark(c,Math.min(i*70,280));});
+  });
+  [].forEach.call(document.querySelectorAll(SOLO),function(el){mark(el,0);});
+  if(!all.length)return;
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+  },{threshold:.08,rootMargin:'0px 0px -8% 0px'});
+  all.forEach(function(el){io.observe(el);});
+  setTimeout(function(){
+    all.forEach(function(el){
+      if(el.classList.contains('in'))return;
+      var r=el.getBoundingClientRect();
+      if(r.top<innerHeight&&r.bottom>0){el.classList.add('in');io.unobserve(el);}
+    });
+  },2500);
+})();
+
+// 수입 단계 — 단계가 나타날 때 왼쪽 연결선이 그 지점까지 차오릅니다.
+// 위로 되감아도 줄어들지 않게 지나온 최대 지점을 기억합니다.
+(function(){
+  var flow=document.querySelector('.flow'); if(!flow)return;
+  var steps=[].slice.call(flow.querySelectorAll('.fstep')); if(!steps.length)return;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches||!('IntersectionObserver' in window)){
+    flow.style.setProperty('--fp','1'); return;
+  }
+  var last=-1;
+  function fill(i){
+    if(i<0||i<=last)return; last=i;
+    var st=steps[i], ico=st.querySelector('.fico'); if(!ico)return;
+    if(i===steps.length-1){flow.style.setProperty('--fp','1');return;}  // 마지막 단계에선 끝까지
+    var span=flow.offsetHeight-68;                 // ::before의 top·bottom 34px와 같은 구간
+    var c=st.offsetTop+ico.offsetTop+ico.offsetHeight/2-34;
+    flow.style.setProperty('--fp', Math.max(0,Math.min(1,c/span)).toFixed(3));
+  }
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting) fill(steps.indexOf(e.target)); });
+  },{threshold:.3,rootMargin:'0px 0px -18% 0px'});
+  steps.forEach(function(st){io.observe(st);});
+  var t; addEventListener('resize',function(){
+    clearTimeout(t); t=setTimeout(function(){var l=last; last=-1; fill(l);},200);
+  },{passive:true});
+})();
+
+// 지도 — 화면에 들어오면 지점이 먼저 찍히고 항로가 이어집니다
+(function(){
+  var wrap=document.querySelector('.mapwrap'); if(!wrap)return;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches||!('IntersectionObserver' in window))return;
+  var arcs=[].slice.call(wrap.querySelectorAll('.arc'));
+  var mks=[].slice.call(wrap.querySelectorAll('.mk:not(.mk-kor)'));
+  var kor=wrap.querySelector('.mk-kor');
+  if(kor)kor.style.setProperty('--ad','0ms');           // 도착지부터
+  mks.forEach(function(m,i){m.style.setProperty('--ad',(120+i*70)+'ms');});
+  arcs.forEach(function(a,i){a.style.setProperty('--ad',(260+i*70)+'ms');});
+  wrap.classList.add('anim');
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){wrap.classList.add('in');io.disconnect();} });
+  },{threshold:.2});
+  io.observe(wrap);
+})();
+
 const hd=document.querySelector('header');
 addEventListener('scroll',()=>hd.classList.toggle('scrolled',scrollY>8),{passive:true});
 </script>
