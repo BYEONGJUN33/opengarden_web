@@ -125,6 +125,9 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 @keyframes cardIn{from{opacity:0}to{opacity:1}}
 .plant .ph{aspect-ratio:1/1;background:linear-gradient(135deg,#dfe9de,#c0d3bd);display:flex;align-items:center;justify-content:center;color:var(--green);font-size:12px;font-weight:700;position:relative;overflow:hidden;cursor:pointer}
 .plant .ph img{transition:transform .5s ease}
+/* 카드는 격자 정렬을 위해 정사각형으로 잘라 씁니다. 세로로 긴 사진이 들어오면
+   아래(화분·바닥)보다 위(수형·꽃)를 남기는 편이 고르는 데 낫습니다. */
+.plant .ph img{object-position:50% 40%}
 .plant:hover .ph img{transform:scale(1.05)}
 .badge{position:absolute;top:10px;left:10px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;background:#fff}
 .badge.pre{background:#FFF3D6;color:#8a6100}
@@ -195,8 +198,12 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 @keyframes skm{0%{background-position:100% 0}100%{background-position:0 0}}
 
 /* 품종 상세 모달 */
-.dphoto{position:relative;aspect-ratio:4/3;background:linear-gradient(135deg,#dfe9de,#c0d3bd);border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--green);font-size:13px;font-weight:700}
-.dphoto img{width:100%;height:100%;object-fit:cover}
+.dphoto{position:relative;aspect-ratio:4/3;background:#e9eee8;border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--green);font-size:13px;font-weight:700}
+/* 상세 사진은 잘라내지 않습니다 — 수형·화서를 보고 고르는 화면이라 전체가 보여야 합니다.
+   비율이 안 맞아 남는 여백은 같은 사진을 흐리게 깔아 메웁니다. */
+.dphoto img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain}
+.dphoto .dbg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;
+  filter:blur(24px) saturate(1.15);transform:scale(1.15);opacity:.55}
 
 /* 사진 갤러리 — 사진이 2장 이상일 때만 화살표·썸네일이 붙습니다 */
 .gnav{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border:0;border-radius:50%;
@@ -566,7 +573,7 @@ function render(){
     const moq=multi?null:p.variants[0].moq;
     const label=n?(multi?`✓ ${n}개 규격 담김`:'✓ 담김'):'견적에 담기';
     el.innerHTML=`
-      <div class="ph">${p.image?`<img src="${p.image}" alt="${p.kname}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`:'식물 사진'}<span class="badge ${p.status==='즉시 출하'?'now':'pre'}">${p.status}</span>${shotsOf(p)>1?`<span class="shots" aria-label="사진 ${shotsOf(p)}장"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M21 7v12a2 2 0 0 1-2 2H7"/></svg>${shotsOf(p)}</span>`:''}</div>
+      <div class="ph">${p.image?`<img src="${p.image}" alt="${p.kname}" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:50% 40%">`:'식물 사진'}<span class="badge ${p.status==='즉시 출하'?'now':'pre'}">${p.status}</span>${shotsOf(p)>1?`<span class="shots" aria-label="사진 ${shotsOf(p)}장"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M21 7v12a2 2 0 0 1-2 2H7"/></svg>${shotsOf(p)}</span>`:''}</div>
       <div class="pbody">
         <div class="kname">${p.kname}</div>
         <div class="sname">${p.sname}</div>
@@ -605,6 +612,7 @@ function gShow(i){
   if(!gShots.length)return;
   gIdx=(i+gShots.length)%gShots.length; // 양끝에서 순환
   const img=document.getElementById('gMain'); if(img)img.src=gShots[gIdx];
+  const bg=document.getElementById('gBg'); if(bg)bg.style.backgroundImage=`url('${gShots[gIdx]}')`;
   const c=document.getElementById('gCount'); if(c)c.textContent=`${gIdx+1} / ${gShots.length}`;
   document.querySelectorAll('.gthumb').forEach((t,n)=>{
     const on=n===gIdx;
@@ -641,6 +649,7 @@ function renderDetail(){
   // 첫 장만 즉시 로드하고 나머지는 썸네일 클릭 시 받아옴
   const gallery=gShots.length
     ? `<div class="dphoto">
+         <div class="dbg" id="gBg" style="background-image:url('${gShots[0]}')"></div>
          <img id="gMain" src="${gShots[0]}" alt="${p.kname}">
          ${many?`<button class="gnav prev" id="gPrev" aria-label="이전 사진">‹</button>
                  <button class="gnav next" id="gNext" aria-label="다음 사진">›</button>
