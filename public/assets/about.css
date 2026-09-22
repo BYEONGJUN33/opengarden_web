@@ -49,6 +49,10 @@
 .step-output{border-top:1px solid var(--line);padding-top:16px;margin-top:24px;font-size:11px;color:var(--gray)}
 .step-output span{display:inline-block;margin-left:18px;font-size:13px;color:var(--green)}
 .journey-art{background:var(--bg-soft);padding:18px 28px;text-align:center;border-radius:4px}
+.journey-photo{margin:0;min-width:0}
+.journey-photo img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:50% 60%;border-radius:4px}
+.journey-photo.care-photo img{object-position:50% 38%}
+.journey-photo figcaption{font-size:11px;color:var(--gray);padding-top:10px;line-height:1.6}
 .journey-art svg{display:block;width:100%;height:auto;max-height:240px;fill:none;stroke:var(--green);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
 .journey-art>span{font-size:11px;color:var(--gray);display:block;margin:8px 0}
 .art-fill{fill:#e1eade}.art-paper{fill:#fff}.art-leaf{fill:#91b185}.art-ground{stroke:#bdcdb9}.art-check{stroke-width:4}
