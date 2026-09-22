@@ -14,25 +14,33 @@
 .about-page .facts b{font-size:16px}
 .about-page .facts span{font-size:13px}
 .sourcing{background:var(--bg-soft)}
+.sourcing-map{background:#fff;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.map-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 24px;border-bottom:1px solid var(--line)}
+.map-tools>span{font-size:10px;letter-spacing:.15em;color:var(--gray)}
+.map-tools>div{display:none;gap:6px}
+@media(max-width:860px){.map-tools>div{display:flex}}
+.map-tools button{border:1px solid var(--line);background:white;color:var(--green);padding:8px 14px;border-radius:3px;font-size:12px;min-height:40px}
+.map-tools button:hover{background:var(--bg-soft);border-color:var(--green)}
+.world-scroll{overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
+.world-stage{position:relative;min-width:800px;aspect-ratio:1600/600;margin-top:22px}
+.world-stage>img,.world-stage>svg{position:absolute;inset:0;width:100%;height:100%}
+.world-stage>img{opacity:.65}
+.world-routes{fill:none;stroke:var(--green);stroke-width:2;stroke-linecap:round}
+.world-points{fill:white;stroke:var(--green);stroke-width:3}
+.korea-ring{fill:rgba(255,255,255,.6);stroke:var(--green);stroke-width:3}
+.map-label{position:absolute;text-align:center;transform:translateX(-50%);padding:8px 12px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:3px;white-space:nowrap}
+.map-label strong{display:block;font-size:16px;color:var(--green-dark)}
+.map-label span{font-size:10px;color:var(--gray);display:block}
+.map-label.europe{left:17%;top:37%}.map-label.america{left:86%;top:38%}.map-label.korea{left:50.27%;top:40%;border-color:var(--green)}
+.map-caption{display:flex;justify-content:space-between;gap:12px;padding:10px 24px 20px;font-size:11px;color:var(--gray)}
+.map-caption i{display:inline-block;width:20px;height:2px;background:var(--green);vertical-align:middle;margin-right:6px}
+.map-swipe{display:none}
+.map-delivery{display:flex;align-items:center;justify-content:center;gap:32px;padding:28px 20px;border-top:1px solid var(--line);background:var(--green-dark);color:#fff;text-align:center}
+.map-delivery span{display:block;font-size:9px;letter-spacing:.1em;color:#cfe0d4;margin-bottom:6px}
+.map-delivery strong{font-size:16px;font-weight:500}.map-delivery b{font-weight:400;color:#cfe0d4}
+.domestic-note{font-size:12px;color:var(--gray);padding:15px 20px;text-align:center}
+@media(max-width:760px){.map-tools{padding:12px}.map-tools>span{font-size:9px}.map-tools button{padding:8px 12px}.map-caption{padding:14px;flex-direction:column;gap:6px}.map-swipe{display:inline}.map-delivery{gap:12px;padding:24px 12px}.map-delivery strong{font-size:12px}.map-delivery span{font-size:8px}.domestic-note{font-size:11px}}
 .section-heading{margin-top:0;margin-bottom:48px;align-items:end}
-.network{padding:36px;background:#fff;border:1px solid var(--line);border-radius:4px}
-.network-sources{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
-.source-region{border-top:2px solid var(--green);padding:18px 0 10px;text-align:center}
-.region-code,.network-hub>span,.network-destination>span{font-size:10px;color:var(--gray);letter-spacing:.13em;display:block}
-.source-region h3{font-size:24px;margin:14px 0 7px;max-width:none}
-.source-region p{font-size:13px;color:var(--ink)}
-.region-note{font-size:11px;color:var(--gray);display:block;margin-top:8px}
-.network-connector{height:56px;position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin:0 0 30px}
-.network-connector:before{content:'';position:absolute;left:calc(16.666% - 11px);right:calc(16.666% - 11px);bottom:0;border-bottom:1px solid #a8bcae}
-.network-connector i{height:100%;width:1px;background:#a8bcae;justify-self:center}
-.network-connector:after{content:'';position:absolute;left:50%;bottom:-30px;width:1px;height:30px;background:var(--green)}
-.network-hub{max-width:400px;margin:auto;border:1px solid var(--line);padding:26px;text-align:center;background:var(--bg-soft)}
-.network-hub img{width:44px;height:44px;object-fit:contain;margin-bottom:10px}
-.network-hub strong,.network-destination strong{display:block;font-size:23px;margin:9px 0}
-.network-hub p,.network-destination p{font-size:13px;color:var(--gray)}
-.network-out{text-align:center;color:var(--green);font-size:24px;padding:10px}
-.network-destination{background:var(--green-dark);color:white;text-align:center;max-width:400px;margin:auto;padding:24px}
-.network-destination>span,.network-destination p{color:#cfe0d4}
 .sourcing-more{font-size:14px;border-bottom:1px solid var(--line);padding:22px 0}
 .sourcing-more summary{cursor:pointer;padding:8px 0;color:var(--green);font-weight:500}
 .sourcing-more p{font-size:14px;color:var(--gray);max-width:700px;margin:12px 0;line-height:1.9}
@@ -66,17 +74,6 @@
  .about-statement{margin-top:36px}
  .about-page .facts{gap:0}
  .about-page .intro{padding-bottom:48px}
- .network{padding:24px 16px}
- .network-sources{grid-template-columns:1fr;gap:0}
- .source-region{text-align:left;display:grid;grid-template-columns:72px 1fr;padding:18px 0;border-top:1px solid var(--line);gap:6px 14px}
- .region-code{grid-column:1/-1;font-size:9px}
- .source-region h3{font-size:20px;margin:0;grid-row:2/4;align-self:center}
- .source-region p{font-size:12px}
- .region-note{margin-top:0}
- .network-connector{display:block;height:24px;margin:0 0 16px;border-left:1px solid #a8bcae;margin-left:50%}
- .network-connector:before,.network-connector:after,.network-connector i{display:none}
- .network-hub,.network-destination{padding:22px 12px}
- .network-hub strong,.network-destination strong{font-size:21px}
  .journey-step{grid-template-columns:1fr;gap:24px;padding:32px 0}
  .journey-copy h3{font-size:22px;margin-top:12px}
  .journey-art svg{max-height:190px}
