@@ -17,30 +17,25 @@
 .atlas{background:#fafbf9;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:24px 0}
 .atlas-top{padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:40px}
 .atlas-top>span,.atlas-eyebrow{font-size:10px;letter-spacing:.12em;color:var(--gray)}
-.atlas-top button{font-size:11px;background:none;border:0;border-bottom:1px solid var(--line);padding:10px 0;color:var(--green)}
 .atlas-canvas{position:relative;width:100%;aspect-ratio:8/3;margin:36px 0 16px}
 .atlas-canvas>img,.atlas-canvas>svg{position:absolute;inset:0;width:100%;height:100%}
-.atlas-route-group{display:none}
-.atlas-route-group.active{display:block}
 .atlas-route{fill:none;stroke:var(--green);stroke-width:1.5;vector-effect:non-scaling-stroke;stroke-linecap:round}
 .atlas-origin{fill:var(--green);stroke:#fff;stroke-width:2}
 .atlas-hub{fill:var(--green)}
 .atlas-hub-halo{fill:rgba(31,77,51,.06);stroke:var(--green);stroke-width:1.3;vector-effect:non-scaling-stroke}
-.atlas-korea{position:absolute;left:50.275%;top:39%;transform:translateX(-50%);font-size:13px;font-weight:700;text-align:center;color:var(--green-dark);background:rgba(250,251,249,.88);padding:5px 8px}
+.atlas-korea{position:absolute;left:50.5%;top:40%;transform:translateX(-50%);font-size:13px;font-weight:700;text-align:center;color:var(--green-dark);background:rgba(250,251,249,.88);padding:5px 8px}
 .atlas-korea span{display:block;font-size:8px;font-weight:400;letter-spacing:.08em}
-.atlas.is-running .active .atlas-route{stroke-dasharray:1;animation:atlas-draw 1.8s ease both;animation-delay:var(--route-delay)}
+.atlas.will-animate .atlas-route{stroke-dasharray:1;stroke-dashoffset:1}
+.atlas.will-animate.is-drawn .atlas-route{animation:atlas-draw 2.4s ease both}
 @keyframes atlas-draw{from{stroke-dashoffset:1;opacity:.2}to{stroke-dashoffset:0;opacity:1}}
 .atlas-bottom{display:flex;justify-content:center;align-items:center;gap:42px;padding:24px;min-height:116px;border-top:1px solid var(--line)}
 .atlas-bottom>div{flex:1;text-align:center}
 .atlas-bottom p{font-size:17px;color:var(--green-dark);margin-top:8px}
-.atlas-country-groups{min-height:34px}
+.atlas-countries{min-height:34px}
 .atlas-direction{font-size:24px;color:var(--green)}
-.atlas-controls{display:flex;justify-content:center;gap:10px}
-.atlas-controls button{min-width:44px;min-height:40px;font-size:11px;border:1px solid var(--line);background:transparent;color:var(--gray);border-radius:3px}
-.atlas-controls button[aria-pressed=true]{background:var(--green);color:#fff;border-color:var(--green)}
 .atlas-note{text-align:center;color:var(--gray);font-size:11px;padding:20px 18px 0}
-@media(max-width:760px){.atlas-top{padding:0 14px;gap:8px}.atlas-top>span{font-size:8px}.atlas-top button{font-size:10px}.atlas-canvas{margin:30px 0 22px}.atlas-korea{font-size:10px;padding:2px 5px}.atlas-korea span{font-size:6px}.atlas-bottom{padding:20px 12px;gap:10px;min-height:130px}.atlas-bottom p{font-size:13px}.atlas-eyebrow{font-size:9px}.atlas-country-groups{min-height:48px}.atlas-note{font-size:10px;line-height:1.8}.atlas-route{stroke-width:1}}
-@media(prefers-reduced-motion:reduce){.atlas.is-running .active .atlas-route{animation:none;stroke-dasharray:none}}
+@media(max-width:760px){.atlas-top{padding:0 14px;gap:8px}.atlas-top>span{font-size:8px}.atlas-top button{font-size:10px}.atlas-canvas{margin:30px 0 22px}.atlas-korea{font-size:10px;padding:2px 5px}.atlas-korea span{font-size:6px}.atlas-bottom{padding:20px 12px;gap:10px;min-height:130px}.atlas-bottom p{font-size:13px}.atlas-eyebrow{font-size:9px}.atlas-countries{min-height:48px}.atlas-note{font-size:10px;line-height:1.8}.atlas-route{stroke-width:1}}
+@media(prefers-reduced-motion:reduce){.atlas.will-animate .atlas-route{animation:none;stroke-dasharray:none;stroke-dashoffset:0}}
 .section-heading{margin-top:0;margin-bottom:48px;align-items:end}
 .sourcing-more{font-size:14px;border-bottom:1px solid var(--line);padding:22px 0}
 .sourcing-more summary{cursor:pointer;padding:8px 0;color:var(--green);font-weight:500}
