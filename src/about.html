@@ -140,6 +140,7 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 </style>
 <link rel="stylesheet" href="/assets/site.css">
 <link rel="stylesheet" href="/assets/about.css">
+<script src="/assets/about-map.js" defer></script>
 </head>
 <body class="about-page">
 
@@ -148,32 +149,24 @@ footer a{color:var(--gray);text-decoration:none;font-weight:700}
 
 
 <main>
-<div class="wrap page-head"><div class="kicker-s">ABOUT OPEN GARDEN</div><h1>나무가 자란 곳부터,<br>심길 곳까지.</h1><p>국내 농가의 식물부터 유럽·북미의 새로운 품종까지.<br class="pc-br">필요한 식물을 찾고, 현장에 도착하기까지의 과정을 연결합니다.</p><a class="about-jump" href="#sourcing">오픈가든이 일하는 방식 <span aria-hidden="true">↓</span></a></div>
+<div class="wrap page-head"><div class="kicker-s">ABOUT OPEN GARDEN</div><h1>나무가 자란 곳부터,<br>심길 곳까지.</h1><p>국내 농가의 식물부터 세계 여러 산지의 새로운 품종까지.<br class="pc-br">필요한 식물을 찾고, 현장에 도착하기까지의 과정을 연결합니다.</p><a class="about-jump" href="#sourcing">오픈가든이 일하는 방식 <span aria-hidden="true">↓</span></a></div>
 <section class="intro" aria-label="오픈가든 소개"><div class="wrap">
 <figure class="about-landscape"><img src="/assets/about.jpg" alt="다양한 묘목이 줄지어 자라는 농장 풍경" width="1280" height="853" fetchpriority="high"><figcaption>식물을 찾는 일에서, 현장에 보내는 일까지.</figcaption></figure>
 <div class="about-statement"><div><div class="kicker-s">OUR APPROACH</div><h2>좋은 식물을 찾는 일.<br>잘 도착하게 하는 일.</h2></div><div><p>현장에 필요한 식물이 한 농장에 모두 있지는 않습니다. 오픈가든은 국내 거래 농가와 해외 현지 농장을 연결해 품종, 규격, 수량에 맞는 공급처를 찾습니다.</p><p>국내에서 구할 수 있는 품목은 매칭하고, 해외 품목은 수입 가능 여부부터 확인합니다. 수입 후에는 국내 적응과 출하 준비를 거쳐 현장 납품으로 이어갑니다.</p></div></div>
 <ul class="facts"><li><b>국내·해외를 함께 살펴봅니다</b><span>현장에 필요한 품종과 규격을 기준으로 공급처를 찾습니다.</span></li>
       <li><b>현지 농가와 직접 연결합니다</b><span>유럽·북미 농가와 거래하며, Hoogenraad의 한국 에이전시로 품종 도입을 연결합니다.</span></li>
       <li><b>출하까지 이어서 관리합니다</b><span>수입 절차에서 국내 적응재배, 현장 납품까지 흐름을 이어갑니다.</span></li></ul></div></section>
-<section class="sourcing" id="sourcing"><div class="wrap"><div class="section-heading"><div><div class="kicker-s">SOURCING NETWORK</div><h2>산지는 넓게.<br>공급의 흐름은 명확하게.</h2></div><p>국내 수급과 해외 소싱을 함께 검토합니다. 식물이 어디에서 오든, 현장에서 필요한 조건을 기준으로 연결합니다.</p></div>
-<div class="sourcing-map">
-  <div class="map-tools" aria-label="지도 위치 이동"><span>GLOBAL SOURCING</span><div><button type="button" data-map-x=".17">유럽</button><button type="button" data-map-x=".503">한국</button><button type="button" data-map-x=".87">북미</button></div></div>
-  <div class="world-scroll" tabindex="0" role="region" aria-label="공급망 세계지도. 좁은 화면에서는 좌우로 이동할 수 있습니다.">
-    <div class="world-stage">
-      <img src="/assets/worldmap.svg" width="1600" height="600" alt="한국을 중심으로 왼쪽에 유럽, 오른쪽에 북미가 있는 세계지도" loading="lazy">
-      <svg viewBox="0 0 1600 600" aria-hidden="true"><defs><marker id="route-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5 0 10Z" fill="#1F4D33"/></marker></defs>
-        <g class="world-routes" marker-end="url(#route-arrow)"><path d="M260.7 122.7 Q520 -15 789 180"/><path d="M288.5 159 Q535 65 789 183"/><path d="M238.3 178.8 Q530 155 789 189"/><path d="M1487.1 162.6 Q1180 -20 820 181"/><path d="M1293.3 154.6 Q1080 95 820 188"/></g>
-        <g class="world-points"><circle cx="260.7" cy="122.7" r="6"/><circle cx="288.5" cy="159" r="6"/><circle cx="238.3" cy="178.8" r="6"/><circle cx="1487.1" cy="162.6" r="6"/><circle cx="1293.3" cy="154.6" r="6"/></g>
-        <circle class="korea-ring" cx="804.4" cy="187.2" r="20"/>
-      </svg>
-      <div class="map-label europe"><strong>유럽</strong><span>네덜란드 · 이탈리아 · 스페인</span></div>
-      <div class="map-label korea"><span>OPEN GARDEN</span><strong>대한민국</strong></div>
-      <div class="map-label america"><strong>북미</strong><span>미국 · 캐나다</span></div>
-    </div>
+<section class="sourcing" id="sourcing"><div class="wrap"><div class="section-heading"><div><div class="kicker-s">SOURCING NETWORK</div><h2>필요한 식물을 찾아,<br>세계의 산지를 연결합니다.</h2></div><p>중국에서 스페인까지, 여러 나라의 산지를 폭넓게 살펴봅니다. 필요한 품종과 규격, 현장 일정에 맞는 공급처를 찾습니다.</p></div>
+<div class="sourcing-map atlas" id="sourcingAtlas">
+  <div class="atlas-top"><span>GLOBAL PLANT SOURCING</span><button id="atlasPause" type="button" aria-pressed="false" hidden>자동 전환 일시정지</button></div>
+  <div class="atlas-canvas" role="img" aria-label="중국, 스페인 등 세계 여러 산지에서 한국으로 연결되는 식물 소싱 개념도">
+    <img src="/assets/sourcing-land.svg" width="1600" height="600" alt="" loading="lazy">
+    <svg viewBox="0 0 1600 600" aria-hidden="true"><g class="atlas-route-group active" data-route-group="0"><g style="--route-delay:0s"><path class="atlas-route" pathLength="1" d="M756 202 Q780.2 178.004 804.4 187.2"/><circle class="atlas-origin" cx="756" cy="202" r="6"/></g><g style="--route-delay:0.35s"><path class="atlas-route" pathLength="1" d="M238.3 178.8 Q521.35 71.24100000000003 804.4 187.2"/><circle class="atlas-origin" cx="238.3" cy="178.8" r="6"/></g><g style="--route-delay:0.7s"><path class="atlas-route" pathLength="1" d="M260.7 122.7 Q532.55 30 804.4 187.2"/><circle class="atlas-origin" cx="260.7" cy="122.7" r="6"/></g></g><g class="atlas-route-group" data-route-group="1"><g style="--route-delay:0s"><path class="atlas-route" pathLength="1" d="M288.5 159 Q546.45 60.979 804.4 187.2"/><circle class="atlas-origin" cx="288.5" cy="159" r="6"/></g><g style="--route-delay:0.35s"><path class="atlas-route" pathLength="1" d="M1293.3 154.6 Q1048.85 61.709 804.4 187.2"/><circle class="atlas-origin" cx="1293.3" cy="154.6" r="6"/></g><g style="--route-delay:0.7s"><path class="atlas-route" pathLength="1" d="M1487.1 162.6 Q1145.75 32.887 804.4 187.2"/><circle class="atlas-origin" cx="1487.1" cy="162.6" r="6"/></g></g><g class="atlas-route-group" data-route-group="2"><g style="--route-delay:0s"><path class="atlas-route" pathLength="1" d="M1019.1 522.2 Q911.75 146.40699999999998 804.4 187.2"/><circle class="atlas-origin" cx="1019.1" cy="522.2" r="6"/></g><g style="--route-delay:0.35s"><path class="atlas-route" pathLength="1" d="M324 504.9 Q564.2 95.92399999999999 804.4 187.2"/><circle class="atlas-origin" cx="324" cy="504.9" r="6"/></g><g style="--route-delay:0.7s"><path class="atlas-route" pathLength="1" d="M1525.8 502.6 Q1165.1 50.133999999999986 804.4 187.2"/><circle class="atlas-origin" cx="1525.8" cy="502.6" r="6"/></g></g><circle class="atlas-hub-halo" cx="804.4" cy="187.2" r="22"/><circle class="atlas-hub" cx="804.4" cy="187.2" r="8"/></svg>
+    <span class="atlas-korea">한국<span>OPEN GARDEN</span></span>
   </div>
-  <div class="map-caption"><span><i aria-hidden="true"></i> 주요 거래 국가 → 한국</span><span class="map-swipe">좌우로 밀거나 지역 버튼으로 이동하세요</span></div>
-  <div class="map-delivery"><div><span>OVERSEAS</span><strong>해외 농가 소싱</strong></div><b aria-hidden="true">→</b><div><span>OPEN GARDEN</span><strong>수입 · 국내 적응</strong></div><b aria-hidden="true">→</b><div><span>YOUR PROJECT</span><strong>현장 납품</strong></div></div>
-  <p class="domestic-note">국내에 있는 품목은 전국 거래 농가에서 매칭해 공급합니다.</p>
+  <div class="atlas-bottom"><div><span class="atlas-eyebrow">세계의 산지에서</span><div class="atlas-country-groups"><p data-country-group="0">중국 · 스페인 · 네덜란드</p><p data-country-group="1" hidden>이탈리아 · 미국 · 캐나다</p><p data-country-group="2" hidden>뉴질랜드 · 남아프리카공화국 · 칠레</p></div></div><span class="atlas-direction" aria-hidden="true">→</span><div><span class="atlas-eyebrow">필요한 현장까지</span><p>오픈가든이 연결합니다</p></div></div>
+  <div class="atlas-controls" aria-label="소싱 지역 보기"><button type="button" data-atlas-group="0" aria-pressed="true" aria-label="중국, 스페인, 네덜란드 보기">01</button><button type="button" data-atlas-group="1" aria-pressed="false" aria-label="이탈리아, 미국, 캐나다 보기">02</button><button type="button" data-atlas-group="2" aria-pressed="false" aria-label="뉴질랜드, 남아프리카공화국, 칠레 보기">03</button></div>
+  <p class="atlas-note">다양한 산지를 연결하는 소싱 개념도 · 품목별 공급 가능 여부는 상담 시 확인합니다.</p>
 </div>
 <details class="sourcing-more"><summary>목록에 없는 산지나 품종을 찾고 계신가요?</summary><p>독일·벨기에·폴란드·뉴질랜드·남아프리카공화국·칠레 등 다른 원예 산지도 요청에 따라 수급 가능 여부를 확인합니다. 품종명과 필요한 규격·수량을 함께 알려주세요.</p><a href="https://pf.kakao.com/_lGfxhX/chat" target="_blank" rel="noopener">품종 문의하기 ↗</a></details></div></section>
 <section class="journey" id="journey"><div class="wrap"><div class="section-heading"><div><div class="kicker-s">FROM NURSERY TO SITE</div><h2>도착하기까지,<br>하나의 이어진 과정.</h2></div><p>해외 품목은 아래 흐름으로 준비합니다. 필요한 절차와 예상 일정은 품목·생산 국가·시기에 맞춰 확인합니다.</p></div><ol class="journey-list">
@@ -209,14 +202,6 @@ if(!('IntersectionObserver' in window)||matchMedia('(prefers-reduced-motion: red
 var items=document.querySelectorAll('.about-statement,.facts li,.sourcing-map,.journey-step,.brief-grid');
 var io=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});
 items.forEach(function(el){el.setAttribute('data-reveal','');io.observe(el);});
-})();
-// Region controls keep the map legible on narrow screens.
-(function(){
-var sc=document.querySelector('.world-scroll'),stage=document.querySelector('.world-stage');
-if(!sc||!stage)return;
-function center(x,smooth){sc.scrollTo({left:Math.max(0,stage.offsetWidth*x-sc.clientWidth/2),behavior:smooth&&!matchMedia('(prefers-reduced-motion: reduce)').matches?'smooth':'auto'});}
-document.querySelectorAll('[data-map-x]').forEach(function(button){button.addEventListener('click',function(){center(Number(button.dataset.mapX),true);});});
-center(.503,false);
 })();
 const hd=document.querySelector('header');
 addEventListener('scroll',()=>hd.classList.toggle('scrolled',scrollY>8),{passive:true});

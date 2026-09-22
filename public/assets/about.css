@@ -14,32 +14,33 @@
 .about-page .facts b{font-size:16px}
 .about-page .facts span{font-size:13px}
 .sourcing{background:var(--bg-soft)}
-.sourcing-map{background:#fff;border:1px solid var(--line);border-radius:4px;overflow:hidden}
-.map-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 24px;border-bottom:1px solid var(--line)}
-.map-tools>span{font-size:10px;letter-spacing:.15em;color:var(--gray)}
-.map-tools>div{display:none;gap:6px}
-@media(max-width:860px){.map-tools>div{display:flex}}
-.map-tools button{border:1px solid var(--line);background:white;color:var(--green);padding:8px 14px;border-radius:3px;font-size:12px;min-height:40px}
-.map-tools button:hover{background:var(--bg-soft);border-color:var(--green)}
-.world-scroll{overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
-.world-stage{position:relative;min-width:800px;aspect-ratio:1600/600;margin-top:22px}
-.world-stage>img,.world-stage>svg{position:absolute;inset:0;width:100%;height:100%}
-.world-stage>img{opacity:.65}
-.world-routes{fill:none;stroke:var(--green);stroke-width:2;stroke-linecap:round}
-.world-points{fill:white;stroke:var(--green);stroke-width:3}
-.korea-ring{fill:rgba(255,255,255,.6);stroke:var(--green);stroke-width:3}
-.map-label{position:absolute;text-align:center;transform:translateX(-50%);padding:8px 12px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:3px;white-space:nowrap}
-.map-label strong{display:block;font-size:16px;color:var(--green-dark)}
-.map-label span{font-size:10px;color:var(--gray);display:block}
-.map-label.europe{left:17%;top:37%}.map-label.america{left:86%;top:38%}.map-label.korea{left:50.27%;top:40%;border-color:var(--green)}
-.map-caption{display:flex;justify-content:space-between;gap:12px;padding:10px 24px 20px;font-size:11px;color:var(--gray)}
-.map-caption i{display:inline-block;width:20px;height:2px;background:var(--green);vertical-align:middle;margin-right:6px}
-.map-swipe{display:none}
-.map-delivery{display:flex;align-items:center;justify-content:center;gap:32px;padding:28px 20px;border-top:1px solid var(--line);background:var(--green-dark);color:#fff;text-align:center}
-.map-delivery span{display:block;font-size:9px;letter-spacing:.1em;color:#cfe0d4;margin-bottom:6px}
-.map-delivery strong{font-size:16px;font-weight:500}.map-delivery b{font-weight:400;color:#cfe0d4}
-.domestic-note{font-size:12px;color:var(--gray);padding:15px 20px;text-align:center}
-@media(max-width:760px){.map-tools{padding:12px}.map-tools>span{font-size:9px}.map-tools button{padding:8px 12px}.map-caption{padding:14px;flex-direction:column;gap:6px}.map-swipe{display:inline}.map-delivery{gap:12px;padding:24px 12px}.map-delivery strong{font-size:12px}.map-delivery span{font-size:8px}.domestic-note{font-size:11px}}
+.atlas{background:#fafbf9;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:24px 0}
+.atlas-top{padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:40px}
+.atlas-top>span,.atlas-eyebrow{font-size:10px;letter-spacing:.12em;color:var(--gray)}
+.atlas-top button{font-size:11px;background:none;border:0;border-bottom:1px solid var(--line);padding:10px 0;color:var(--green)}
+.atlas-canvas{position:relative;width:100%;aspect-ratio:8/3;margin:36px 0 16px}
+.atlas-canvas>img,.atlas-canvas>svg{position:absolute;inset:0;width:100%;height:100%}
+.atlas-route-group{display:none}
+.atlas-route-group.active{display:block}
+.atlas-route{fill:none;stroke:var(--green);stroke-width:1.5;vector-effect:non-scaling-stroke;stroke-linecap:round}
+.atlas-origin{fill:var(--green);stroke:#fff;stroke-width:2}
+.atlas-hub{fill:var(--green)}
+.atlas-hub-halo{fill:rgba(31,77,51,.06);stroke:var(--green);stroke-width:1.3;vector-effect:non-scaling-stroke}
+.atlas-korea{position:absolute;left:50.275%;top:39%;transform:translateX(-50%);font-size:13px;font-weight:700;text-align:center;color:var(--green-dark);background:rgba(250,251,249,.88);padding:5px 8px}
+.atlas-korea span{display:block;font-size:8px;font-weight:400;letter-spacing:.08em}
+.atlas.is-running .active .atlas-route{stroke-dasharray:1;animation:atlas-draw 1.8s ease both;animation-delay:var(--route-delay)}
+@keyframes atlas-draw{from{stroke-dashoffset:1;opacity:.2}to{stroke-dashoffset:0;opacity:1}}
+.atlas-bottom{display:flex;justify-content:center;align-items:center;gap:42px;padding:24px;min-height:116px;border-top:1px solid var(--line)}
+.atlas-bottom>div{flex:1;text-align:center}
+.atlas-bottom p{font-size:17px;color:var(--green-dark);margin-top:8px}
+.atlas-country-groups{min-height:34px}
+.atlas-direction{font-size:24px;color:var(--green)}
+.atlas-controls{display:flex;justify-content:center;gap:10px}
+.atlas-controls button{min-width:44px;min-height:40px;font-size:11px;border:1px solid var(--line);background:transparent;color:var(--gray);border-radius:3px}
+.atlas-controls button[aria-pressed=true]{background:var(--green);color:#fff;border-color:var(--green)}
+.atlas-note{text-align:center;color:var(--gray);font-size:11px;padding:20px 18px 0}
+@media(max-width:760px){.atlas-top{padding:0 14px;gap:8px}.atlas-top>span{font-size:8px}.atlas-top button{font-size:10px}.atlas-canvas{margin:30px 0 22px}.atlas-korea{font-size:10px;padding:2px 5px}.atlas-korea span{font-size:6px}.atlas-bottom{padding:20px 12px;gap:10px;min-height:130px}.atlas-bottom p{font-size:13px}.atlas-eyebrow{font-size:9px}.atlas-country-groups{min-height:48px}.atlas-note{font-size:10px;line-height:1.8}.atlas-route{stroke-width:1}}
+@media(prefers-reduced-motion:reduce){.atlas.is-running .active .atlas-route{animation:none;stroke-dasharray:none}}
 .section-heading{margin-top:0;margin-bottom:48px;align-items:end}
 .sourcing-more{font-size:14px;border-bottom:1px solid var(--line);padding:22px 0}
 .sourcing-more summary{cursor:pointer;padding:8px 0;color:var(--green);font-weight:500}
