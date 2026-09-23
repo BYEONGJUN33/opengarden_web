@@ -52,6 +52,7 @@
 .journey-photo{margin:0;min-width:0}
 .journey-photo img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:50% 60%;border-radius:4px}
 .journey-photo.care-photo img{object-position:50% 38%}
+.journey-photo.inspection-photo img{object-position:50% 75%}
 .journey-photo figcaption{font-size:11px;color:var(--gray);padding-top:10px;line-height:1.6}
 .journey-art svg{display:block;width:100%;height:auto;max-height:240px;fill:none;stroke:var(--green);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
 .journey-art>span{font-size:11px;color:var(--gray);display:block;margin:8px 0}
