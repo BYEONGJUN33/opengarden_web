@@ -1,0 +1,84 @@
+.about-page .page-head{padding-top:48px;padding-bottom:42px}
+.about-page .page-head h1{font-size:clamp(36px,5.5vw,60px);line-height:1.35}
+.about-page .page-head p{margin-top:24px;font-size:17px}
+.about-jump{display:inline-flex;gap:24px;color:var(--green);font-size:13px;text-decoration:none;border-bottom:1px solid var(--line);padding:12px 0;margin-top:18px}
+.about-page .intro{padding:0 0 80px}
+.about-landscape{margin:0;position:relative;overflow:hidden;border-radius:4px;background:var(--bg-soft)}
+.about-landscape img{width:100%;height:420px;object-fit:cover;object-position:center 64%;display:block}
+.about-landscape figcaption{font-size:12px;color:var(--gray);padding:12px 0;background:white}
+.about-statement,.section-heading{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start;margin-top:64px}
+.about-statement h2,.section-heading h2,.brief-grid h2{font-size:clamp(27px,3.6vw,39px);margin-inline:0}
+.about-statement p,.section-heading>p,.brief-grid p{color:var(--gray);font-size:15px;line-height:1.9}
+.about-statement p+p{margin-top:16px}
+.about-page .facts{gap:30px;margin-top:40px}
+.about-page .facts b{font-size:16px}
+.about-page .facts span{font-size:13px}
+.sourcing{background:var(--bg-soft)}
+.atlas{background:#fafbf9;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:24px 0}
+.atlas-top{padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:40px}
+.atlas-top>span,.atlas-eyebrow{font-size:10px;letter-spacing:.12em;color:var(--gray)}
+.atlas-canvas{position:relative;width:100%;aspect-ratio:8/3;margin:36px 0 16px}
+.atlas-canvas>img,.atlas-canvas>svg{position:absolute;inset:0;width:100%;height:100%}
+.atlas-route{fill:none;stroke:var(--green);stroke-width:1.5;vector-effect:non-scaling-stroke;stroke-linecap:round}
+.atlas-origin{fill:var(--green);stroke:#fff;stroke-width:2}
+.atlas-hub{fill:var(--green)}
+.atlas-hub-halo{fill:rgba(31,77,51,.06);stroke:var(--green);stroke-width:1.3;vector-effect:non-scaling-stroke}
+.atlas-korea{position:absolute;left:50.5%;top:40%;transform:translateX(-50%);font-size:13px;font-weight:700;text-align:center;color:var(--green-dark);background:rgba(250,251,249,.88);padding:5px 8px}
+.atlas-korea span{display:block;font-size:8px;font-weight:400;letter-spacing:.08em}
+.atlas.will-animate .atlas-route{stroke-dasharray:1;stroke-dashoffset:1}
+.atlas.will-animate.is-drawn .atlas-route{animation:atlas-draw 2.4s ease both}
+@keyframes atlas-draw{from{stroke-dashoffset:1;opacity:.2}to{stroke-dashoffset:0;opacity:1}}
+.atlas-bottom{display:flex;justify-content:center;align-items:center;gap:42px;padding:24px;min-height:116px;border-top:1px solid var(--line)}
+.atlas-bottom>div{flex:1;text-align:center}
+.atlas-bottom p{font-size:17px;color:var(--green-dark);margin-top:8px}
+.atlas-countries{min-height:34px}
+.atlas-direction{font-size:24px;color:var(--green)}
+.atlas-note{text-align:center;color:var(--gray);font-size:11px;padding:20px 18px 0}
+@media(max-width:760px){.atlas-top{padding:0 14px;gap:8px}.atlas-top>span{font-size:8px}.atlas-top button{font-size:10px}.atlas-canvas{margin:30px 0 22px}.atlas-korea{font-size:10px;padding:2px 5px}.atlas-korea span{font-size:6px}.atlas-bottom{padding:20px 12px;gap:10px;min-height:130px}.atlas-bottom p{font-size:13px}.atlas-eyebrow{font-size:9px}.atlas-countries{min-height:48px}.atlas-note{font-size:10px;line-height:1.8}.atlas-route{stroke-width:1}}
+@media(prefers-reduced-motion:reduce){.atlas.will-animate .atlas-route{animation:none;stroke-dasharray:none;stroke-dashoffset:0}}
+.section-heading{margin-top:0;margin-bottom:48px;align-items:end}
+.sourcing-more{font-size:14px;border-bottom:1px solid var(--line);padding:22px 0}
+.sourcing-more summary{cursor:pointer;padding:8px 0;color:var(--green);font-weight:500}
+.sourcing-more p{font-size:14px;color:var(--gray);max-width:700px;margin:12px 0;line-height:1.9}
+.sourcing-more a{color:var(--green);text-underline-offset:4px}
+.journey-list{list-style:none;padding:0}
+.journey-step{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;padding:40px 0;border-top:1px solid var(--line)}
+.step-number{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--green)}
+.journey-copy h3{font-size:24px;font-weight:500;margin:18px 0 14px}
+.journey-copy>p{color:var(--gray);font-size:15px;line-height:1.85;max-width:29em}
+.step-output{border-top:1px solid var(--line);padding-top:16px;margin-top:24px;font-size:11px;color:var(--gray)}
+.step-output span{display:inline-block;margin-left:18px;font-size:13px;color:var(--green)}
+.journey-art{background:var(--bg-soft);padding:18px 28px;text-align:center;border-radius:4px}
+.journey-photo{margin:0;min-width:0}
+.journey-photo img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:50% 60%;border-radius:4px}
+.journey-photo.care-photo img{object-position:50% 38%}
+.journey-photo.inspection-photo img{object-position:50% 75%}
+.journey-photo figcaption{font-size:11px;color:var(--gray);padding-top:10px;line-height:1.6}
+.journey-art svg{display:block;width:100%;height:auto;max-height:240px;fill:none;stroke:var(--green);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.journey-art>span{font-size:11px;color:var(--gray);display:block;margin:8px 0}
+.art-fill{fill:#e1eade}.art-paper{fill:#fff}.art-leaf{fill:#91b185}.art-ground{stroke:#bdcdb9}.art-check{stroke-width:4}
+.journey-step.in .art-check{stroke-dasharray:100;animation:draw-check 1s ease both}
+@keyframes draw-check{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
+.about-brief{background:var(--bg-soft)}
+.brief-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px}
+.brief-grid>div>p{margin-top:20px}
+.brief-grid ol{list-style:none;padding:0}
+.brief-grid li{display:flex;gap:20px;padding:22px 0;border-top:1px solid var(--line)}
+.brief-grid li>span{font-size:12px;color:var(--green);padding-top:4px}
+.brief-grid h3{font-size:17px;margin-bottom:8px}
+.brief-grid li p{font-size:14px}
+@media(max-width:760px){
+ .about-page .page-head{padding-top:28px;padding-bottom:32px}
+ .about-page .page-head p{font-size:15px}
+ .about-landscape img{height:280px}
+ .about-statement,.section-heading,.brief-grid{grid-template-columns:1fr;gap:24px}
+ .about-statement{margin-top:36px}
+ .about-page .facts{gap:0}
+ .about-page .intro{padding-bottom:48px}
+ .journey-step{grid-template-columns:1fr;gap:24px;padding:32px 0}
+ .journey-copy h3{font-size:22px;margin-top:12px}
+ .journey-art svg{max-height:190px}
+ .journey-art{padding:12px 20px}
+ .section-heading{margin-bottom:30px}
+}
+@media(prefers-reduced-motion:reduce){.journey-step.in .art-check{animation:none}}
