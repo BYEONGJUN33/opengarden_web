@@ -97,3 +97,7 @@
   .catalog-page .badge{top:8px;left:8px;font-size:10px;padding:3px 6px}
 }
 @media(prefers-reduced-motion:reduce){.catalog-page .plant .ph img{transition:none;transform:none}}
+
+.erp-tools{position:relative;font-size:12px}.erp-tools summary{cursor:pointer;padding:8px}.erp-tools[open]{background:white;border:1px solid var(--line);padding:8px}.erp-tools button{display:block;border:0;background:var(--bg-soft);color:var(--green);padding:8px;margin-top:4px}.quote-bar .wrap{flex-wrap:wrap}
+
+.dphoto .gcount{top:12px;bottom:auto}

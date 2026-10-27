@@ -1,4 +1,19 @@
 {
   "buildCommand": "node build.js",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/plants/:group/:id",
+      "destination": "/api/plant?group=:group&id=:id"
+    },
+    {
+      "source": "/sitemap-plants.xml",
+      "destination": "/api/plant-sitemap"
+    }
+  ],
+  "functions": {
+    "api/plant-image.js": {
+      "includeFiles": "public/assets/logo.png"
+    }
+  }
 }

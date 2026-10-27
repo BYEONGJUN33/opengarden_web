@@ -16,6 +16,9 @@ if (fs.existsSync(envPath)) {
 }
 
 const HANDLERS = {
+  '/api/plant-image': require('./api/plant-image.js'),
+  '/api/plant': require('./api/plant.js'),
+  '/api/plant-sitemap': require('./api/plant-sitemap.js'),
   '/api/catalog': require('./api/catalog.js'),
   '/api/quote': require('./api/quote.js'),
   '/api/stock': require('./api/stock.js'),
@@ -33,6 +36,10 @@ const PORT = process.env.PORT || 3000;
 
 http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
+
+  const plant=url.pathname.match(/^\/plants\/(immediate|preorder)\/(rec[A-Za-z0-9]{14})$/);
+  if(plant){url.pathname='/api/plant';url.searchParams.set('group',plant[1]);url.searchParams.set('id',plant[2]);}
+  if(url.pathname==='/sitemap-plants.xml')url.pathname='/api/plant-sitemap';
 
   // API 라우팅 — Vercel의 (req, res) 형식에 맞춰 query/body/status/json 보강
   if (HANDLERS[url.pathname]) {
