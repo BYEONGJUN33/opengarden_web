@@ -276,6 +276,7 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 <link rel="stylesheet" href="/assets/site.css">
 <link rel="stylesheet" href="/assets/catalog.css">
 <script src="/assets/catalog-info.js"></script>
+<script src="/assets/catalog-tools.js"></script>
 </head>
 <body class="catalog-page">
 
@@ -331,6 +332,7 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
   <div class="wrap">
     <div class="info"><b id="barCount">0종</b> 선택됨 · 가격은 견적서로 안내됩니다</div>
     <button class="go" onclick="openModal()">견적 받기</button>
+    <details class="erp-tools"><summary>직원용 ERP</summary><button type="button" onclick="sendToErp('proposal')">제안서로 보내기</button><button type="button" onclick="sendToErp('catalog-bridge')">견적용 목록 보내기</button></details>
   </div>
 </div>
 
@@ -577,6 +579,7 @@ function buildItems(){
     // 대표 사진은 사진이 가장 많은 규격에서 가져옵니다
     const best=it.variants.reduce((a,b)=>(shotsOf(b)>shotsOf(a)?b:a),it.variants[0]);
     it.image=best.image||null; it.images=best.images||[];
+    it.searchText=CatalogTools.searchText(it);
   });
 }
 const inCartCount=it=>it.variants.filter(v=>cart[v.id]).length;
@@ -630,7 +633,7 @@ function filtered(){
   return ITEMS.filter(p=>
     (cat==="전체"||groupOf(p)===cat)&&(sub==="전체"||subOf(p)===sub)&&
     p.variants.some(v=>CatalogInfo.matchesVariant(v,z,s))&&
-    (!q||p.kname.toLowerCase().includes(q)||p.sname.toLowerCase().includes(q)));
+    (!q||CatalogTools.matches(p.searchText,q)));
 }
 
 function render(){
@@ -648,13 +651,15 @@ function render(){
     const moq=multi?null:p.variants[0].moq;
     const label=n?(multi?`✓ ${n}개 규격 담김`:'✓ 담김'):'견적에 담기';
     el.innerHTML=`
-      <button type="button" class="ph" aria-label="${esc(p.kname)} 상세 보기">${p.image?`<img src="${esc(p.image)}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:50% 40%">`:'사진 준비 중'}${p.status?`<span class="badge ${p.status==='즉시 출하'?'now':'pre'}">${p.statuses.length>1?'즉시 출하 · 사전 예약':esc(p.status)}</span>`:''}${shotsOf(p)>1?`<span class="shots" aria-label="사진 ${shotsOf(p)}장">사진 ${shotsOf(p)}</span>`:''}</button>
+      <button type="button" class="ph" aria-label="${esc(p.kname)} 상세 보기">${p.image?`<img src="${esc(p.image)}" alt="${esc(p.kname)}" decoding="async" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:50% 40%">`:'사진 준비 중'}${p.status?`<span class="badge ${p.status==='즉시 출하'?'now':'pre'}">${p.statuses.length>1?'즉시 출하 · 사전 예약':esc(p.status)}</span>`:''}${shotsOf(p)>1?`<span class="shots" aria-label="사진 ${shotsOf(p)}장">사진 ${shotsOf(p)}</span>`:''}</button>
       <div class="pbody">
         <h2 class="kname"><button type="button" class="plant-name">${esc(p.kname)}</button></h2>
         ${clean(p.sname)?`<div class="sname">${esc(p.sname)}</div>`:''}
+        ${p.variants[0].page?`<a href="${esc(p.variants[0].page)}">품종 정보 ↗</a>`:''}
         <div class="meta">${[sizeTag,p.cat,moq?`최소 ${moq}개`:''].map(clean).filter(Boolean).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
         <button class="add${n?' added':''}" data-key="${esc(p.key)}">${label}</button>
       </div>`;
+    el.querySelector('img')?.addEventListener('error',e=>{e.target.hidden=true;const note=document.createElement('span');note.textContent='사진을 불러오지 못했습니다';e.target.parentElement.append(note);},{once:true});
     // 규격이 여러 개면 어느 SKU인지 알 수 없으므로 바로 담지 않고 상세를 엽니다
     el.querySelector('.add').onclick=e=>{
       if(multi)openDetail(p.key);
@@ -785,7 +790,7 @@ function renderDetail(){
   // 품종 링크 공유 — 카톡으로 특정 품종을 콕 집어 보낼 때 사용
   // 규격까지 지정된 레코드ID를 넘겨 상대방도 같은 규격을 보게 합니다
   document.getElementById('dShare').onclick=()=>{
-    const url=itemUrl(p.id);
+    const url=p.page?location.origin+p.page:itemUrl(p.id);
     navigator.clipboard.writeText(url)
       .then(()=>toast('링크가 복사되었습니다 — 카톡에 붙여넣어 보내세요'))
       .catch(()=>prompt('아래 링크를 복사하세요',url));
@@ -836,10 +841,10 @@ function openModal(){
   Object.keys(cart).forEach(id=>{
     const p=PLANTS.find(x=>x.id===id);
     const row=document.createElement('div');row.className='item';
-    row.innerHTML=`<div><div class="n">${p.kname}</div><div class="s">${[p.size,p.zone].filter(Boolean).join(' · ')}${p.moq?` · 최소 ${p.moq}개`:''}</div></div>
+    row.innerHTML=`<div><div class="n">${esc(p.kname)}</div><div class="s">${esc([p.size,p.zone].filter(Boolean).join(' · '))}${p.moq?` · 최소 ${p.moq}개`:''}</div></div>
       <div class="qty">
         <button aria-label="수량 감소">−</button>
-        <input type="number" min="1" value="${cart[id]}" aria-label="${p.kname} 수량">
+        <input type="number" min="1" value="${cart[id]}" aria-label="${esc(p.kname)} 수량">
         <button aria-label="수량 증가">+</button>
         <button class="rm" aria-label="삭제" title="삭제"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"/><path d="M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13"/><path d="M10 11v6M14 11v6"/></svg></button>
       </div>`;
@@ -929,7 +934,18 @@ function toast(t){
   clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
 }
 
-['q','zone','status'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+let searchTimer;
+document.getElementById('q').addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(render,120);});
+['zone','status'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+function sendToErp(tool){
+  try{
+    const encoded=CatalogTools.encodeSelection(PLANTS,cart,location.origin);
+    const origin=location.hostname==='open-garden.co.kr'||location.hostname==='www.open-garden.co.kr'
+      ?'https://app.open-garden.co.kr':'https://og-erp-git-feature-erp-update-20261025-opengarden.vercel.app';
+    window.open(origin+'/tools/'+tool+'.html?og_selection='+encoded,'_blank','noopener,noreferrer');
+  }catch(e){toast(e.message);}
+}
+
 
 // 스크롤 시 헤더 그림자
 // 스크롤 등장 — 화면에 들어온 항목부터 하나씩. 스크롤을 가로채지 않습니다.
@@ -971,8 +987,8 @@ addEventListener('scroll',()=>hd.classList.toggle('scrolled',scrollY>8),{passive
 (async function init(){
   try{
     const [im,pre]=await Promise.all([
-      fetch('/api/catalog?group=immediate').then(r=>r.ok?r.json():{items:[]}),
-      fetch('/api/catalog?group=preorder').then(r=>r.ok?r.json():{items:[]})
+      fetch('/api/catalog?group=immediate').then(r=>{if(!r.ok)throw new Error('catalog unavailable');return r.json();}),
+      fetch('/api/catalog?group=preorder').then(r=>{if(!r.ok)throw new Error('catalog unavailable');return r.json();})
     ]);
     // 에어테이블 '속 분류' 예외표를 반영 (없으면 코드 기본값으로 동작)
     OVERRIDE={...(im.groupOverrides||{}),...(pre.groupOverrides||{})};
@@ -980,7 +996,7 @@ addEventListener('scroll',()=>hd.classList.toggle('scrolled',scrollY>8),{passive
       ...im.items.map(x=>({...x,status:'즉시 출하'})),
       ...pre.items.map(x=>({...x,status:'사전 예약'}))
     ].map(x=>({
-      id:x.sku||x.id, kname:x.kname, sname:x.sname, size:x.size,
+      id:x.sku||x.id, recordId:x.id, page:x.page, sku:x.sku, kname:x.kname, sname:x.sname, size:x.size,
       zone:x.zone, cat:Array.isArray(x.cat)?(x.cat[0]||''):x.cat,
       status:x.status, image:x.image||null,
       // 구버전 API(images 없음)와도 섞여 돌 수 있어 image 하나로 되돌릴 수 있게 둠
@@ -990,9 +1006,16 @@ addEventListener('scroll',()=>hd.classList.toggle('scrolled',scrollY>8),{passive
       height:clean(x.height),spread:clean(x.spread),light:clean(x.light),soil:clean(x.soil),
       moisture:clean(x.moisture),foliage:clean(x.foliage),flowering:clean(x.flowering)
     }));
-    if(live.length){ PLANTS.length=0; PLANTS.push(...live); }
-    document.getElementById('sampleNote').hidden=!!live.length;
-  }catch(e){ document.getElementById('sampleNote').hidden=false; }
+    PLANTS.length=0; PLANTS.push(...live);
+    document.getElementById('sampleNote').hidden=true;
+  }catch(e){
+    PLANTS.length=0;buildItems();renderCats();renderSubs();renderZones();render();
+    document.getElementById('sampleNote').hidden=true;
+    document.getElementById('bar').classList.remove('show');
+    document.getElementById('count').textContent='카탈로그 연결을 확인해주세요';
+    document.getElementById('grid').innerHTML='<div class="empty">카탈로그를 불러오지 못했습니다. 담아둔 목록은 보관됩니다.<br><button type="button" onclick="location.reload()">다시 시도</button></div>';
+    return;
+  }
   // 저장돼 있던 견적 목록 중 현재 카탈로그에 없는 품목은 정리
   Object.keys(cart).forEach(id=>{ if(!PLANTS.find(p=>p.id===id)) delete cart[id]; });
   saveCart(); updateBar();
