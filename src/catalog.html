@@ -218,7 +218,7 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
 .gstrip{display:flex;gap:8px;margin-top:10px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .gstrip::-webkit-scrollbar{display:none}
 .gthumb{flex:0 0 62px;height:48px;padding:0;border:2px solid transparent;border-radius:9px;overflow:hidden;background:#eef1ed;transition:border-color .15s}
-.gthumb img{width:100%;height:100%;object-fit:cover;object-position:50% 40%;display:block}
+.gthumb img{width:100%;height:100%;object-fit:contain;object-position:center;display:block}
 .gthumb[aria-selected="true"]{border-color:var(--green)}
 .gthumb:focus-visible{outline:3px solid var(--green);outline-offset:2px}
 /* 카드 위 장수 배지 */
@@ -651,7 +651,7 @@ function render(){
     const moq=multi?null:p.variants[0].moq;
     const label=n?(multi?`✓ ${n}개 규격 담김`:'✓ 담김'):'견적에 담기';
     el.innerHTML=`
-      <button type="button" class="ph" aria-label="${esc(p.kname)} 상세 보기">${p.image?`<img src="${esc(p.image)}" alt="${esc(p.kname)}" decoding="async" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:50% 40%">`:'사진 준비 중'}${p.status?`<span class="badge ${p.status==='즉시 출하'?'now':'pre'}">${p.statuses.length>1?'즉시 출하 · 사전 예약':esc(p.status)}</span>`:''}${shotsOf(p)>1?`<span class="shots" aria-label="사진 ${shotsOf(p)}장">사진 ${shotsOf(p)}</span>`:''}</button>
+      <button type="button" class="ph" aria-label="${esc(p.kname)} 상세 보기">${p.image?`<img src="${esc(p.image)}" alt="${esc(p.kname)}" decoding="async" loading="lazy" style="width:100%;height:100%;object-fit:contain;object-position:center">`:'사진 준비 중'}${p.status?`<span class="badge ${p.status==='즉시 출하'?'now':'pre'}">${p.statuses.length>1?'즉시 출하 · 사전 예약':esc(p.status)}</span>`:''}${shotsOf(p)>1?`<span class="shots" aria-label="사진 ${shotsOf(p)}장">사진 ${shotsOf(p)}</span>`:''}</button>
       <div class="pbody">
         <h2 class="kname"><button type="button" class="plant-name">${esc(p.kname)}</button></h2>
         ${clean(p.sname)?`<div class="sname">${esc(p.sname)}</div>`:''}
@@ -741,15 +741,16 @@ function renderDetail(){
          ${gShots.map((u,i)=>`<button class="gthumb" role="tab" data-i="${i}" aria-selected="${i===0}" aria-label="사진 ${i+1}"><img src="${esc(u)}" alt="" loading="lazy"></button>`).join('')}
        </div>`:''}`
     : `<div class="dphoto">식물 사진 준비 중</div>`;
-  const facts=CatalogInfo.facts(p), description=clean(p.desc), use=clean(p.use);
+  const brief=CatalogInfo.summary(p), facts=brief.facts, description=brief.description;
   document.getElementById('dBody').innerHTML=`
     <div class="detail-layout"><div class="detail-gallery">${gallery}</div><div class="detail-copy">
     ${clean(it.cat)?`<div class="detail-category">${esc(it.cat)}</div>`:''}
     <h2 class="dk">${esc(it.kname)}</h2>
     ${clean(it.sname)?`<p class="ds">${esc(it.sname)}</p>`:''}
-    ${description?`<section class="detail-section"><h3>식물 특징</h3><p class="ddesc">${esc(description)}</p></section>`:''}
-    ${facts.length?`<section class="detail-section"><h3>식재 정보</h3><dl class="plant-facts">${facts.map(f=>`<div data-fact="${f.key}"><dt>${f.label}</dt><dd>${esc(f.value)}</dd></div>`).join('')}</dl>${facts.some(f=>f.key==='zone')?'<p class="hardiness-note">내한성은 등록된 등급·Zone·온도 표기를 그대로 표시합니다.</p>':''}</section>`:''}
-    ${use?`<section class="detail-section"><h3>추천 용도</h3><p class="ddesc">${esc(use)}</p></section>`:''}
+    
+    <section class="detail-section" aria-label="품종 요약 (최대 600자)"><h3>품종 요약</h3><dl class="plant-facts">${facts.map(f=>`<div data-fact="${f.key}"><dt>${f.label}</dt><dd>${esc(f.value)}</dd></div>`).join('')}</dl>
+    ${description?`<p class="ddesc summary-description">${esc(description)}</p>`:''}
+    ${brief.tags.length?`<p class="summary-tags">${brief.tags.map(t=>`<span>${esc(t)}</span>`).join('')}</p>`:''}</section>
     <section class="detail-section"><h3>공급 규격</h3>
     <div class="dsizes" role="group" aria-label="규격 선택">
       <span class="dsz-lbl">규격</span>
@@ -1004,7 +1005,7 @@ addEventListener('scroll',()=>hd.classList.toggle('scrolled',scrollY>8),{passive
       desc:x.desc||'', use:x.use||'', moq:x.moq||null,
       // Optional display properties remain empty until an explicit server field mapping exists.
       height:clean(x.height),spread:clean(x.spread),light:clean(x.light),soil:clean(x.soil),
-      moisture:clean(x.moisture),foliage:clean(x.foliage),flowering:clean(x.flowering)
+      moisture:clean(x.moisture),foliage:clean(x.foliage),flowering:clean(x.flowering),planting:clean(x.planting),difficulty:clean(x.difficulty),tags:Array.isArray(x.tags)?x.tags:[]
     }));
     PLANTS.length=0; PLANTS.push(...live);
     document.getElementById('sampleNote').hidden=true;

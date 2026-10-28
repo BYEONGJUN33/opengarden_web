@@ -39,7 +39,7 @@
 .catalog-page .plant{border:0;border-radius:0;box-shadow:none;overflow:visible;min-width:0;background:none;animation:none}
 .catalog-page .plant .ph{border:0;border-radius:4px;aspect-ratio:1/1;background:#edf1eb;width:100%;padding:0;font-family:inherit;text-align:center;font-size:12px;font-weight:500}
 .catalog-page .plant .ph:focus-visible{outline:3px solid var(--green);outline-offset:4px}
-.catalog-page .plant:hover .ph img{transform:scale(1.025)}
+.catalog-page .plant:hover .ph img{transform:none}
 .catalog-page .pbody{padding:16px 0 0}
 .catalog-page .kname{font-family:'Noto Sans KR',sans-serif;font-size:18px;line-height:1.45;font-weight:700;word-break:keep-all}
 .plant-name{border:0;background:none;color:var(--ink);padding:0;text-align:left;font:inherit}
@@ -101,3 +101,8 @@
 .erp-tools{position:relative;font-size:12px}.erp-tools summary{cursor:pointer;padding:8px}.erp-tools[open]{background:white;border:1px solid var(--line);padding:8px}.erp-tools button{display:block;border:0;background:var(--bg-soft);color:var(--green);padding:8px;margin-top:4px}.quote-bar .wrap{flex-wrap:wrap}
 
 .dphoto .gcount{top:12px;bottom:auto}
+
+/* Preserve the entire plant at every viewport; no hover crop or thumbnail crop. */
+.catalog-page .plant .ph img,.catalog-page .dphoto img,.catalog-page .gthumb img{object-fit:contain;object-position:center;padding:4%;box-sizing:border-box;background:var(--bg-soft)}
+.catalog-page .ddesc.summary-description{margin-top:18px}
+.summary-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.summary-tags span{background:var(--bg-soft);border-radius:4px;padding:4px 8px;font-size:12px}
