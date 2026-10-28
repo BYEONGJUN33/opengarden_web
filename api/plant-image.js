@@ -20,18 +20,22 @@ async function readImage(response) {
   }
   return Buffer.concat(chunks);
 }
+// One proportional mark for all source aspect ratios; never write back to attachments.
+const WATERMARK = Object.freeze({ widthRatio: .24, marginRatio: .035, opacity: .30 });
 async function watermark(input) {
   const photo = await sharp(input, { limitInputPixels: 40000000 }).rotate()
-    .resize({ width: 1000, height: 1000, fit: 'inside', withoutEnlargement: true })
-    .removeAlpha().jpeg().toBuffer({ resolveWithObject: true });
+    .resize({ width: 1600, height: 1600, fit: 'inside', withoutEnlargement: true })
+    .flatten({ background: '#f4f6f1' }).jpeg({ quality: 90 }).toBuffer({ resolveWithObject: true });
   const { width, height } = photo.info;
-  const stripHeight = Math.min(height, Math.max(24, Math.round(height * .12)));
-  const strip = Buffer.from(`<svg width="${width}" height="${stripHeight}"><rect width="100%" height="100%" fill="white" fill-opacity=".82"/></svg>`);
+  const margin = Math.max(0, Math.min(Math.round(width * WATERMARK.marginRatio), Math.floor(height * .1)));
   const logo = await sharp(path.join(__dirname, '../public/assets/logo.png'))
-    .resize({ width: Math.max(1, Math.round(width * .28)), height: Math.max(1, stripHeight - 8), fit: 'inside' }).png().toBuffer();
-  return sharp(photo.data).composite([
-    { input: strip, gravity: 'south' }, { input: logo, gravity: 'southeast' }
-  ]).webp({ quality: 82 }).toBuffer();
+    .resize({ width: Math.max(1, Math.round(width * WATERMARK.widthRatio)), height: Math.max(1, height - margin * 2), fit: 'inside' })
+    .ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  for (let i = 3; i < logo.data.length; i += 4) logo.data[i] = Math.round(logo.data[i] * WATERMARK.opacity);
+  return sharp(photo.data).composite([{
+    input: logo.data, raw: { width: logo.info.width, height: logo.info.height, channels: 4 },
+    left: Math.max(0, width - margin - logo.info.width), top: Math.max(0, height - margin - logo.info.height)
+  }]).webp({ quality: 84 }).toBuffer();
 }
 module.exports = async (req, res) => {
   if (req.method !== 'GET') return res.status(405).end();
@@ -53,3 +57,5 @@ module.exports = async (req, res) => {
 module.exports.allowedImage = allowedImage;
 module.exports.watermark = watermark;
 module.exports.readImage = readImage;
+
+module.exports.WATERMARK = WATERMARK;

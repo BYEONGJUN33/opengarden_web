@@ -29,13 +29,14 @@ test('catalog whitelists fields, paginates, hides unconfirmed sizes and source U
   global.fetch=async url=>{
     const u=new URL(url);assert.equal(u.hostname,'api.airtable.com');
     if(u.pathname.endsWith('tbl7iGQoFTeGUTXyd'))return {ok:true,json:async()=>({records:[]})};
-    assert.equal(u.searchParams.getAll('fields[]').length,6);
+    assert.equal(u.searchParams.getAll('fields[]').length,10);
     assert.ok(!u.searchParams.getAll('fields[]').includes('price'));calls++;
-    return {ok:true,json:async()=>u.searchParams.has('offset')?{records:[{id:'rec00000000000000',fields:{fldxfOsqC0b41oxmt:'Hidden',fldBy0z3isyaVqCmC:'미정'}}]}:{offset:'next',records:[{id,fields:{fldxfOsqC0b41oxmt:'수국',fldBy0z3isyaVqCmC:'C2',price:12345,fldwpaj4TS0bW9E0x:[{url:'https://v5.airtableusercontent.com/photo'}]}}]}};
+    return {ok:true,json:async()=>u.searchParams.has('offset')?{records:[{id:'rec00000000000000',fields:{fldxfOsqC0b41oxmt:'Hidden',fldBy0z3isyaVqCmC:'미정'}},{id:'rec00000000000001',fields:{fldxfOsqC0b41oxmt:'Private',fldBy0z3isyaVqCmC:'C2',flda4BMnsROcUcBVF:'비공개'}},{id:'rec00000000000002',fields:{fldxfOsqC0b41oxmt:'Draft',fldBy0z3isyaVqCmC:'C2',flda4BMnsROcUcBVF:'미검토'}}]}:{offset:'next',records:[{id,fields:{fldxfOsqC0b41oxmt:'수국',fldBy0z3isyaVqCmC:'C2',price:12345,fldwpaj4TS0bW9E0x:[{url:'https://v5.airtableusercontent.com/photo'}]}}]}};
   };
   try{
     const data=await getCatalog('immediate');assert.equal(calls,2);assert.equal(data.items.length,1);assert.equal(data.hidden,1);
     const p=publicItem(data.items[0]);assert.match(p.image,/^\/api\/plant-image\?/);assert.equal(p.price,undefined);
+    assert.ok(!JSON.stringify(data).includes('Private'));assert.ok(!JSON.stringify(data).includes('Draft'));
     assert.ok(!JSON.stringify(p).includes('airtableusercontent'));await getCatalog('immediate');assert.equal(calls,2);
     const html=renderPlant({...p,kname:'</script><img onerror="x">'});
     assert.ok(html.includes('&lt;/script&gt;'));assert.ok(!html.includes('</script><img'));
@@ -49,12 +50,29 @@ test('image fetch rejects arbitrary origins, credentials and oversized input',as
   await assert.rejects(()=>readImage(new Response('bad',{headers:{'content-type':'text/html'}})));
   await assert.rejects(()=>readImage(new Response('bad',{headers:{'content-type':'image/jpeg','content-length':'11000000'}})));
 });
-test('watermark produces a bounded WebP with visible changed pixels',async()=>{
-  const input=await sharp({create:{width:400,height:300,channels:3,background:'#1f4d33'}}).png().toBuffer();
-  const result=await watermark(input), meta=await sharp(result).metadata();
-  assert.equal(meta.format,'webp');assert.equal(meta.width,400);assert.equal(meta.height,300);
-  const {data,info}=await sharp(result).raw().toBuffer({resolveWithObject:true});
-  assert.ok(data[(290*info.width+10)*info.channels]>150,'watermark band is burned into pixels');
+test('watermark preserves wide/tall images with one translucent inset logo and no opaque band',async()=>{
+  for(const [width,height] of [[400,300],[300,800],[1000,250]]){
+    const input=await sharp({create:{width,height,channels:3,background:'#1f4d33'}}).png().toBuffer();
+    const result=await watermark(input), meta=await sharp(result).metadata();
+    assert.equal(meta.format,'webp');assert.equal(meta.width,width);assert.equal(meta.height,height);
+    const {data,info}=await sharp(result).raw().toBuffer({resolveWithObject:true});
+    const at=(x,y)=>data[(y*info.width+x)*info.channels];
+    assert.ok(Math.abs(at(10,height-10)-31)<12,'no opaque bottom strip');
+    let changed=0;
+    for(let y=Math.floor(height*.6);y<height;y++)for(let x=Math.floor(width*.65);x<width;x++)if(Math.abs(at(x,y)-31)>12)changed++;
+    assert.ok(changed>10,'translucent logo changes bottom right pixels');
+    assert.ok(Math.abs(at(width-1,height-1)-31)<12,'safe edge margin');
+  }
+});
+test('summary shares a 600-character budget, preserves known values and does not invent plant facts',()=>{
+  const {summary}=require('../public/assets/catalog-info');
+  const empty=summary({});assert.equal(empty.facts.length,4);assert.ok(empty.facts.every(f=>f.value==='미확인'));
+  const long=summary({desc:'꽃🌷'.repeat(600),use:'정원'.repeat(200),zone:'-20℃',tags:['우수상'.repeat(40)]});
+  assert.ok(Array.from(long.text).length<=600);assert.equal(long.facts[1].label,'내한성 (등록값)');
+  const structured=summary({desc:'개화 시기: 5~6월\nUSDA Zone: Zone 5–8\n추천 식재 시기: 봄\n관리 난이도: 쉬움\n태그: 우수상, 나라장터 등록\n향기로운 꽃'});
+  assert.equal(structured.facts[0].value,'5~6월');assert.equal(structured.facts[1].value,'Zone 5–8');assert.equal(structured.description,'향기로운 꽃');assert.equal(structured.tags.length,2);
+  const html=renderPlant({id,kname:'수국',sname:'Hydrangea',size:'C2',group:'immediate',page:'/plants/immediate/'+id,images:[],desc:'가'.repeat(2000)});
+  assert.ok(!html.includes('가'.repeat(601)));assert.ok(html.includes('미확인'));
 });
 test('every inline JavaScript block parses after build',()=>{
   for(const file of fs.readdirSync('dist').filter(f=>f.endsWith('.html'))){
