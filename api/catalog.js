@@ -1,9 +1,11 @@
-const { getCatalog, publicItem } = require('../lib/catalog-data');
+const { getCatalog, publicItem, GROUPS } = require('../lib/catalog-data');
 module.exports = async (req, res) => {
   if (req.method !== 'GET') return res.status(405).json({ error: 'GET only' });
   try {
-    const data = await getCatalog(req.query.group === 'preorder' ? 'preorder' : 'immediate');
-    res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=1200');
+    const group = typeof req.query.group === 'string' ? req.query.group : 'immediate';
+    if (!GROUPS.includes(group)) return res.status(400).json({ error: 'Invalid catalog group' });
+    const data = await getCatalog(group);
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=900');
     return res.status(200).json({ ...data, items: data.items.map(publicItem) });
   } catch {
     res.setHeader('Cache-Control', 'no-store');
