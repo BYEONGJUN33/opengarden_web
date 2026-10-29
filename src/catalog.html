@@ -999,52 +999,70 @@ addEventListener('scroll',()=>hd.classList.toggle('scrolled',scrollY>8),{passive
 
 // 초기화: 배포 후엔 /api/catalog에서 실데이터 로드, 실패(로컬 미리보기 등) 시 샘플 데이터 유지
 (async function init(){
-  try{
-    const [im,pre]=await Promise.all([
-      fetch('/api/catalog?group=immediate').then(r=>{if(!r.ok)throw new Error('catalog unavailable');return r.json();}),
-      fetch('/api/catalog?group=preorder').then(r=>{if(!r.ok)throw new Error('catalog unavailable');return r.json();})
-    ]);
-    // 에어테이블 '속 분류' 예외표를 반영 (없으면 코드 기본값으로 동작)
-    OVERRIDE={...(im.groupOverrides||{}),...(pre.groupOverrides||{})};
-    const live=[
-      ...im.items.map(x=>({...x,status:'즉시 출하'})),
-      ...pre.items.map(x=>({...x,status:'사전 예약'}))
-    ].map(x=>({
-      id:x.sku||x.id, recordId:x.id, page:x.page, sku:x.sku, kname:x.kname, sname:x.sname, size:x.size,
-      zone:x.zone, cat:Array.isArray(x.cat)?(x.cat[0]||''):x.cat,
-      status:x.status, image:x.image||null,
-      // 구버전 API(images 없음)와도 섞여 돌 수 있어 image 하나로 되돌릴 수 있게 둠
-      images:Array.isArray(x.images)&&x.images.length?x.images:(x.image?[x.image]:[]),
-      desc:x.desc||'', use:x.use||'', moq:x.moq||null,
-      // Optional display properties remain empty until an explicit server field mapping exists.
-      height:clean(x.height),spread:clean(x.spread),light:clean(x.light),soil:clean(x.soil),
-      moisture:clean(x.moisture),foliage:clean(x.foliage),flowering:clean(x.flowering),planting:clean(x.planting),difficulty:clean(x.difficulty),tags:Array.isArray(x.tags)?x.tags:[]
-    }));
-    PLANTS.length=0; PLANTS.push(...live);
+  // Every supplier is loaded independently. As soon as the first responds, cards become usable.
+  const sources=[
+    {group:'immediate',status:'즉시 출하'},
+    {group:'preorder',status:'사전 예약'},
+    {group:'hoogenraad',status:'수입 제안'},
+    {group:'hbm',status:'수입 제안'}
+  ];
+  const loaded=new Map(), failed=[];
+  const update=()=>{
+    PLANTS.length=0;
+    sources.forEach(source=>{if(loaded.has(source.group))PLANTS.push(...loaded.get(source.group));});
+    buildItems();renderCats();renderSubs();renderZones();render();updateBar();
     document.getElementById('sampleNote').hidden=true;
-  }catch(e){
+  };
+  const load=async source=>{
+    try {
+      const response=await fetch('/api/catalog?group='+encodeURIComponent(source.group));
+      if(!response.ok)throw Error('Catalog '+source.group+' unavailable');
+      const data=await response.json();
+      if(source.group==='immediate')OVERRIDE={...(data.groupOverrides||{})};
+      const items=(data.items||[]).map(x=>({
+        id:source.group==='hoogenraad'||source.group==='hbm'?x.id:(x.sku||x.id),
+        recordId:x.id,group:source.group,source:x.source||'',page:x.page,sku:x.sku,
+        kname:x.kname,sname:x.sname,size:x.size,zone:x.zone,
+        cat:Array.isArray(x.cat)?(x.cat[0]||''):x.cat,
+        status:source.status,image:x.image||null,
+        images:Array.isArray(x.images)&&x.images.length?x.images:(x.image?[x.image]:[]),
+        desc:x.desc||'',use:x.use||'',moq:x.moq||null,
+        height:clean(x.height),spread:clean(x.spread),light:clean(x.light),
+        soil:clean(x.soil),moisture:clean(x.moisture),foliage:clean(x.foliage),
+        flowering:clean(x.flowering),planting:clean(x.planting),
+        difficulty:clean(x.difficulty),tags:Array.isArray(x.tags)?x.tags:[]
+      }));
+      loaded.set(source.group,items);
+      update();
+    } catch(e) {
+      failed.push(source.group);
+    }
+  };
+  await Promise.all(sources.map(load));
+  if(!loaded.size){
     PLANTS.length=0;buildItems();renderCats();renderSubs();renderZones();render();
     document.getElementById('sampleNote').hidden=true;
     document.getElementById('bar').classList.remove('show');
-    document.getElementById('count').textContent='카탈로그 연결을 확인해주세요';
+    document.getElementById('count').textContent='카탈로그 연결을 확인해 주세요';
     document.getElementById('grid').innerHTML='<div class="empty">카탈로그를 불러오지 못했습니다. 담아둔 목록은 보관됩니다.<br><button type="button" onclick="location.reload()">다시 시도</button></div>';
     return;
   }
-  // 저장돼 있던 견적 목록 중 현재 카탈로그에 없는 품목은 정리
-  Object.keys(cart).forEach(id=>{ if(!PLANTS.find(p=>p.id===id)) delete cart[id]; });
-  saveCart(); updateBar();
-  buildItems();
-  renderCats();
-  renderSubs();
-  renderZones();
-  render();
-  // 공유 링크(?item=…)로 들어왔으면 해당 품종 상세를 바로 연다
+  // Do not discard saved selections when one catalog source temporarily fails.
+  if(!failed.length){
+    Object.keys(cart).forEach(id=>{if(!PLANTS.some(p=>p.id===id))delete cart[id];});
+    saveCart();updateBar();
+  }
+  if(failed.length){
+    const note=document.getElementById('sampleNote');
+    note.hidden=false;note.textContent='일부 공급처를 불러오지 못했습니다. 표시된 품종은 이용할 수 있으며, 새로고침하면 다시 연결합니다.';
+  }
   const want=new URLSearchParams(location.search).get('item');
   if(want){
-    if(PLANTS.some(p=>p.id===want)) openDetail(want);
+    const match=PLANTS.find(p=>p.id===want);
+    if(match)openDetail(((match.source||'')+'|'+(match.kname||'')+'|'+(match.sname||'')).trim().toLowerCase());
     else toast('요청하신 품종을 찾을 수 없습니다');
   }
-})();
+})()
 </script>
 <script>
 // 모바일 메뉴 — 열기/닫기 + 접근성(ESC·포커스 트랩·스크롤 잠금)
