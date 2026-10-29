@@ -1,6 +1,6 @@
 const sharp = require('sharp');
 const path = require('node:path');
-const { getCatalog } = require('../lib/catalog-data');
+const { getCatalog, GROUPS } = require('../lib/catalog-data');
 const LIMIT = 10 * 1024 * 1024;
 function allowedImage(value) {
   try {
@@ -40,7 +40,7 @@ async function watermark(input) {
 module.exports = async (req, res) => {
   if (req.method !== 'GET') return res.status(405).end();
   const { group, id } = req.query, index = String(req.query.index ?? '0');
-  if (!['immediate', 'preorder'].includes(group) || typeof id !== 'string' || !/^rec[A-Za-z0-9]{14}$/.test(id) || !/^\d{1,2}$/.test(index)) return res.status(400).end();
+  if (!GROUPS.includes(group) || typeof id !== 'string' || !/^rec[A-Za-z0-9]{14}$/.test(id) || !/^\d{1,2}$/.test(index)) return res.status(400).end();
   try {
     const data = await getCatalog(group);
     const url = data.items.find(p => p.id === id)?.images[Number(index)];
