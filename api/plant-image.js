@@ -22,9 +22,9 @@ async function readImage(response) {
 }
 // One proportional mark for all source aspect ratios; never write back to attachments.
 const WATERMARK = Object.freeze({ widthRatio: .24, marginRatio: .035, opacity: .30 });
-async function watermark(input) {
+async function watermark(input, maxSize = 1600) {
   const photo = await sharp(input, { limitInputPixels: 40000000 }).rotate()
-    .resize({ width: 1600, height: 1600, fit: 'inside', withoutEnlargement: true })
+    .resize({ width: maxSize, height: maxSize, fit: 'inside', withoutEnlargement: true })
     .flatten({ background: '#f4f6f1' }).jpeg({ quality: 90 }).toBuffer({ resolveWithObject: true });
   const { width, height } = photo.info;
   const margin = Math.max(0, Math.min(Math.round(width * WATERMARK.marginRatio), Math.floor(height * .1)));
@@ -40,6 +40,7 @@ async function watermark(input) {
 module.exports = async (req, res) => {
   if (req.method !== 'GET') return res.status(405).end();
   const { group, id } = req.query, index = String(req.query.index ?? '0');
+  const previewSize = req.query.w === '520' ? 520 : 1600;
   if (!GROUPS.includes(group) || typeof id !== 'string' || !/^rec[A-Za-z0-9]{14}$/.test(id) || !/^\d{1,2}$/.test(index)) return res.status(400).end();
   try {
     const data = await getCatalog(group);
@@ -47,7 +48,7 @@ module.exports = async (req, res) => {
     if (!url) return res.status(404).end();
     if (!allowedImage(url)) throw new Error('Untrusted attachment');
     const response = await fetch(url, { redirect: 'error', signal: AbortSignal.timeout(10000) });
-    const output = await watermark(await readImage(response));
+    const output = await watermark(await readImage(response), previewSize);
     res.setHeader('Content-Type', 'image/webp');
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
