@@ -73,6 +73,9 @@ nav.tabs a span{color:var(--gray);font-weight:500;font-size:12px}
 .st-btn:active{background:#E3E9DF}
 .opt.on .stepper{border-color:var(--green);box-shadow:0 0 0 2px rgba(31,77,51,.12)}
 .opt.on .stepper input{color:var(--green)}
+.qty{display:flex;align-items:center;gap:6px}
+.all{height:32px;padding:0 9px;border:1px solid #C9D1C4;border-radius:8px;background:#fff;font-size:12px;font-weight:700;color:var(--green);white-space:nowrap}
+.all:active,.all.on{background:var(--green);border-color:var(--green);color:#fff}
 .o-warn{grid-column:1/-1;font-size:12px;color:var(--warn);font-weight:600}
 .terms{margin:26px 0 8px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}
 .terms h2{font-size:16px;font-weight:800;color:var(--green);margin-bottom:8px}
@@ -229,6 +232,8 @@ nav.tabs a span{color:var(--gray);font-weight:500;font-size:12px}
     opts.forEach(function(o){
       if (saved[o.dataset.id]) setQty(o, saved[o.dataset.id]);
       var inp = o.querySelector('input');
+      var all = o.querySelector('.all');
+      if (all) all.addEventListener('click', function(){ setQty(o, parseInt(o.dataset.max, 10)); update(); });
       o.querySelector('.minus').addEventListener('click', function(){ setQty(o, qtyOf(o) - 100); update(); });
       o.querySelector('.plus').addEventListener('click', function(){ setQty(o, qtyOf(o) + 100); update(); });
       inp.addEventListener('input', function(){ o.classList.toggle('on', qtyOf(o) > 0); update(); });
@@ -247,6 +252,7 @@ nav.tabs a span{color:var(--gray);font-weight:500;font-size:12px}
     else w.hidden = true;
     o.querySelector('input').value = q;
     o.classList.toggle('on', q > 0);
+    var a = o.querySelector('.all'); if (a) a.classList.toggle('on', !!max && q === max);
   }
   function picked(){
     return opts.filter(function(o){ return qtyOf(o) > 0; }).map(function(o){
