@@ -32,6 +32,11 @@ dev.js            로컬 미리보기 서버 (`npm run dev` → localhost:3000, 
 5. **디자인 토큰 유지**: `:root` CSS 변수(--green 등)와 Noto Sans KR 체계를 임의 변경하지 않는다.
    색·폰트 변경은 사용자 확인 후에만.
 
+> **예외 — 주문형 제안서 `/p/<무작위ID>/` (2026-10-29 사용자 승인)**: 고객별로 카톡방에 보내는
+> 제안서 링크는 가격·재고를 정적 HTML에 포함한다(원칙 1·3의 예외). 조건: 추측 불가 ID, noindex +
+> robots `Disallow: /p/`, 사이트 어디에서도 링크하지 않음, `api/catalog.js` 화이트리스트는 그대로.
+> 생성·운영 방법은 `tools/order-proposal/README.md`.
+
 ## 기술 결정사항
 
 - 순수 HTML/CSS/JS. 프레임워크·빌드 도구 없음 (필요해지면 사용자와 상의 후 도입)
