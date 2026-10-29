@@ -53,3 +53,30 @@ test('Hoogenraad/HBM adapters publish only eligible rows and hide all financial 
     assert.match(serialized,/\/api\/plant-image\?group=hoogenraad/);
   }finally{global.fetch=original;}
 });
+
+test('single-record thumbnail lookup avoids full table scans and blocks private items',async()=>{
+  const {getRecordImage}=require('../lib/catalog-data');
+  const original=global.fetch, seen=[];
+  global.fetch=async (raw)=>{
+    const url=new URL(raw);seen.push(url.pathname);
+    assert.equal(url.pathname.split('/').pop().startsWith('rec'),true);
+    const hidden=url.pathname.endsWith('rec99999999999999');
+    return {ok:true,json:async()=>({fields:{
+      fld3XAFUiRqL9I5xM:'조팝',
+      fldHpENoNezkg0YrO:'Spiraea',
+      fldqrGhf56NzhOusv:'P9',
+      fldci5Va4ESSmWZ2E:hidden?'비공개':'공개',
+      fldDj5Udu4O5dk5Cq:[{url:'https://v5.airtableusercontent.com/example'}]
+    }})};
+  };
+  try{
+    const a=await getRecordImage('hoogenraad','rec12345678901234',0);
+    const b=await getRecordImage('hoogenraad','rec12345678901234',0);
+    assert.equal(a,'https://v5.airtableusercontent.com/example');
+    assert.equal(b,a);
+    assert.equal(seen.length,1,'warm cache prevents duplicate Airtable reads');
+    assert.equal(await getRecordImage('hoogenraad','rec99999999999999',0),null);
+    assert.equal(await getRecordImage('hoogenraad','bad-id',0),null);
+    assert.equal(seen.length,2);
+  }finally{global.fetch=original;}
+});
