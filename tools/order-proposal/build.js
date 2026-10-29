@@ -50,11 +50,11 @@ function card(it) {
             <span class="o-stock">재고 ${esc(stockTxt(st))}${few}</span>
             <span class="o-price">${won(price)}<small>/구</small></span>
           </div>
-          <div class="stepper">
+          <div class="qty">${Number.isInteger(st) ? `<button type="button" class="all" aria-label="${esc(it.name)} ${esc(sp)} 전량 ${st}구">전량</button>` : ''}<div class="stepper">
             <button type="button" class="st-btn minus" aria-label="${esc(it.name)} ${esc(sp)} 100구 빼기">−</button>
             <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="${esc(it.name)} ${esc(sp)} 수량(구)">
             <button type="button" class="st-btn plus" aria-label="${esc(it.name)} ${esc(sp)} 100구 더하기">+</button>
-          </div>
+          </div></div>
           <div class="o-warn" hidden></div>
         </div>`;
   }).join('');
