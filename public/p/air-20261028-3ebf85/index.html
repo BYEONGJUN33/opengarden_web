@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>항공 즉시수배 구근 제안 · 오픈가든</title>
+<meta property="og:title" content="오픈가든 · 항공 즉시수배 구근 제안">
+<meta property="og:description" content="2026-10-28 재고 기준 · 품목별 수량을 입력하고 바로 견적을 요청하세요">
+<meta property="og:image" content="https://open-garden.co.kr/assets/og.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--green:#1F4D33;--green-dark:#123023;--leaf:#5C8C48;--ink:#111814;--gray:#6b746e;--bg:#fff;--soft:#F4F6F3;--line:#E4E8E3;--kakao:#FEE500;--gold:#9A6510;--warn:#B4541B}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{font-family:'Noto Sans KR',-apple-system,'Apple SD Gothic Neo',sans-serif;color:var(--ink);background:var(--soft);line-height:1.55;font-size:15px;letter-spacing:-.01em;word-break:keep-all;padding-bottom:calc(132px + env(safe-area-inset-bottom))}
+button{font-family:inherit;cursor:pointer}
+input,textarea{font-family:inherit;font-size:16px}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+header.hero{background:var(--green);color:#fff;padding:22px 0 20px}
+.brand{font-size:12px;font-weight:700;letter-spacing:.28em;opacity:.85}
+.hero h1{font-size:23px;font-weight:800;margin-top:8px;letter-spacing:-.02em}
+.hero .meta{font-size:13px;opacity:.85;margin-top:4px}
+.notice{background:#fff;border-bottom:1px solid var(--line)}
+.notice ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px 14px;padding:12px 0;font-size:13px;color:var(--gray)}
+.notice b{color:var(--ink)}
+.howto{margin:14px 0 4px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:13.5px;color:var(--gray)}
+.howto b{color:var(--green)}
+nav.tabs{position:sticky;top:0;z-index:20;background:rgba(244,246,243,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+nav.tabs .wrap{display:flex;gap:8px;overflow-x:auto;padding-top:10px;padding-bottom:10px;scrollbar-width:none}
+nav.tabs a{flex:none;font-size:14px;font-weight:700;color:var(--ink);text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 14px;min-height:36px;display:flex;align-items:center;gap:5px}
+nav.tabs a span{color:var(--gray);font-weight:500;font-size:12px}
+.grp{margin-top:22px}
+.grp h2{display:flex;align-items:baseline;gap:8px;font-size:20px;font-weight:800;color:var(--green);margin-bottom:10px}
+.grp h2 small{font-size:12px;color:var(--gray);font-weight:500;letter-spacing:.04em}
+.cards{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:720px){.cards{grid-template-columns:1fr 1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.c-photo{aspect-ratio:1/1;background:var(--soft);overflow:hidden}
+.c-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.c-body{padding:14px 14px 12px;display:flex;flex-direction:column;flex:1}
+.c-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.c-grp{font-size:12px;font-weight:700;color:var(--leaf);letter-spacing:.06em}
+.badge{font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.badge.req{background:var(--green);color:#fff}
+.badge.alt{background:#FDF4E2;color:var(--gold);box-shadow:inset 0 0 0 1px #E3B865}
+.c-name{font-size:19px;font-weight:800;margin-top:4px;letter-spacing:-.02em}
+.c-latin{font-size:12.5px;font-style:italic;color:var(--gray)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.chip{font-size:12px;font-weight:600;color:#3f4a3c;border:1px solid #CFD8C7;border-radius:999px;padding:3px 9px}
+.chip.size{background:var(--green);border-color:var(--green);color:#fff}
+.feat{list-style:none;margin-top:9px;font-size:13.5px;color:#3f4a3c}
+.feat li{position:relative;padding-left:12px;margin-top:2px}
+.feat li::before{content:'';position:absolute;left:1px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--leaf)}
+.c-note{font-size:12.5px;color:var(--warn);font-weight:600;margin-top:6px}
+.opts{margin-top:auto;padding-top:12px}
+.opt{border-top:1px solid var(--line);padding:10px 0 2px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px 10px}
+.opt-info{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px}
+.o-spec{font-size:15px;font-weight:700}
+.o-stock{font-size:12.5px;color:var(--gray)}
+.o-price{font-size:17px;font-weight:800;width:100%}
+.o-price small{font-size:12px;font-weight:500;color:var(--gray);margin-left:1px}
+.few{font-style:normal;font-size:11px;font-weight:700;color:var(--warn);border:1px solid #E6A27A;border-radius:4px;padding:0 4px}
+.stepper{display:flex;align-items:center;border:1px solid #C9D1C4;border-radius:12px;overflow:hidden;background:#fff}
+.stepper input{width:76px;height:44px;border:0;text-align:center;font-weight:700;font-size:16px;-moz-appearance:textfield;color:var(--ink)}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.st-btn{width:44px;height:44px;border:0;background:var(--soft);font-size:22px;font-weight:500;color:var(--green)}
+.st-btn:active{background:#E3E9DF}
+.opt.on .stepper{border-color:var(--green);box-shadow:0 0 0 2px rgba(31,77,51,.12)}
+.opt.on .stepper input{color:var(--green)}
+.o-warn{grid-column:1/-1;font-size:12px;color:var(--warn);font-weight:600}
+.terms{margin:26px 0 8px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}
+.terms h2{font-size:16px;font-weight:800;color:var(--green);margin-bottom:8px}
+.terms ul{list-style:none;display:flex;flex-direction:column;gap:7px;font-size:13.5px;color:#3f4a3c}
+.terms li{position:relative;padding-left:16px}
+.terms li::before{content:'※';position:absolute;left:0;color:var(--leaf);font-size:12px}
+.terms b{color:var(--ink)}
+.foot{text-align:center;font-size:12px;color:var(--gray);padding:18px 0 8px}
+/* 하단 고정 바 */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(17,24,20,.08);padding:10px 0 calc(10px + env(safe-area-inset-bottom))}
+.bar .wrap{display:flex;flex-direction:column;gap:8px}
+.bar-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.bar-count{font-size:13px;color:var(--gray)}
+.bar-total{font-size:20px;font-weight:800}
+.bar-total small{font-size:12px;font-weight:500;color:var(--gray);margin-left:3px}
+.prog{height:6px;border-radius:3px;background:#E6EBE3;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--leaf);transition:width .2s}
+.prog-txt{font-size:12px;color:var(--gray);margin-top:-3px}
+.prog-txt.ok{color:var(--green);font-weight:700}
+.btn-go{height:50px;border:0;border-radius:12px;background:var(--green);color:#fff;font-size:16px;font-weight:800}
+.btn-go:disabled{background:#B9C2B5}
+/* 요청 시트 */
+.sheet-bg{position:fixed;inset:0;z-index:40;background:rgba(17,24,20,.45);display:none}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:#fff;border-radius:18px 18px 0 0;max-height:92vh;overflow:auto;transform:translateY(105%);transition:transform .22s ease;padding:18px 0 calc(18px + env(safe-area-inset-bottom))}
+.open .sheet-bg{display:block} .open .sheet{transform:none}
+.sheet h2{font-size:19px;font-weight:800}
+.sheet .sum{margin-top:10px;background:var(--soft);border-radius:12px;padding:10px 12px;font-size:13.5px}
+.sheet .sum li{display:flex;justify-content:space-between;gap:8px;padding:3px 0;list-style:none}
+.sheet .sum .tot{border-top:1px solid var(--line);margin-top:6px;padding-top:7px;font-weight:800;font-size:15px}
+.sheet .below{font-size:12.5px;color:var(--warn);font-weight:600;margin-top:8px}
+.field{margin-top:12px}
+.field label{display:block;font-size:13.5px;font-weight:700;margin-bottom:5px}
+.field label em{color:var(--warn);font-style:normal}
+.field input,.field textarea{width:100%;border:1px solid #C9D1C4;border-radius:10px;padding:11px 12px;color:var(--ink);background:#fff}
+.field textarea{min-height:76px;resize:vertical}
+.agree{display:flex;gap:8px;align-items:flex-start;margin-top:12px;font-size:13px;color:#3f4a3c}
+.agree input{width:20px;height:20px;margin-top:1px;accent-color:var(--green);flex:none}
+.agree small{display:block;color:var(--gray);font-size:12px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.err{color:var(--warn);font-size:13px;font-weight:600;margin-top:10px;min-height:1em}
+.row2{display:flex;gap:8px;margin-top:14px}
+.row2 button{flex:1;height:50px;border-radius:12px;font-size:15.5px;font-weight:800}
+.btn-ghost{background:#fff;border:1px solid #C9D1C4;color:var(--ink)}
+.btn-send{background:var(--green);border:0;color:#fff}
+.btn-send:disabled{background:#B9C2B5}
+.done{text-align:center;padding:10px 0}
+.done .no{display:inline-block;margin-top:10px;font-size:20px;font-weight:800;color:var(--green);background:var(--soft);border-radius:10px;padding:6px 14px;letter-spacing:.04em}
+.done p{font-size:14px;color:#3f4a3c;margin-top:10px}
+.btn-kakao{display:flex;align-items:center;justify-content:center;gap:6px;height:50px;border-radius:12px;background:var(--kakao);color:#191600;font-weight:800;text-decoration:none;margin-top:14px}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="brand">OPEN GARDEN</div>
+  <h1>항공 즉시수배 구근 제안</h1>
+  <div class="meta">2026. 10. 28 · 2026-10-28 재고 기준</div>
+</div></header>
+<div class="notice"><div class="wrap"><ul>
+  <li>판매가 <b>원/구 · VAT 별도</b></li>
+  <li>항공 건 <b>최소 1,000만원</b></li>
+  <li>네덜란드 → 인천 <b>약 3일</b></li>
+</ul></div></div>
+<nav class="tabs" aria-label="품목 구분"><div class="wrap"><a href="#g-allium">알리움 <span>13</span></a><a href="#g-narcissus">수선화 <span>3</span></a><a href="#g-tulipa">튤립 <span>3</span></a><a href="#g-muscari">무스카리 <span>2</span></a></div></nav>
+<main class="wrap">
+  <p class="howto">필요한 품목에 <b>수량(구)</b>을 넣고 아래 <b>견적 요청</b>을 누르면 담당자에게 바로 전달됩니다. 확인 후 견적서를 보내드립니다.</p>
+  
+  <section class="grp" id="g-allium">
+    <h2><span>알리움</span><small>Allium · 13품종</small></h2>
+    <div class="cards">
+    <article class="card" id="i-ps">
+      <div class="c-photo"><img src="img/ps.jpg" alt="퍼플 센세이션" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">알리움</span><span class="badge req">★ 요청 품종</span></div>
+        <h3 class="c-name">퍼플 센세이션</h3>
+        <p class="c-latin">Allium hollandicum &#x27;Purple Sensation&#x27;</p>
+        <div class="chips"><span class="chip size">중형</span><span class="chip">화구 8~10cm</span><span class="chip">키 70~90cm</span></div>
+        <ul class="feat"><li>진보라 구형 화구에 별 모양 소화가 촘촘</li><li>5월 개화 · 경관 대량식재 표준 품종</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="ps|12/14" data-grp="알리움" data-name="퍼플 센세이션" data-spec="12/14" data-price="500" data-max="2400">
+          <div class="opt-info">
+            <span class="o-spec">12/14</span>
+            <span class="o-stock">재고 2,400구</span>
+            <span class="o-price">₩500<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="퍼플 센세이션 12/14 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="퍼플 센세이션 12/14 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="퍼플 센세이션 12/14 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-pw">
+      <div class="c-photo"><img src="img/pw.jpg" alt="핀볼 위저드" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">알리움</span><span class="badge req">★ 요청 품종</span></div>
+        <h3 class="c-name">핀볼 위저드</h3>
+        <p class="c-latin">Allium &#x27;Pinball Wizard&#x27;</p>
+        <div class="chips"><span class="chip size">대형</span><span class="chip">화구 15~20cm</span><span class="chip">키 60~90cm</span></div>
+        <ul class="feat"><li>은빛 도는 라일락 보라, 성글게 퍼진 초대형 구형</li><li>5월 말~6월 개화 · 시선 집중 포컬 식재</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="pw|18/20" data-grp="알리움" data-name="핀볼 위저드" data-spec="18/20" data-price="3100" data-max="100">
+          <div class="opt-info">
+            <span class="o-spec">18/20</span>
+            <span class="o-stock">재고 100구 <em class="few">소량</em></span>
+            <span class="o-price">₩3,100<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="핀볼 위저드 18/20 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="핀볼 위저드 18/20 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="핀볼 위저드 18/20 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-gl">
+      <div class="c-photo"><img src="img/gl.jpg" alt="글라디에이터" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">알리움</span><span class="badge alt">◇ 엠배서더 대체</span></div>
+        <h3 class="c-name">글라디에이터</h3>
+        <p class="c-latin">Allium &#x27;Gladiator&#x27;</p>
+        <div class="chips"><span class="chip size">대형</span><span class="chip">화구 10~15cm</span><span class="chip">키 100~125cm</span></div>
+        <ul class="feat"><li>라일락 보라 구형, 굵고 곧은 꽃대 (기간테움계)</li><li>5월 말~6월 개화 · 화단 후경 대형 포인트</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="gl|18/20" data-grp="알리움" data-name="글라디에이터" data-spec="18/20" data-price="1800" data-max="50">
+          <div class="opt-info">
+            <span class="o-spec">18/20</span>
+            <span class="o-stock">재고 50구</span>
+            <span class="o-price">₩1,800<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="글라디에이터 18/20 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="글라디에이터 18/20 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="글라디에이터 18/20 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-st">
+      <div class="c-photo"><img src="img/st.jpg" alt="스티피타툼" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">알리움</span><span class="badge alt">◇ 마운트에베레스트 대체</span></div>
+        <h3 class="c-name">스티피타툼</h3>
+        <p class="c-latin">Allium stipitatum</p>
+        <div class="chips"><span class="chip size">중형</span><span class="chip">화구 8~12cm</span><span class="chip">키 80~120cm</span></div>
+        <ul class="feat"><li>연보라~라일락 핑크 구형 · 마운트에베레스트(백색)와 동일 종</li><li>5~6월 개화 · 키·초형이 비슷해 대체 식재 용이</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="st|14/+" data-grp="알리움" data-name="스티피타툼" data-spec="14/+" data-price="400" data-max="200">
+          <div class="opt-info">
+            <span class="o-spec">14/+</span>
+            <span class="o-stock">재고 200구</span>
+            <span class="o-price">₩400<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="스티피타툼 14/+ 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="스티피타툼 14/+ 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="스티피타툼 14/+ 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-ch">
+      <div class="c-photo"><img src="img/ch.jpg" alt="크리스토피 알보필로섬" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">알리움</span></div>
+        <h3 class="c-name">크리스토피 알보필로섬</h3>
+        <p class="c-latin">Allium christophii (albopilosum)</p>
+        <div class="chips"><span class="chip size">대형</span><span class="chip">화구 20~25cm</span><span class="chip">키 40~60cm</span></div>
+        <ul class="feat"><li>메탈릭 라일락 별 모양 소화가 퍼진 대형 화구</li><li>6월 개화 · 키가 낮아 화단 전경, 드라이플라워</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="ch|12/14" data-grp="알리움" data-name="크리스토피 알보필로섬" data-spec="12/14" data-price="600" data-max="3000">
+          <div class="opt-info">
+            <span class="o-spec">12/14</span>
+            <span class="o-stock">재고 3,000구</span>
+            <span class="o-price">₩600<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="크리스토피 알보필로섬 12/14 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="크리스토피 알보필로섬 12/14 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="크리스토피 알보필로섬 12/14 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-rm">
+      <div class="c-photo"><img src="img/rm.jpg" alt="아메시스티누스 레드 모히칸" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">알리움</span></div>
+        <h3 class="c-name">아메시스티누스 레드 모히칸</h3>
+        <p class="c-latin">Allium amethystinum &#x27;Red Mohican&#x27;</p>
+        <div class="chips"><span class="chip size">중형</span><span class="chip">계란형 화구</span><span class="chip">키 90~100cm</span></div>
+        <ul class="feat"><li>와인레드 화구 위로 흰 꽃이 솟는 모히칸 초형</li><li>6월 개화 · 절화·드라이 활용, 개성 있는 포인트</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="rm|10/12" data-grp="알리움" data-name="아메시스티누스 레드 모히칸" data-spec="10/12" data-price="1900" data-max="3500">
+          <div class="opt-info">
+            <span class="o-spec">10/12</span>
+            <span class="o-stock">재고 3,500구</span>
+            <span class="o-price">₩1,900<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="아메시스티누스 레드 모히칸 10/12 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="아메시스티누스 레드 모히칸 10/12 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="아메시스티누스 레드 모히칸 10/12 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-ny">
+      <div class="c-photo"><img src="img/ny.jpg" alt="뉴욕" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">알리움</span></div>
+        <h3 class="c-name">뉴욕</h3>
+        <p class="c-latin">Allium &#x27;New York&#x27;</p>
+        <div class="chips"><span class="chip size">소형</span><span class="chip">화구 약 6.5cm</span><span class="chip">키 65~75cm</span></div>
+        <ul class="feat"><li>연한 라일락 핑크, 촘촘한 구형(아래가 평평)</li><li>5~6월 개화 · 군식·절화용</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="ny|10/+" data-grp="알리움" data-name="뉴욕" data-spec="10/+" data-price="600" data-max="1000">
+          <div class="opt-info">
+            <span class="o-spec">10/+</span>
+            <span class="o-stock">재고 1,000구</span>
+            <span class="o-price">₩600<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="뉴욕 10/+ 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="뉴욕 10/+ 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="뉴욕 10/+ 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-da">
+      <div class="c-photo"><img src="img/da.jpg" alt="달라스" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">알리움</span></div>
+        <h3 class="c-name">달라스</h3>
+        <p class="c-latin">Allium &#x27;Dallas&#x27;</p>
+        <div class="chips"><span class="chip size">소형</span><span class="chip">화구 약 7cm</span><span class="chip">키 20~30cm</span></div>
+        <ul class="feat"><li>보랏빛 핑크 구형, 청회색 잎이 낮게 깔림</li><li>5~6월 개화 · 30cm 이하 단신, 화단 전경·화분</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="da|10/12" data-grp="알리움" data-name="달라스" data-spec="10/12" data-price="500" data-max="1000">
+          <div class="opt-info">
+            <span class="o-spec">10/12</span>
+            <span class="o-stock">재고 1,000구</span>
+            <span class="o-price">₩500<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="달라스 10/12 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="달라스 10/12 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="달라스 10/12 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-ci">
+      <div class="c-photo"><img src="img/ci.jpg" alt="시카고" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">알리움</span></div>
+        <h3 class="c-name">시카고</h3>
+        <p class="c-latin">Allium &#x27;Chicago&#x27;</p>
+        <div class="chips"><span class="chip size">중형</span><span class="chip">화구 7.5~8cm</span><span class="chip">키 60~80cm</span></div>
+        <ul class="feat"><li>짙은 바이올렛 꽃에 보라 수술</li><li>5~6월 개화 · 2022년 등록 신품종, 절화·드라이</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="ci|10/12" data-grp="알리움" data-name="시카고" data-spec="10/12" data-price="400" data-max="500">
+          <div class="opt-info">
+            <span class="o-spec">10/12</span>
+            <span class="o-stock">재고 500구</span>
+            <span class="o-price">₩400<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="시카고 10/12 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="시카고 10/12 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="시카고 10/12 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-si">
+      <div class="c-photo"><img src="img/si.jpg" alt="시큘럼" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">알리움</span></div>
+        <h3 class="c-name">시큘럼</h3>
+        <p class="c-latin">Allium siculum (Nectaroscordum)</p>
+        <div class="chips"><span class="chip size">중형</span><span class="chip">종 모양 하수형</span><span class="chip">키 80~120cm</span></div>
+        <ul class="feat"><li>크림·연녹색에 자줏빛 줄무늬, 종 모양 꽃이 늘어짐</li><li>5~6월 개화 · 개화 후 씨방이 위로 서 장식효과</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="si|8/10" data-grp="알리움" data-name="시큘럼" data-spec="8/10" data-price="400" data-max="450">
+          <div class="opt-info">
+            <span class="o-spec">8/10</span>
+            <span class="o-stock">재고 450구</span>
+            <span class="o-price">₩400<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="시큘럼 8/10 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="시큘럼 8/10 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="시큘럼 8/10 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-mg">
+      <div class="c-photo"><img src="img/mg.jpg" alt="매직" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">알리움</span></div>
+        <h3 class="c-name">매직</h3>
+        <p class="c-latin">Allium &#x27;Magic&#x27;</p>
+        <div class="chips"><span class="chip size">중형</span><span class="chip">반구형 약 10cm</span><span class="chip">키 60~75cm</span></div>
+        <ul class="feat"><li>자주·와인빛 반구형, 지면서 불꽃형으로 퍼짐</li><li>6월 만생 개화 · 슈베르티 교잡 계열</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="mg|12/14" data-grp="알리움" data-name="매직" data-spec="12/14" data-price="400" data-max="400">
+          <div class="opt-info">
+            <span class="o-spec">12/14</span>
+            <span class="o-stock">재고 400구</span>
+            <span class="o-price">₩400<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="매직 12/14 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="매직 12/14 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="매직 12/14 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-mi">
+      <div class="c-photo"><img src="img/mi.jpg" alt="마이애미" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">알리움</span></div>
+        <h3 class="c-name">마이애미</h3>
+        <p class="c-latin">Allium &#x27;Miami&#x27;</p>
+        <div class="chips"><span class="chip size">중형</span><span class="chip">둥근 화구</span><span class="chip">키 80~100cm</span></div>
+        <ul class="feat"><li>적보라(자주) 구형, 성글게 열린 화구</li><li>5월 말~6월 개화 · 절화·경관 식재</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="mi|10/12" data-grp="알리움" data-name="마이애미" data-spec="10/12" data-price="300" data-max="350">
+          <div class="opt-info">
+            <span class="o-spec">10/12</span>
+            <span class="o-stock">재고 350구</span>
+            <span class="o-price">₩300<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="마이애미 10/12 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="마이애미 10/12 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="마이애미 10/12 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-sc">
+      <div class="c-photo"><img src="img/sc.jpg" alt="슈베르티" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">알리움</span></div>
+        <h3 class="c-name">슈베르티</h3>
+        <p class="c-latin">Allium schubertii</p>
+        <div class="chips"><span class="chip size">대형</span><span class="chip">불꽃형 30~40cm</span><span class="chip">키 30~60cm</span></div>
+        <ul class="feat"><li>연분홍·자주 소화가 길이가 다른 꽃자루로 터지는 폭죽 모양</li><li>6월 개화 · 드라이플라워·포인트 식재</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="sc|12/+" data-grp="알리움" data-name="슈베르티" data-spec="12/+" data-price="1400" data-max="100">
+          <div class="opt-info">
+            <span class="o-spec">12/+</span>
+            <span class="o-stock">재고 100구 <em class="few">소량</em></span>
+            <span class="o-price">₩1,400<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="슈베르티 12/+ 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="슈베르티 12/+ 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="슈베르티 12/+ 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article></div>
+  </section>
+  <section class="grp" id="g-narcissus">
+    <h2><span>수선화</span><small>Narcissus · 3품종</small></h2>
+    <div class="cards">
+    <article class="card" id="i-dm">
+      <div class="c-photo"><img src="img/dm.jpg" alt="더치마스터" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">수선화</span><span class="badge req">★ 요청 품종</span></div>
+        <h3 class="c-name">더치마스터</h3>
+        <p class="c-latin">Narcissus &#x27;Dutch Master&#x27;</p>
+        <div class="chips"><span class="chip size">대형</span><span class="chip">꽃 지름 약 10cm</span><span class="chip">키 40~45cm</span></div>
+        <ul class="feat"><li>꽃잎·트럼펫 모두 진노랑, 정통 트럼펫 수선화</li><li>3~4월 개화 · 경관·화단 대량식재 표준</li></ul>
+        <p class="c-note">14/16 소진 · 16/18만 보유</p>
+        <div class="opts">
+        <div class="opt" data-id="dm|16/18" data-grp="수선화" data-name="더치마스터" data-spec="16/18" data-price="1000" data-max="">
+          <div class="opt-info">
+            <span class="o-spec">16/18</span>
+            <span class="o-stock">재고 10,000구 이상</span>
+            <span class="o-price">₩1,000<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="더치마스터 16/18 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="더치마스터 16/18 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="더치마스터 16/18 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-ta">
+      <div class="c-photo"><img src="img/ta.jpg" alt="타히티" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">수선화</span><span class="badge alt">◇ 딕윌든·윈스턴처칠 대체</span></div>
+        <h3 class="c-name">타히티</h3>
+        <p class="c-latin">Narcissus &#x27;Tahiti&#x27;</p>
+        <div class="chips"><span class="chip size">대형 겹꽃</span><span class="chip">꽃 지름 8~10cm</span><span class="chip">키 35~45cm</span></div>
+        <ul class="feat"><li>노랑 겹꽃 사이로 주황·적색 꽃잎이 섞임</li><li>4월 개화 · 은은한 향, 다년 정착 우수</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="ta|14/16" data-grp="수선화" data-name="타히티" data-spec="14/16" data-price="1000" data-max="">
+          <div class="opt-info">
+            <span class="o-spec">14/16</span>
+            <span class="o-stock">재고 10,000구 이상</span>
+            <span class="o-price">₩1,000<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="타히티 14/16 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="타히티 14/16 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="타히티 14/16 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        <div class="opt" data-id="ta|16/18" data-grp="수선화" data-name="타히티" data-spec="16/18" data-price="1200" data-max="">
+          <div class="opt-info">
+            <span class="o-spec">16/18</span>
+            <span class="o-stock">재고 10,000구 이상</span>
+            <span class="o-price">₩1,200<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="타히티 16/18 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="타히티 16/18 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="타히티 16/18 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-sa">
+      <div class="c-photo"><img src="img/sa.jpg" alt="세일러맨" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">수선화</span><span class="badge alt">◇ 오렌저리 대체</span></div>
+        <h3 class="c-name">세일러맨</h3>
+        <p class="c-latin">Narcissus &#x27;Sailorman&#x27;</p>
+        <div class="chips"><span class="chip size">대형</span><span class="chip">스플릿 코로나</span><span class="chip">키 35~45cm</span></div>
+        <ul class="feat"><li>컵이 갈라져 꽃잎 위로 펼쳐진 노랑 프릴형</li><li>3월 말~4월 조생 개화 · 향 있음</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="sa|12/14" data-grp="수선화" data-name="세일러맨" data-spec="12/14" data-price="500" data-max="">
+          <div class="opt-info">
+            <span class="o-spec">12/14</span>
+            <span class="o-stock">재고 10,000구 이상</span>
+            <span class="o-price">₩500<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="세일러맨 12/14 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="세일러맨 12/14 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="세일러맨 12/14 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article></div>
+  </section>
+  <section class="grp" id="g-tulipa">
+    <h2><span>튤립</span><small>Tulipa · 3품종</small></h2>
+    <div class="cards">
+    <article class="card" id="i-ng">
+      <div class="c-photo"><img src="img/ng.jpg" alt="네그리타 더블" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">튤립</span><span class="badge alt">◇ 겹튤립 추천</span></div>
+        <h3 class="c-name">네그리타 더블</h3>
+        <p class="c-latin">Tulipa &#x27;Negrita Double&#x27;</p>
+        <div class="chips"><span class="chip size">대형</span><span class="chip">만생 겹꽃</span><span class="chip">키 40~50cm</span></div>
+        <ul class="feat"><li>짙은 로열 퍼플, 작약처럼 둥근 대륜 겹꽃</li><li>4월 말~5월 개화 · 꽃대가 튼튼한 만생종</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="ng|10/11" data-grp="튤립" data-name="네그리타 더블" data-spec="10/11" data-price="600" data-max="14000">
+          <div class="opt-info">
+            <span class="o-spec">10/11</span>
+            <span class="o-stock">재고 14,000구</span>
+            <span class="o-price">₩600<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="네그리타 더블 10/11 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="네그리타 더블 10/11 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="네그리타 더블 10/11 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-pk">
+      <div class="c-photo"><img src="img/pk.jpg" alt="핑크 사운드" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">튤립</span><span class="badge alt">◇ 골든아펠도른 대체</span></div>
+        <h3 class="c-name">핑크 사운드</h3>
+        <p class="c-latin">Tulipa &#x27;Pink Sound&#x27;</p>
+        <div class="chips"><span class="chip size">대형</span><span class="chip">다윈하이브리드</span><span class="chip">키 40~60cm</span></div>
+        <ul class="feat"><li>연핑크 바탕에 진핑크 맥이 드는 대륜</li><li>4월 개화 · 비바람에 강하고 절화 적합</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="pk|12/+" data-grp="튤립" data-name="핑크 사운드" data-spec="12/+" data-price="400" data-max="2000">
+          <div class="opt-info">
+            <span class="o-spec">12/+</span>
+            <span class="o-stock">재고 2,000구</span>
+            <span class="o-price">₩400<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="핑크 사운드 12/+ 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="핑크 사운드 12/+ 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="핑크 사운드 12/+ 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-mv">
+      <div class="c-photo"><img src="img/mv.jpg" alt="미스틱 반 에이크" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">튤립</span><span class="badge alt">◇ 골든아펠도른 대체</span></div>
+        <h3 class="c-name">미스틱 반 에이크</h3>
+        <p class="c-latin">Tulipa &#x27;Mystic van Eijk&#x27;</p>
+        <div class="chips"><span class="chip size">대형</span><span class="chip">꽃 지름 약 10cm</span><span class="chip">키 45~55cm</span></div>
+        <ul class="feat"><li>연핑크에 진핑크·살구빛이 번지는 파스텔 대륜</li><li>4~5월 개화 · 오래 피고 은은한 향</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="mv|12/+" data-grp="튤립" data-name="미스틱 반 에이크" data-spec="12/+" data-price="400" data-max="1000">
+          <div class="opt-info">
+            <span class="o-spec">12/+</span>
+            <span class="o-stock">재고 1,000구</span>
+            <span class="o-price">₩400<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="미스틱 반 에이크 12/+ 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="미스틱 반 에이크 12/+ 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="미스틱 반 에이크 12/+ 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article></div>
+  </section>
+  <section class="grp" id="g-muscari">
+    <h2><span>무스카리</span><small>Muscari · 2품종</small></h2>
+    <div class="cards">
+    <article class="card" id="i-ar">
+      <div class="c-photo"><img src="img/ar.jpg" alt="아르메니아쿰" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">무스카리</span><span class="badge req">★ 요청 품종</span></div>
+        <h3 class="c-name">아르메니아쿰</h3>
+        <p class="c-latin">Muscari armeniacum</p>
+        <div class="chips"><span class="chip size">소형</span><span class="chip">꽃차례 3~4cm</span><span class="chip">키 15~20cm</span></div>
+        <ul class="feat"><li>코발트블루 종 모양 소화가 포도송이처럼 밀집</li><li>4월 개화 · 군식·대량식재 표준</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="ar|8/9" data-grp="무스카리" data-name="아르메니아쿰" data-spec="8/9" data-price="200" data-max="3000">
+          <div class="opt-info">
+            <span class="o-spec">8/9</span>
+            <span class="o-stock">재고 3,000구</span>
+            <span class="o-price">₩200<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="아르메니아쿰 8/9 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="아르메니아쿰 8/9 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="아르메니아쿰 8/9 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article>
+    <article class="card" id="i-bb">
+      <div class="c-photo"><img src="img/bb.jpg" alt="베이비 브레스" loading="lazy" decoding="async"></div>
+      <div class="c-body">
+        <div class="c-top"><span class="c-grp">무스카리</span><span class="badge req">★ 요청 품종</span></div>
+        <h3 class="c-name">베이비 브레스</h3>
+        <p class="c-latin">Muscari &#x27;Baby&#x27;s Breath&#x27;</p>
+        <div class="chips"><span class="chip size">소형</span><span class="chip">흰빛 소화형</span><span class="chip">키 15~20cm</span></div>
+        <ul class="feat"><li>연두빛 봉오리가 흰색에 가까운 아이스블루로 개화</li><li>4~5월 개화 · 달콤한 향, RHS AGM 수상</li></ul>
+        
+        <div class="opts">
+        <div class="opt" data-id="bb|7/8" data-grp="무스카리" data-name="베이비 브레스" data-spec="7/8" data-price="200" data-max="3000">
+          <div class="opt-info">
+            <span class="o-spec">7/8</span>
+            <span class="o-stock">재고 3,000구</span>
+            <span class="o-price">₩200<small>/구</small></span>
+          </div>
+          <div class="stepper">
+            <button type="button" class="st-btn minus" aria-label="베이비 브레스 7/8 100구 빼기">−</button>
+            <input type="number" inputmode="numeric" min="0" step="100" value="0" aria-label="베이비 브레스 7/8 수량(구)">
+            <button type="button" class="st-btn plus" aria-label="베이비 브레스 7/8 100구 더하기">+</button>
+          </div>
+          <div class="o-warn" hidden></div>
+        </div>
+        </div>
+      </div>
+    </article></div>
+  </section>
+  <section class="terms"><h2>거래 조건 및 안내</h2><ul><li>본 단가는 <b>항공 긴급 수배 건 기준</b>이며, VAT 별도 · 현장 인도 조건입니다. 통상 해상 수입 단가와는 별도입니다.</li><li>항공 건은 <b>주문 총액 1,000만원(VAT 별도) 이상</b>부터 진행 가능합니다. 통관·검역·운송비가 물량과 무관하게 고정으로 발생합니다.</li><li>네덜란드 출발 기준 <b>인천 도착까지 약 3일</b> 소요됩니다.</li><li>골든 아펠도른은 현지 재고 소진으로, 농가 직발주 시 <b>최소 12,000구</b>부터 가능합니다.</li></ul></section>
+  <p class="foot">Open Garden · 오픈가든 · open-garden.co.kr</p>
+</main>
+
+<div class="bar" id="bar"><div class="wrap">
+  <div class="bar-top"><span class="bar-count" id="cnt">선택한 품목이 없습니다</span><span class="bar-total" id="tot">₩0<small>VAT 별도</small></span></div>
+  <div class="prog" id="prog" aria-hidden="true"><i id="progI"></i></div>
+  <div class="prog-txt" id="progT"></div>
+  <button class="btn-go" id="go" disabled>견적 요청하기</button>
+</div></div>
+
+<div id="sheetWrap">
+  <div class="sheet-bg" id="sheetBg"></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetH"><div class="wrap" id="sheetIn">
+    <h2 id="sheetH">견적 요청 확인</h2>
+    <ul class="sum" id="sum"></ul>
+    <p class="below" id="below" hidden></p>
+    <form id="form" novalidate>
+      <div class="field"><label for="fName">상호 / 성함</label><input id="fName" autocomplete="organization" maxlength="100" placeholder="예: ○○조경 홍길동"></div>
+      <div class="field"><label for="fPhone">연락처 <em>*</em></label><input id="fPhone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30" placeholder="010-0000-0000" required></div>
+      <div class="field"><label for="fMemo">요청사항</label><textarea id="fMemo" maxlength="800" placeholder="납품지, 희망 일정 등"></textarea></div>
+      <div class="hp" aria-hidden="true"><input id="fWeb" tabindex="-1" autocomplete="off"></div>
+      <label class="agree"><input type="checkbox" id="fAgree"><span><b>(필수)</b> 개인정보 수집·이용에 동의합니다.<small>연락처·성함/소속·요청 사항·품목을 견적 및 납품 진행 목적으로 3년간 보관합니다. 거부하실 수 있으며 이 경우 접수가 제한됩니다. <a href="/privacy.html" target="_blank" rel="noopener">자세히 보기</a></small></span></label>
+      <p class="err" id="err" role="alert"></p>
+      <div class="row2"><button type="button" class="btn-ghost" id="back">수량 수정</button><button type="submit" class="btn-send" id="send">요청 보내기</button></div>
+    </form>
+  </div></div>
+</div>
+
+<script>
+(function(){
+  var CFG = {"pid":"air-20261028-3ebf85","title":"항공 즉시수배 구근 제안","date":"2026. 10. 28","min":10000000,"minLabel":"1,000만원"};
+  var KEY = 'og-order:' + CFG.pid;
+  var opts = [].slice.call(document.querySelectorAll('.opt'));
+  var $ = function(id){ return document.getElementById(id); };
+  var fmt = function(n){ return n.toLocaleString('ko-KR'); };
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch(e) {}
+
+  function qtyOf(o){ return Math.max(0, parseInt(o.querySelector('input').value, 10) || 0); }
+  function setQty(o, q){
+    var max = parseInt(o.dataset.max, 10);
+    var w = o.querySelector('.o-warn');
+    q = Math.max(0, Math.round(q) || 0);
+    if (max && q > max) { q = max; w.textContent = '재고 ' + fmt(max) + '구까지 가능합니다'; w.hidden = false; }
+    else w.hidden = true;
+    o.querySelector('input').value = q;
+    o.classList.toggle('on', q > 0);
+  }
+  function picked(){
+    return opts.filter(function(o){ return qtyOf(o) > 0; }).map(function(o){
+      var q = qtyOf(o), p = +o.dataset.price;
+      return { id:o.dataset.id, grp:o.dataset.grp, name:o.dataset.name, spec:o.dataset.spec, price:p, qty:q, amt:p*q };
+    });
+  }
+  function update(){
+    var list = picked(), total = list.reduce(function(s,i){ return s + i.amt; }, 0);
+    $('cnt').textContent = list.length ? '선택 ' + list.length + '개 품목 · ' + fmt(list.reduce(function(s,i){return s+i.qty;},0)) + '구' : '선택한 품목이 없습니다';
+    $('tot').innerHTML = '₩' + fmt(total) + '<small>VAT 별도</small>';
+    var t = $('progT');
+    if (!CFG.min) { $('prog').hidden = true; t.hidden = true; }
+    else {
+      $('progI').style.width = (Math.min(1, total / CFG.min) * 100) + '%';
+      if (total >= CFG.min) { t.textContent = '최소 주문 금액(' + CFG.minLabel + ')을 충족했습니다'; t.className = 'prog-txt ok'; }
+      else { t.textContent = '최소 주문 ' + CFG.minLabel + '까지 ₩' + fmt(CFG.min - total) + ' 남음'; t.className = 'prog-txt'; }
+    }
+    $('go').disabled = list.length === 0;
+    var s = {}; list.forEach(function(i){ s[i.id] = i.qty; });
+    try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e) {}
+    return { list:list, total:total };
+  }
+  opts.forEach(function(o){
+    if (saved[o.dataset.id]) setQty(o, saved[o.dataset.id]);
+    var inp = o.querySelector('input');
+    o.querySelector('.minus').addEventListener('click', function(){ setQty(o, qtyOf(o) - 100); update(); });
+    o.querySelector('.plus').addEventListener('click', function(){ setQty(o, qtyOf(o) + 100); update(); });
+    inp.addEventListener('input', function(){ o.classList.toggle('on', qtyOf(o) > 0); update(); });
+    inp.addEventListener('change', function(){ setQty(o, qtyOf(o)); update(); });
+    inp.addEventListener('focus', function(){ if (inp.value === '0') inp.select(); });
+  });
+  update();
+
+  function openSheet(){
+    var st = update();
+    var sum = $('sum'); sum.innerHTML = '';
+    st.list.forEach(function(i){
+      var li = document.createElement('li');
+      var a = document.createElement('span'); a.textContent = i.name + ' ' + i.spec + ' × ' + fmt(i.qty) + '구';
+      var b = document.createElement('span'); b.textContent = '₩' + fmt(i.amt);
+      li.appendChild(a); li.appendChild(b); sum.appendChild(li);
+    });
+    var tl = document.createElement('li'); tl.className = 'tot';
+    tl.innerHTML = '<span>합계 (VAT 별도)</span><span>₩' + fmt(st.total) + '</span>';
+    sum.appendChild(tl);
+    var below = $('below');
+    if (CFG.min && st.total < CFG.min) { below.textContent = '최소 주문 금액은 ' + CFG.minLabel + '입니다. 그대로 요청하시면 담당자가 조정안을 안내드립니다.'; below.hidden = false; }
+    else below.hidden = true;
+    $('err').textContent = '';
+    document.body.classList.add('open');
+  }
+  function closeSheet(){ document.body.classList.remove('open'); }
+  $('go').addEventListener('click', openSheet);
+  $('back').addEventListener('click', closeSheet);
+  $('sheetBg').addEventListener('click', closeSheet);
+
+  $('form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var st = update(), err = $('err');
+    var phone = $('fPhone').value.trim();
+    if (phone.replace(/\D/g, '').length < 9) { err.textContent = '연락처를 확인해주세요.'; $('fPhone').focus(); return; }
+    if (!$('fAgree').checked) { err.textContent = '개인정보 수집·이용에 동의해주세요.'; return; }
+    if (!st.list.length) { err.textContent = '수량을 입력한 품목이 없습니다.'; return; }
+    var memo = '[제안서 ' + CFG.pid + '] ' + CFG.title + ' (' + CFG.date + ')\n'
+      + '합계 ₩' + fmt(st.total) + ' (VAT 별도)' + (CFG.min && st.total < CFG.min ? ' · 최소 주문 ' + CFG.minLabel + ' 미달' : '')
+      + ($('fMemo').value.trim() ? '\n고객 메모: ' + $('fMemo').value.trim() : '');
+    var body = {
+      name: $('fName').value.trim(), phone: phone, memo: memo, agree: true, marketing: false, website: $('fWeb').value,
+      items: st.list.map(function(i){ return { sku: CFG.pid + ':' + i.id, kname: i.grp + ' ' + i.name + ' @₩' + fmt(i.price) + ' = ₩' + fmt(i.amt), size: i.spec, qty: i.qty }; })
+    };
+    var btn = $('send'); btn.disabled = true; btn.textContent = '보내는 중…'; err.textContent = '';
+    fetch('/api/quote', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })
+      .then(function(r){ return r.json().then(function(j){ if (!r.ok || !j.ok) throw new Error(j.error || '접수 실패'); return j; }); })
+      .then(function(j){
+        try { localStorage.removeItem(KEY); } catch(e) {}
+        var box = $('sheetIn');
+        box.innerHTML = '<div class="done"><h2>견적 요청이 접수되었습니다</h2><div class="no"></div>'
+          + '<p>담당자가 확인 후 연락처로 견적서를 보내드립니다.</p>'
+          + '<a class="btn-kakao" href="https://pf.kakao.com/_lGfxhX/chat" target="_blank" rel="noopener">카카오톡 채널로 문의하기</a></div>';
+        box.querySelector('.no').textContent = j.requestNo || '';
+        $('bar').hidden = true;
+      })
+      .catch(function(x){ err.textContent = (x && x.message) || '접수에 실패했습니다. 카카오톡 채널로 문의해주세요.'; btn.disabled = false; btn.textContent = '요청 보내기'; });
+  });
+})();
+</script>
+</body></html>

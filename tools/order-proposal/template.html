@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>%%TITLE%% · 오픈가든</title>
+<meta property="og:title" content="오픈가든 · %%TITLE%%">
+<meta property="og:description" content="%%BASIS%% · 품목별 수량을 입력하고 바로 견적을 요청하세요">
+<meta property="og:image" content="https://open-garden.co.kr/assets/og.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--green:#1F4D33;--green-dark:#123023;--leaf:#5C8C48;--ink:#111814;--gray:#6b746e;--bg:#fff;--soft:#F4F6F3;--line:#E4E8E3;--kakao:#FEE500;--gold:#9A6510;--warn:#B4541B}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{font-family:'Noto Sans KR',-apple-system,'Apple SD Gothic Neo',sans-serif;color:var(--ink);background:var(--soft);line-height:1.55;font-size:15px;letter-spacing:-.01em;word-break:keep-all;padding-bottom:calc(132px + env(safe-area-inset-bottom))}
+button{font-family:inherit;cursor:pointer}
+input,textarea{font-family:inherit;font-size:16px}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+header.hero{background:var(--green);color:#fff;padding:22px 0 20px}
+.brand{font-size:12px;font-weight:700;letter-spacing:.28em;opacity:.85}
+.hero h1{font-size:23px;font-weight:800;margin-top:8px;letter-spacing:-.02em}
+.hero .meta{font-size:13px;opacity:.85;margin-top:4px}
+.notice{background:#fff;border-bottom:1px solid var(--line)}
+.notice ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px 14px;padding:12px 0;font-size:13px;color:var(--gray)}
+.notice b{color:var(--ink)}
+.howto{margin:14px 0 4px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:13.5px;color:var(--gray)}
+.howto b{color:var(--green)}
+nav.tabs{position:sticky;top:0;z-index:20;background:rgba(244,246,243,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+nav.tabs .wrap{display:flex;gap:8px;overflow-x:auto;padding-top:10px;padding-bottom:10px;scrollbar-width:none}
+nav.tabs a{flex:none;font-size:14px;font-weight:700;color:var(--ink);text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 14px;min-height:36px;display:flex;align-items:center;gap:5px}
+nav.tabs a span{color:var(--gray);font-weight:500;font-size:12px}
+.grp{margin-top:22px}
+.grp h2{display:flex;align-items:baseline;gap:8px;font-size:20px;font-weight:800;color:var(--green);margin-bottom:10px}
+.grp h2 small{font-size:12px;color:var(--gray);font-weight:500;letter-spacing:.04em}
+.cards{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:720px){.cards{grid-template-columns:1fr 1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.c-photo{aspect-ratio:1/1;background:var(--soft);overflow:hidden}
+.c-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.c-body{padding:14px 14px 12px;display:flex;flex-direction:column;flex:1}
+.c-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.c-grp{font-size:12px;font-weight:700;color:var(--leaf);letter-spacing:.06em}
+.badge{font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.badge.req{background:var(--green);color:#fff}
+.badge.alt{background:#FDF4E2;color:var(--gold);box-shadow:inset 0 0 0 1px #E3B865}
+.c-name{font-size:19px;font-weight:800;margin-top:4px;letter-spacing:-.02em}
+.c-latin{font-size:12.5px;font-style:italic;color:var(--gray)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.chip{font-size:12px;font-weight:600;color:#3f4a3c;border:1px solid #CFD8C7;border-radius:999px;padding:3px 9px}
+.chip.size{background:var(--green);border-color:var(--green);color:#fff}
+.feat{list-style:none;margin-top:9px;font-size:13.5px;color:#3f4a3c}
+.feat li{position:relative;padding-left:12px;margin-top:2px}
+.feat li::before{content:'';position:absolute;left:1px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--leaf)}
+.c-note{font-size:12.5px;color:var(--warn);font-weight:600;margin-top:6px}
+.opts{margin-top:auto;padding-top:12px}
+.opt{border-top:1px solid var(--line);padding:10px 0 2px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px 10px}
+.opt-info{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px}
+.o-spec{font-size:15px;font-weight:700}
+.o-stock{font-size:12.5px;color:var(--gray)}
+.o-price{font-size:17px;font-weight:800;width:100%}
+.o-price small{font-size:12px;font-weight:500;color:var(--gray);margin-left:1px}
+.few{font-style:normal;font-size:11px;font-weight:700;color:var(--warn);border:1px solid #E6A27A;border-radius:4px;padding:0 4px}
+.stepper{display:flex;align-items:center;border:1px solid #C9D1C4;border-radius:12px;overflow:hidden;background:#fff}
+.stepper input{width:76px;height:44px;border:0;text-align:center;font-weight:700;font-size:16px;-moz-appearance:textfield;color:var(--ink)}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.st-btn{width:44px;height:44px;border:0;background:var(--soft);font-size:22px;font-weight:500;color:var(--green)}
+.st-btn:active{background:#E3E9DF}
+.opt.on .stepper{border-color:var(--green);box-shadow:0 0 0 2px rgba(31,77,51,.12)}
+.opt.on .stepper input{color:var(--green)}
+.o-warn{grid-column:1/-1;font-size:12px;color:var(--warn);font-weight:600}
+.terms{margin:26px 0 8px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}
+.terms h2{font-size:16px;font-weight:800;color:var(--green);margin-bottom:8px}
+.terms ul{list-style:none;display:flex;flex-direction:column;gap:7px;font-size:13.5px;color:#3f4a3c}
+.terms li{position:relative;padding-left:16px}
+.terms li::before{content:'※';position:absolute;left:0;color:var(--leaf);font-size:12px}
+.terms b{color:var(--ink)}
+.foot{text-align:center;font-size:12px;color:var(--gray);padding:18px 0 8px}
+/* 하단 고정 바 */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(17,24,20,.08);padding:10px 0 calc(10px + env(safe-area-inset-bottom))}
+.bar .wrap{display:flex;flex-direction:column;gap:8px}
+.bar-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.bar-count{font-size:13px;color:var(--gray)}
+.bar-total{font-size:20px;font-weight:800}
+.bar-total small{font-size:12px;font-weight:500;color:var(--gray);margin-left:3px}
+.prog{height:6px;border-radius:3px;background:#E6EBE3;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--leaf);transition:width .2s}
+.prog-txt{font-size:12px;color:var(--gray);margin-top:-3px}
+.prog-txt.ok{color:var(--green);font-weight:700}
+.btn-go{height:50px;border:0;border-radius:12px;background:var(--green);color:#fff;font-size:16px;font-weight:800}
+.btn-go:disabled{background:#B9C2B5}
+/* 요청 시트 */
+.sheet-bg{position:fixed;inset:0;z-index:40;background:rgba(17,24,20,.45);display:none}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:#fff;border-radius:18px 18px 0 0;max-height:92vh;overflow:auto;transform:translateY(105%);transition:transform .22s ease;padding:18px 0 calc(18px + env(safe-area-inset-bottom))}
+.open .sheet-bg{display:block} .open .sheet{transform:none}
+.sheet h2{font-size:19px;font-weight:800}
+.sheet .sum{margin-top:10px;background:var(--soft);border-radius:12px;padding:10px 12px;font-size:13.5px}
+.sheet .sum li{display:flex;justify-content:space-between;gap:8px;padding:3px 0;list-style:none}
+.sheet .sum .tot{border-top:1px solid var(--line);margin-top:6px;padding-top:7px;font-weight:800;font-size:15px}
+.sheet .below{font-size:12.5px;color:var(--warn);font-weight:600;margin-top:8px}
+.field{margin-top:12px}
+.field label{display:block;font-size:13.5px;font-weight:700;margin-bottom:5px}
+.field label em{color:var(--warn);font-style:normal}
+.field input,.field textarea{width:100%;border:1px solid #C9D1C4;border-radius:10px;padding:11px 12px;color:var(--ink);background:#fff}
+.field textarea{min-height:76px;resize:vertical}
+.agree{display:flex;gap:8px;align-items:flex-start;margin-top:12px;font-size:13px;color:#3f4a3c}
+.agree input{width:20px;height:20px;margin-top:1px;accent-color:var(--green);flex:none}
+.agree small{display:block;color:var(--gray);font-size:12px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.err{color:var(--warn);font-size:13px;font-weight:600;margin-top:10px;min-height:1em}
+.row2{display:flex;gap:8px;margin-top:14px}
+.row2 button{flex:1;height:50px;border-radius:12px;font-size:15.5px;font-weight:800}
+.btn-ghost{background:#fff;border:1px solid #C9D1C4;color:var(--ink)}
+.btn-send{background:var(--green);border:0;color:#fff}
+.btn-send:disabled{background:#B9C2B5}
+.done{text-align:center;padding:10px 0}
+.done .no{display:inline-block;margin-top:10px;font-size:20px;font-weight:800;color:var(--green);background:var(--soft);border-radius:10px;padding:6px 14px;letter-spacing:.04em}
+.done p{font-size:14px;color:#3f4a3c;margin-top:10px}
+.btn-kakao{display:flex;align-items:center;justify-content:center;gap:6px;height:50px;border-radius:12px;background:var(--kakao);color:#191600;font-weight:800;text-decoration:none;margin-top:14px}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="brand">OPEN GARDEN</div>
+  <h1>%%TITLE%%</h1>
+  <div class="meta">%%DATE%% · %%BASIS%%</div>
+</div></header>
+<div class="notice"><div class="wrap"><ul>
+  <li>판매가 <b>원/구 · VAT 별도</b></li>
+  %%NOTICE%%
+</ul></div></div>
+<nav class="tabs" aria-label="품목 구분"><div class="wrap">%%NAV%%</div></nav>
+<main class="wrap">
+  <p class="howto">필요한 품목에 <b>수량(구)</b>을 넣고 아래 <b>견적 요청</b>을 누르면 담당자에게 바로 전달됩니다. 확인 후 견적서를 보내드립니다.</p>
+  %%SECTIONS%%
+  <section class="terms"><h2>거래 조건 및 안내</h2><ul>%%TERMS%%</ul></section>
+  <p class="foot">Open Garden · 오픈가든 · open-garden.co.kr</p>
+</main>
+
+<div class="bar" id="bar"><div class="wrap">
+  <div class="bar-top"><span class="bar-count" id="cnt">선택한 품목이 없습니다</span><span class="bar-total" id="tot">₩0<small>VAT 별도</small></span></div>
+  <div class="prog" id="prog" aria-hidden="true"><i id="progI"></i></div>
+  <div class="prog-txt" id="progT"></div>
+  <button class="btn-go" id="go" disabled>견적 요청하기</button>
+</div></div>
+
+<div id="sheetWrap">
+  <div class="sheet-bg" id="sheetBg"></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetH"><div class="wrap" id="sheetIn">
+    <h2 id="sheetH">견적 요청 확인</h2>
+    <ul class="sum" id="sum"></ul>
+    <p class="below" id="below" hidden></p>
+    <form id="form" novalidate>
+      <div class="field"><label for="fName">상호 / 성함</label><input id="fName" autocomplete="organization" maxlength="100" placeholder="예: ○○조경 홍길동"></div>
+      <div class="field"><label for="fPhone">연락처 <em>*</em></label><input id="fPhone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30" placeholder="010-0000-0000" required></div>
+      <div class="field"><label for="fMemo">요청사항</label><textarea id="fMemo" maxlength="800" placeholder="납품지, 희망 일정 등"></textarea></div>
+      <div class="hp" aria-hidden="true"><input id="fWeb" tabindex="-1" autocomplete="off"></div>
+      <label class="agree"><input type="checkbox" id="fAgree"><span><b>(필수)</b> 개인정보 수집·이용에 동의합니다.<small>연락처·성함/소속·요청 사항·품목을 견적 및 납품 진행 목적으로 3년간 보관합니다. 거부하실 수 있으며 이 경우 접수가 제한됩니다. <a href="/privacy.html" target="_blank" rel="noopener">자세히 보기</a></small></span></label>
+      <p class="err" id="err" role="alert"></p>
+      <div class="row2"><button type="button" class="btn-ghost" id="back">수량 수정</button><button type="submit" class="btn-send" id="send">요청 보내기</button></div>
+    </form>
+  </div></div>
+</div>
+
+<script>
+(function(){
+  var CFG = %%CFG%%;
+  var KEY = 'og-order:' + CFG.pid;
+  var opts = [].slice.call(document.querySelectorAll('.opt'));
+  var $ = function(id){ return document.getElementById(id); };
+  var fmt = function(n){ return n.toLocaleString('ko-KR'); };
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch(e) {}
+
+  function qtyOf(o){ return Math.max(0, parseInt(o.querySelector('input').value, 10) || 0); }
+  function setQty(o, q){
+    var max = parseInt(o.dataset.max, 10);
+    var w = o.querySelector('.o-warn');
+    q = Math.max(0, Math.round(q) || 0);
+    if (max && q > max) { q = max; w.textContent = '재고 ' + fmt(max) + '구까지 가능합니다'; w.hidden = false; }
+    else w.hidden = true;
+    o.querySelector('input').value = q;
+    o.classList.toggle('on', q > 0);
+  }
+  function picked(){
+    return opts.filter(function(o){ return qtyOf(o) > 0; }).map(function(o){
+      var q = qtyOf(o), p = +o.dataset.price;
+      return { id:o.dataset.id, grp:o.dataset.grp, name:o.dataset.name, spec:o.dataset.spec, price:p, qty:q, amt:p*q };
+    });
+  }
+  function update(){
+    var list = picked(), total = list.reduce(function(s,i){ return s + i.amt; }, 0);
+    $('cnt').textContent = list.length ? '선택 ' + list.length + '개 품목 · ' + fmt(list.reduce(function(s,i){return s+i.qty;},0)) + '구' : '선택한 품목이 없습니다';
+    $('tot').innerHTML = '₩' + fmt(total) + '<small>VAT 별도</small>';
+    var t = $('progT');
+    if (!CFG.min) { $('prog').hidden = true; t.hidden = true; }
+    else {
+      $('progI').style.width = (Math.min(1, total / CFG.min) * 100) + '%';
+      if (total >= CFG.min) { t.textContent = '최소 주문 금액(' + CFG.minLabel + ')을 충족했습니다'; t.className = 'prog-txt ok'; }
+      else { t.textContent = '최소 주문 ' + CFG.minLabel + '까지 ₩' + fmt(CFG.min - total) + ' 남음'; t.className = 'prog-txt'; }
+    }
+    $('go').disabled = list.length === 0;
+    var s = {}; list.forEach(function(i){ s[i.id] = i.qty; });
+    try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e) {}
+    return { list:list, total:total };
+  }
+  opts.forEach(function(o){
+    if (saved[o.dataset.id]) setQty(o, saved[o.dataset.id]);
+    var inp = o.querySelector('input');
+    o.querySelector('.minus').addEventListener('click', function(){ setQty(o, qtyOf(o) - 100); update(); });
+    o.querySelector('.plus').addEventListener('click', function(){ setQty(o, qtyOf(o) + 100); update(); });
+    inp.addEventListener('input', function(){ o.classList.toggle('on', qtyOf(o) > 0); update(); });
+    inp.addEventListener('change', function(){ setQty(o, qtyOf(o)); update(); });
+    inp.addEventListener('focus', function(){ if (inp.value === '0') inp.select(); });
+  });
+  update();
+
+  function openSheet(){
+    var st = update();
+    var sum = $('sum'); sum.innerHTML = '';
+    st.list.forEach(function(i){
+      var li = document.createElement('li');
+      var a = document.createElement('span'); a.textContent = i.name + ' ' + i.spec + ' × ' + fmt(i.qty) + '구';
+      var b = document.createElement('span'); b.textContent = '₩' + fmt(i.amt);
+      li.appendChild(a); li.appendChild(b); sum.appendChild(li);
+    });
+    var tl = document.createElement('li'); tl.className = 'tot';
+    tl.innerHTML = '<span>합계 (VAT 별도)</span><span>₩' + fmt(st.total) + '</span>';
+    sum.appendChild(tl);
+    var below = $('below');
+    if (CFG.min && st.total < CFG.min) { below.textContent = '최소 주문 금액은 ' + CFG.minLabel + '입니다. 그대로 요청하시면 담당자가 조정안을 안내드립니다.'; below.hidden = false; }
+    else below.hidden = true;
+    $('err').textContent = '';
+    document.body.classList.add('open');
+  }
+  function closeSheet(){ document.body.classList.remove('open'); }
+  $('go').addEventListener('click', openSheet);
+  $('back').addEventListener('click', closeSheet);
+  $('sheetBg').addEventListener('click', closeSheet);
+
+  $('form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var st = update(), err = $('err');
+    var phone = $('fPhone').value.trim();
+    if (phone.replace(/\D/g, '').length < 9) { err.textContent = '연락처를 확인해주세요.'; $('fPhone').focus(); return; }
+    if (!$('fAgree').checked) { err.textContent = '개인정보 수집·이용에 동의해주세요.'; return; }
+    if (!st.list.length) { err.textContent = '수량을 입력한 품목이 없습니다.'; return; }
+    var memo = '[제안서 ' + CFG.pid + '] ' + CFG.title + ' (' + CFG.date + ')\n'
+      + '합계 ₩' + fmt(st.total) + ' (VAT 별도)' + (CFG.min && st.total < CFG.min ? ' · 최소 주문 ' + CFG.minLabel + ' 미달' : '')
+      + ($('fMemo').value.trim() ? '\n고객 메모: ' + $('fMemo').value.trim() : '');
+    var body = {
+      name: $('fName').value.trim(), phone: phone, memo: memo, agree: true, marketing: false, website: $('fWeb').value,
+      items: st.list.map(function(i){ return { sku: CFG.pid + ':' + i.id, kname: i.grp + ' ' + i.name + ' @₩' + fmt(i.price) + ' = ₩' + fmt(i.amt), size: i.spec, qty: i.qty }; })
+    };
+    var btn = $('send'); btn.disabled = true; btn.textContent = '보내는 중…'; err.textContent = '';
+    fetch('/api/quote', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })
+      .then(function(r){ return r.json().then(function(j){ if (!r.ok || !j.ok) throw new Error(j.error || '접수 실패'); return j; }); })
+      .then(function(j){
+        try { localStorage.removeItem(KEY); } catch(e) {}
+        var box = $('sheetIn');
+        box.innerHTML = '<div class="done"><h2>견적 요청이 접수되었습니다</h2><div class="no"></div>'
+          + '<p>담당자가 확인 후 연락처로 견적서를 보내드립니다.</p>'
+          + '<a class="btn-kakao" href="https://pf.kakao.com/_lGfxhX/chat" target="_blank" rel="noopener">카카오톡 채널로 문의하기</a></div>';
+        box.querySelector('.no').textContent = j.requestNo || '';
+        $('bar').hidden = true;
+      })
+      .catch(function(x){ err.textContent = (x && x.message) || '접수에 실패했습니다. 카카오톡 채널로 문의해주세요.'; btn.disabled = false; btn.textContent = '요청 보내기'; });
+  });
+})();
+</script>
+</body></html>
