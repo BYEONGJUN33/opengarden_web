@@ -82,3 +82,23 @@ test('every inline JavaScript block parses after build',()=>{
     }
   }
 });
+
+test('scientific cultivar identity merges imports with domestic availability but not unrelated lookalikes',()=>{
+  const key=tools.cultivarKey;
+  assert.equal(
+    key({kname:"목수국 '리빙 코튼 크림'",sname:"Hydrangea pan. Living 'Cotton Cream'",source:'호게나르드'}),
+    key({kname:"목수국 Cotton Cream",sname:"Hydrangea paniculata 'Living Cotton Cream'",source:'국내 농장'})
+  );
+  assert.equal(
+    key({kname:"수선화 '타히티'",sname:"Narcissus 'Tahiti'",source:'HBM'}),
+    key({kname:"수선화 '타히티(겹)'",sname:"Narcissus 'Tahiti'",source:'구근 라인업'})
+  );
+  assert.notEqual(
+    key({kname:"목수국 A",sname:"Hydrangea paniculata 'A'",source:'호게나르드'}),
+    key({kname:"목수국 B",sname:"Hydrangea paniculata 'B'",source:'호게나르드'})
+  );
+  assert.notEqual(
+    key({kname:"구분 불확실",sname:"Hydrangea pan.",source:'호게나르드'}),
+    key({kname:"구분 불확실",sname:"Hydrangea pan.",source:'국내 농장'})
+  );
+});
