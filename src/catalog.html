@@ -301,6 +301,7 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
       <button type="button" data-supply="즉시 출하" aria-pressed="false">즉시 출하</button>
       <button type="button" data-supply="사전 예약" aria-pressed="false">사전 예약</button>
       <button type="button" data-supply="수입 제안" aria-pressed="false">수입 제안</button>
+       <label class="filter-field"><span>공급처</span><select id="supplier" aria-label="공급처 필터"><option value="">모든 공급처</option><option value="국내 농장">국내 농장</option><option value="구근 라인업">기존 구근</option><option value="호게나르드">호게나르드</option><option value="HBM">HBM</option></select></label>
     </div>
       <select id="status" aria-label="공급 구분" hidden>
         <option value="">공급 구분 전체</option>
@@ -311,7 +312,6 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
     <div class="chips" id="cats" role="group" aria-label="카테고리 필터"></div>
     <div class="filter-panel" id="filterPanel" hidden>
       <div class="filter-fields">
-         <label class="filter-field"><span>공급처</span><select id="supplier" aria-label="공급처 필터"><option value="">모든 공급처</option><option value="국내 농장">국내 농장</option><option value="구근 라인업">기존 구근</option><option value="호게나르드">호게나르드</option><option value="HBM">HBM</option></select></label>
         <label class="filter-field" id="zoneField"><span>내한성</span><select id="zone" aria-label="내한성 필터"><option value="">내한성 전체</option></select></label>
         <div class="subrow" id="subrow" hidden>
           <label class="sublbl" for="sub">세부 분류</label>
