@@ -1,9 +1,9 @@
-const { getCatalog, publicItem } = require('../lib/catalog-data');
+const { getCatalog, publicItem, GROUPS } = require('../lib/catalog-data');
 const { renderPlant } = require('../lib/plant-page');
 module.exports = async (req, res) => {
   if (req.method !== 'GET') return res.status(405).end();
   const { group, id } = req.query;
-  if (!['immediate','preorder'].includes(group) || typeof id !== 'string' || !/^rec[A-Za-z0-9]{14}$/.test(id)) return res.status(404).end('Not found');
+  if (!GROUPS.includes(group) || typeof id !== 'string' || !/^rec[A-Za-z0-9]{14}$/.test(id)) return res.status(404).end('Not found');
   try {
     const data = await getCatalog(group), item = data.items.find(p => p.id === id);
     if (!item) return res.status(404).end('품종을 찾을 수 없습니다.');

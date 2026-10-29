@@ -300,11 +300,14 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
       <button type="button" data-supply="" aria-pressed="true">전체 공급</button>
       <button type="button" data-supply="즉시 출하" aria-pressed="false">즉시 출하</button>
       <button type="button" data-supply="사전 예약" aria-pressed="false">사전 예약</button>
+      <button type="button" data-supply="수입 제안" aria-pressed="false">수입 제안</button>
+       <label class="filter-field"><span>공급처</span><select id="supplier" aria-label="공급처 필터"><option value="">모든 공급처</option><option value="국내 농장">국내 농장</option><option value="구근 라인업">기존 구근</option><option value="호게나르드">호게나르드</option><option value="HBM">HBM</option></select></label>
     </div>
       <select id="status" aria-label="공급 구분" hidden>
         <option value="">공급 구분 전체</option>
         <option value="즉시 출하">즉시 출하</option>
         <option value="사전 예약">사전 예약</option>
+         <option value="수입 제안">수입 제안</option>
       </select>
     <div class="chips" id="cats" role="group" aria-label="카테고리 필터"></div>
     <div class="filter-panel" id="filterPanel" hidden>
@@ -323,7 +326,7 @@ select{border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font
   </div>
 </div>
 
-<main class="wrap"><div class="grid" id="grid"></div></main>
+<main class="wrap"><div class="grid" id="grid"></div><div style="text-align:center;padding:0 0 120px"><button class="filter-toggle" type="button" id="loadMore" hidden style="display:none;min-width:220px">품종 더 보기</button></div></main>
 
 <!-- @include fab -->
 
@@ -408,7 +411,8 @@ const PLANTS=[
 ];
 const KAKAO_URL="https://pf.kakao.com/_lGfxhX/chat"; // 오픈가든 카카오톡 채널 채팅
 
-let cat="전체", sub="전체", cart={}; // cat=대분류, sub=세부 분류, cart: {id: qty}
+let cat="전체", sub="전체", cart={};
+ let visibleLimit=36, previousSignature=""; // cat=대분류, sub=세부 분류, cart: {id: qty}
 // 견적 목록은 localStorage에 유지 — 새로고침·페이지 이동에도 안 사라짐
 try{cart=JSON.parse(localStorage.getItem('og_cart')||'{}')}catch(e){cart={}}
 function saveCart(){try{localStorage.setItem('og_cart',JSON.stringify(cart))}catch(e){}}
@@ -487,16 +491,17 @@ const clean=CatalogInfo.text;
 
 function resetFilters(){
   cat='전체';sub='전체';
-  ['q','zone','status'].forEach(id=>document.getElementById(id).value='');
+  ['q','zone','status','supplier'].forEach(id=>document.getElementById(id).value='');
   renderCats();renderSubs();render();
 }
 function renderFilterState(){
-  const z=document.getElementById('zone').value,s=document.getElementById('status').value;
+  const z=document.getElementById('zone').value,s=document.getElementById('status').value, supplier=document.getElementById('supplier').value;
   const q=document.getElementById('q').value.trim();
   document.querySelectorAll('[data-supply]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.supply===s)));
   const active=[];
   if(q)active.push(['q','검색: '+q]);
   if(s)active.push(['status',s]);
+   if(supplier)active.push(['supplier','공급처: '+supplier]);
   if(cat!=='전체')active.push(['cat',cat]);
   if(sub!=='전체')active.push(['sub',document.getElementById('sub').selectedOptions[0]?.textContent||sub]);
   if(z)active.push(['zone','내한성: '+z]);
@@ -549,6 +554,7 @@ function renderSubs(){
   row.hidden=false;
 }
 document.getElementById('sub').onchange=e=>{sub=e.target.value;render();};
+ document.getElementById('supplier').onchange=render;
 
 // ── 품종 묶기 ──
 // 에어테이블은 규격마다 별도 레코드입니다(SKU·단가가 규격별로 달라 구조상 옳음).
@@ -565,9 +571,9 @@ const sizeText=v=>Array.isArray(v)?v.join(', '):String(v||'');
 function buildItems(){
   const m=new Map();
   PLANTS.forEach(p=>{
-    const key=((p.kname||'')+'|'+(p.sname||'')).trim().toLowerCase();
+    const key=((p.source||'')+'|'+(p.kname||'')+'|'+(p.sname||'')).trim().toLowerCase();
     let it=m.get(key);
-    if(!it){ it={key,kname:p.kname,sname:p.sname,cat:p.cat,desc:p.desc,use:p.use,variants:[]}; m.set(key,it); }
+    if(!it){ it={key,kname:p.kname,sname:p.sname,source:p.source,cat:p.cat,desc:p.desc,use:p.use,variants:[]}; m.set(key,it); }
     it.variants.push(p);
   });
   ITEMS=[...m.values()];
@@ -578,7 +584,7 @@ function buildItems(){
     it.status=it.statuses[0]||'';
     // 대표 사진은 사진이 가장 많은 규격에서 가져옵니다
     const best=it.variants.reduce((a,b)=>(shotsOf(b)>shotsOf(a)?b:a),it.variants[0]);
-    it.image=best.image||null; it.images=best.images||[];
+    it.image=best.image||null; it.thumb=best.thumb||best.image||null; it.images=best.images||[];
     it.searchText=CatalogTools.searchText(it);
   });
 }
@@ -628,21 +634,23 @@ renderSkeleton(8);
 
 function filtered(){
   const q=document.getElementById('q').value.trim().toLowerCase();
-  const z=document.getElementById('zone').value, s=document.getElementById('status').value;
-  // 내한성·공급구분은 규격마다 다를 수 있어, 하나라도 맞으면 그 품종을 남깁니다
+  const z=document.getElementById('zone').value, s=document.getElementById('status').value, supplier=document.getElementById('supplier').value;
+  // 공급처·상태·내한성 조건은 SKU에 적용합니다
   return ITEMS.filter(p=>
     (cat==="전체"||groupOf(p)===cat)&&(sub==="전체"||subOf(p)===sub)&&
-    p.variants.some(v=>CatalogInfo.matchesVariant(v,z,s))&&
+    (!supplier||p.source===supplier)&&p.variants.some(v=>CatalogInfo.matchesVariant(v,z,s))&&
     (!q||CatalogTools.matches(p.searchText,q)));
 }
 
 function render(){
-  const list=filtered(), grid=document.getElementById('grid');
+   const list=filtered(), grid=document.getElementById('grid');
+   const signature=[document.getElementById('q').value,document.getElementById('zone').value,document.getElementById('status').value,document.getElementById('supplier').value,cat,sub].join('|');
+   if(signature!==previousSignature){visibleLimit=36;previousSignature=signature;}
   renderFilterState();
   document.getElementById('count').textContent=`${list.length}개 품종 표시 중`;
   grid.innerHTML=list.length?"":"<div class='empty'>조건에 맞는 품종이 없습니다.<br>조건을 줄이거나 다른 이름으로 검색해보세요.<br><button type='button' class='empty-reset'>조건 초기화</button></div>";
   const emptyReset=grid.querySelector('.empty-reset');if(emptyReset)emptyReset.onclick=resetFilters;
-  list.forEach((p,i)=>{
+  list.slice(0,visibleLimit).forEach((p,i)=>{
     const n=inCartCount(p), multi=p.variants.length>1;
     const el=document.createElement('div'); el.className='plant';
     el.style.setProperty('--d',Math.min(i*35,280)+'ms'); // 카드 순차 페이드인 (앞쪽 8줄까지만 시차)
@@ -651,12 +659,12 @@ function render(){
     const moq=multi?null:p.variants[0].moq;
     const label=n?(multi?`✓ ${n}개 규격 담김`:'✓ 담김'):'견적에 담기';
     el.innerHTML=`
-      <button type="button" class="ph" aria-label="${esc(p.kname)} 상세 보기">${p.image?`<img src="${esc(p.image)}" alt="${esc(p.kname)}" decoding="async" loading="lazy" style="width:100%;height:100%;object-fit:contain;object-position:center">`:'사진 준비 중'}${p.status?`<span class="badge ${p.status==='즉시 출하'?'now':'pre'}">${p.statuses.length>1?'즉시 출하 · 사전 예약':esc(p.status)}</span>`:''}${shotsOf(p)>1?`<span class="shots" aria-label="사진 ${shotsOf(p)}장">사진 ${shotsOf(p)}</span>`:''}</button>
+      <button type="button" class="ph" aria-label="${esc(p.kname)} 상세 보기">${p.image?`<img src="${esc(p.thumb||p.image)}" alt="${esc(p.kname)}" decoding="async" loading="lazy" style="width:100%;height:100%;object-fit:contain;object-position:center">`:'사진 준비 중'}${p.status?`<span class="badge ${p.status==='즉시 출하'?'now':'pre'}">${p.statuses.length>1?'즉시 출하 · 사전 예약':esc(p.status)}</span>`:''}${shotsOf(p)>1?`<span class="shots" aria-label="사진 ${shotsOf(p)}장">사진 ${shotsOf(p)}</span>`:''}</button>
       <div class="pbody">
         <h2 class="kname"><button type="button" class="plant-name">${esc(p.kname)}</button></h2>
         ${clean(p.sname)?`<div class="sname">${esc(p.sname)}</div>`:''}
         ${p.variants[0].page?`<a href="${esc(p.variants[0].page)}">품종 정보 ↗</a>`:''}
-        <div class="meta">${[sizeTag,p.cat,moq?`최소 ${moq}개`:''].map(clean).filter(Boolean).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+        <div class="meta">${[p.source,sizeTag,p.cat,moq?`최소 ${moq}개`:''].map(clean).filter(Boolean).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
         <button class="add${n?' added':''}" data-key="${esc(p.key)}">${label}</button>
       </div>`;
     el.querySelector('img')?.addEventListener('error',e=>{e.target.hidden=true;const note=document.createElement('span');note.textContent='사진을 불러오지 못했습니다';e.target.parentElement.append(note);},{once:true});
@@ -669,7 +677,12 @@ function render(){
     el.querySelector('.plant-name').onclick=()=>openDetail(p.key);
     grid.appendChild(el);
   });
+  const more=document.getElementById('loadMore');
+  more.hidden=list.length<=visibleLimit;
+  more.style.display=more.hidden?'none':'inline-flex';
+  more.textContent='다음 '+Math.min(36,list.length-visibleLimit)+'개 보기 · '+Math.min(visibleLimit,list.length)+' / '+list.length;
 }
+document.getElementById('loadMore').onclick=()=>{visibleLimit+=36;render();};
 
 function toggle(id,btn){
   if(cart[id]){delete cart[id];if(btn){btn.classList.remove('added');btn.textContent='견적에 담기';}}
@@ -986,52 +999,70 @@ addEventListener('scroll',()=>hd.classList.toggle('scrolled',scrollY>8),{passive
 
 // 초기화: 배포 후엔 /api/catalog에서 실데이터 로드, 실패(로컬 미리보기 등) 시 샘플 데이터 유지
 (async function init(){
-  try{
-    const [im,pre]=await Promise.all([
-      fetch('/api/catalog?group=immediate').then(r=>{if(!r.ok)throw new Error('catalog unavailable');return r.json();}),
-      fetch('/api/catalog?group=preorder').then(r=>{if(!r.ok)throw new Error('catalog unavailable');return r.json();})
-    ]);
-    // 에어테이블 '속 분류' 예외표를 반영 (없으면 코드 기본값으로 동작)
-    OVERRIDE={...(im.groupOverrides||{}),...(pre.groupOverrides||{})};
-    const live=[
-      ...im.items.map(x=>({...x,status:'즉시 출하'})),
-      ...pre.items.map(x=>({...x,status:'사전 예약'}))
-    ].map(x=>({
-      id:x.sku||x.id, recordId:x.id, page:x.page, sku:x.sku, kname:x.kname, sname:x.sname, size:x.size,
-      zone:x.zone, cat:Array.isArray(x.cat)?(x.cat[0]||''):x.cat,
-      status:x.status, image:x.image||null,
-      // 구버전 API(images 없음)와도 섞여 돌 수 있어 image 하나로 되돌릴 수 있게 둠
-      images:Array.isArray(x.images)&&x.images.length?x.images:(x.image?[x.image]:[]),
-      desc:x.desc||'', use:x.use||'', moq:x.moq||null,
-      // Optional display properties remain empty until an explicit server field mapping exists.
-      height:clean(x.height),spread:clean(x.spread),light:clean(x.light),soil:clean(x.soil),
-      moisture:clean(x.moisture),foliage:clean(x.foliage),flowering:clean(x.flowering),planting:clean(x.planting),difficulty:clean(x.difficulty),tags:Array.isArray(x.tags)?x.tags:[]
-    }));
-    PLANTS.length=0; PLANTS.push(...live);
+  // Every supplier is loaded independently. As soon as the first responds, cards become usable.
+  const sources=[
+    {group:'immediate',status:'즉시 출하'},
+    {group:'preorder',status:'사전 예약'},
+    {group:'hoogenraad',status:'수입 제안'},
+    {group:'hbm',status:'수입 제안'}
+  ];
+  const loaded=new Map(), failed=[];
+  const update=()=>{
+    PLANTS.length=0;
+    sources.forEach(source=>{if(loaded.has(source.group))PLANTS.push(...loaded.get(source.group));});
+    buildItems();renderCats();renderSubs();renderZones();render();updateBar();
     document.getElementById('sampleNote').hidden=true;
-  }catch(e){
+  };
+  const load=async source=>{
+    try {
+      const response=await fetch('/api/catalog?group='+encodeURIComponent(source.group));
+      if(!response.ok)throw Error('Catalog '+source.group+' unavailable');
+      const data=await response.json();
+      if(source.group==='immediate')OVERRIDE={...(data.groupOverrides||{})};
+      const items=(data.items||[]).map(x=>({
+        id:source.group==='hoogenraad'||source.group==='hbm'?x.id:(x.sku||x.id),
+        recordId:x.id,group:source.group,source:x.source||'',page:x.page,sku:x.sku,
+        kname:x.kname,sname:x.sname,size:x.size,zone:x.zone,
+        cat:Array.isArray(x.cat)?(x.cat[0]||''):x.cat,
+        status:source.status,image:x.image||null,thumb:x.thumb||null,
+        images:Array.isArray(x.images)&&x.images.length?x.images:(x.image?[x.image]:[]),
+        desc:x.desc||'',use:x.use||'',moq:x.moq||null,
+        height:clean(x.height),spread:clean(x.spread),light:clean(x.light),
+        soil:clean(x.soil),moisture:clean(x.moisture),foliage:clean(x.foliage),
+        flowering:clean(x.flowering),planting:clean(x.planting),
+        difficulty:clean(x.difficulty),tags:Array.isArray(x.tags)?x.tags:[]
+      }));
+      loaded.set(source.group,items);
+      update();
+    } catch(e) {
+      failed.push(source.group);
+    }
+  };
+  await Promise.all(sources.map(load));
+  if(!loaded.size){
     PLANTS.length=0;buildItems();renderCats();renderSubs();renderZones();render();
     document.getElementById('sampleNote').hidden=true;
     document.getElementById('bar').classList.remove('show');
-    document.getElementById('count').textContent='카탈로그 연결을 확인해주세요';
+    document.getElementById('count').textContent='카탈로그 연결을 확인해 주세요';
     document.getElementById('grid').innerHTML='<div class="empty">카탈로그를 불러오지 못했습니다. 담아둔 목록은 보관됩니다.<br><button type="button" onclick="location.reload()">다시 시도</button></div>';
     return;
   }
-  // 저장돼 있던 견적 목록 중 현재 카탈로그에 없는 품목은 정리
-  Object.keys(cart).forEach(id=>{ if(!PLANTS.find(p=>p.id===id)) delete cart[id]; });
-  saveCart(); updateBar();
-  buildItems();
-  renderCats();
-  renderSubs();
-  renderZones();
-  render();
-  // 공유 링크(?item=…)로 들어왔으면 해당 품종 상세를 바로 연다
+  // Do not discard saved selections when one catalog source temporarily fails.
+  if(!failed.length){
+    Object.keys(cart).forEach(id=>{if(!PLANTS.some(p=>p.id===id))delete cart[id];});
+    saveCart();updateBar();
+  }
+  if(failed.length){
+    const note=document.getElementById('sampleNote');
+    note.hidden=false;note.textContent='일부 공급처를 불러오지 못했습니다. 표시된 품종은 이용할 수 있으며, 새로고침하면 다시 연결합니다.';
+  }
   const want=new URLSearchParams(location.search).get('item');
   if(want){
-    if(PLANTS.some(p=>p.id===want)) openDetail(want);
+    const match=PLANTS.find(p=>p.id===want);
+    if(match)openDetail(((match.source||'')+'|'+(match.kname||'')+'|'+(match.sname||'')).trim().toLowerCase());
     else toast('요청하신 품종을 찾을 수 없습니다');
   }
-})();
+})()
 </script>
 <script>
 // 모바일 메뉴 — 열기/닫기 + 접근성(ESC·포커스 트랩·스크롤 잠금)
