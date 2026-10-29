@@ -40,7 +40,7 @@ test('catalog whitelists fields, paginates, hides unconfirmed sizes and source U
     assert.ok(!JSON.stringify(p).includes('airtableusercontent'));await getCatalog('immediate');assert.equal(calls,2);
     const html=renderPlant({...p,kname:'</script><img onerror="x">'});
     assert.ok(html.includes('&lt;/script&gt;'));assert.ok(!html.includes('</script><img'));
-    const ld=JSON.parse(html.match(/application\/ld\+json">([\s\S]*?)<\/script>/)[1]);assert.equal(ld['@type'],'Product');assert.equal(ld.offers,undefined);
+    const ld=JSON.parse(html.match(/application\/ld\+json">([\s\S]*?)<\/script>/)[1]);assert.ok(ld['@graph'].some(node=>node['@type']==='Product'));assert.ok(ld['@graph'].some(node=>node['@type']==='BreadcrumbList'));assert.equal(ld['@graph'].find(node=>node['@type']==='Product').offers,undefined);
     assert.ok(html.includes('rel="canonical"'));assert.ok(html.includes('/plants/immediate/'+id));
   }finally{global.fetch=old;}
 });
@@ -72,7 +72,7 @@ test('summary shares a 600-character budget, preserves known values and does not
   const structured=summary({desc:'개화 시기: 5~6월\nUSDA Zone: Zone 5–8\n추천 식재 시기: 봄\n관리 난이도: 쉬움\n태그: 우수상, 나라장터 등록\n향기로운 꽃'});
   assert.equal(structured.facts[0].value,'5~6월');assert.equal(structured.facts[1].value,'Zone 5–8');assert.equal(structured.description,'향기로운 꽃');assert.equal(structured.tags.length,2);
   const html=renderPlant({id,kname:'수국',sname:'Hydrangea',size:'C2',group:'immediate',page:'/plants/immediate/'+id,images:[],desc:'가'.repeat(2000)});
-  assert.ok(!html.includes('가'.repeat(601)));assert.ok(html.includes('미확인'));
+  assert.ok(html.includes('가'.repeat(601)),'long-form information stays on the indexed detail page');assert.ok(html.includes('품종 요약'));assert.ok(html.includes('미확인'));
 });
 test('every inline JavaScript block parses after build',()=>{
   for(const file of fs.readdirSync('dist').filter(f=>f.endsWith('.html'))){
