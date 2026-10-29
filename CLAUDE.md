@@ -35,6 +35,8 @@ dev.js            로컬 미리보기 서버 (`npm run dev` → localhost:3000, 
 > **예외 — 주문형 제안서 `/p/<무작위ID>/` (2026-10-29 사용자 승인)**: 고객별로 카톡방에 보내는
 > 제안서 링크는 가격·재고를 정적 HTML에 포함한다(원칙 1·3의 예외). 조건: 추측 불가 ID, noindex +
 > robots `Disallow: /p/`, 사이트 어디에서도 링크하지 않음, `api/catalog.js` 화이트리스트는 그대로.
+> 저장소가 공개라서 품목·가격·고객정보는 AES-GCM 암호화, 열쇠는 링크의 `#k=`에만 둔다.
+> 제안서 JSON(`tools/order-proposal/proposals/`)은 커밋 금지(.gitignore).
 > 생성·운영 방법은 `tools/order-proposal/README.md`.
 
 ## 기술 결정사항
