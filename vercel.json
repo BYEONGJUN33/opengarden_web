@@ -3,6 +3,10 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/o/:id",
+      "destination": "/api/order-page?id=:id"
+    },
+    {
       "source": "/plants/:group/:id",
       "destination": "/api/plant?group=:group&id=:id"
     },
@@ -14,6 +18,9 @@
   "functions": {
     "api/plant-image.js": {
       "includeFiles": "public/assets/logo.png"
+    },
+    "api/order-page.js": {
+      "includeFiles": "tools/order-proposal/template.html"
     }
   }
 }

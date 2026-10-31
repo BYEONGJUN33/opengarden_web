@@ -4,5 +4,7 @@ Allow: /
 Disallow: /stock.html
 # 고객별 주문형 제안서 링크 — 검색 노출 제외
 Disallow: /p/
+# ERP에서 만든 고객별 주문 링크 — 검색 노출 제외
+Disallow: /o/
 Sitemap: https://open-garden.co.kr/sitemap.xml
 Sitemap: https://open-garden.co.kr/sitemap-plants.xml

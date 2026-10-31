@@ -21,6 +21,7 @@ const HANDLERS = {
   '/api/plant-sitemap': require('./api/plant-sitemap.js'),
   '/api/catalog': require('./api/catalog.js'),
   '/api/quote': require('./api/quote.js'),
+  '/api/order-page': require('./api/order-page.js'),
   '/api/stock': require('./api/stock.js'),
 };
 
@@ -40,6 +41,8 @@ http.createServer(async (req, res) => {
   const plant=url.pathname.match(/^\/plants\/(immediate|preorder)\/(rec[A-Za-z0-9]{14})$/);
   if(plant){url.pathname='/api/plant';url.searchParams.set('group',plant[1]);url.searchParams.set('id',plant[2]);}
   if(url.pathname==='/sitemap-plants.xml')url.pathname='/api/plant-sitemap';
+  const order=url.pathname.match(/^\/o\/([A-Za-z0-9_-]{22})$/);
+  if(order){url.pathname='/api/order-page';url.searchParams.set('id',order[1]);}
 
   // API 라우팅 — Vercel의 (req, res) 형식에 맞춰 query/body/status/json 보강
   if (HANDLERS[url.pathname]) {

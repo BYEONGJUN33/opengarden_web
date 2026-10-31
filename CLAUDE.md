@@ -38,6 +38,9 @@ dev.js            로컬 미리보기 서버 (`npm run dev` → localhost:3000, 
 > 저장소가 공개라서 품목·가격·고객정보는 AES-GCM 암호화, 열쇠는 링크의 `#k=`에만 둔다.
 > 제안서 JSON(`tools/order-proposal/proposals/`)은 커밋 금지(.gitignore).
 > 생성·운영 방법은 `tools/order-proposal/README.md`.
+> **주문 링크 `/o/<22자 ID>` (2026-10-30 사용자 승인)**: ERP '주문' 화면에서 품목을 골라 만드는 고객 링크.
+> 원본은 에어테이블 `[영업] 주문 링크`(tbl93mrTsG1IsuFxQ), `api/order-page.js`가 요청마다 읽어 그린다(캐시 금지).
+> 같은 조건: 추측 불가 ID, noindex + robots `Disallow: /o/`, 사이트에서 링크하지 않음. 상태 '마감'이면 닫힌다.
 
 ## 기술 결정사항
 

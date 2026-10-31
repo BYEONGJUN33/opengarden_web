@@ -5,13 +5,11 @@
 <meta name="robots" content="noindex, nofollow">
 <title>%%TITLE%% · 오픈가든</title>
 <meta property="og:title" content="오픈가든 · %%TITLE%%">
-<meta property="og:description" content="%%BASIS%% · 품목별 수량을 입력하고 바로 견적을 요청하세요">
+<meta property="og:description" content="%%BASIS%% · 품목별 수량을 입력하고 바로 %%WORD%%을 요청하세요">
 <meta property="og:type" content="website">
 <meta property="og:url" content="%%PAGEURL%%">
 <meta property="og:image" content="%%OGIMAGE%%">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
+%%OGDIM%%<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
@@ -140,15 +138,15 @@ nav.tabs a span{color:var(--gray);font-weight:500;font-size:12px}
   <div class="meta">%%DATE%% · %%BASIS%%</div>
 </div></header>
 <div class="notice"><div class="wrap"><ul>
-  <li>판매가 <b>원/구 · VAT 별도</b></li>
+  <li>판매가 <b>%%PRICEUNIT%% · VAT 별도</b></li>
   %%NOTICE%%
 </ul></div></div>
 <nav class="tabs" aria-label="품목 구분"><div class="wrap">%%NAV%%</div></nav>
 <main class="wrap">
   <p class="for" id="forWho" hidden></p>
-  <p class="howto">필요한 품목에 <b>수량(구)</b>을 넣고 아래 <b>견적 요청</b>을 누르면 담당자에게 바로 전달됩니다. 확인 후 견적서를 보내드립니다.</p>
-  <div id="secure"><p class="lock" id="lockMsg">제안서를 여는 중…</p></div>
-  <section class="terms"><h2>거래 조건 및 안내</h2><ul>%%TERMS%%</ul></section>
+  <p class="howto">필요한 품목에 <b>%%QTYLABEL%%</b>을 넣고 아래 <b>%%WORD%% 요청</b>을 누르면 담당자에게 바로 전달됩니다. 확인 후 견적서를 보내드립니다.</p>
+  <div id="secure">%%SECURE%%</div>
+  <section class="terms"%%TERMSHIDDEN%%><h2>거래 조건 및 안내</h2><ul>%%TERMS%%</ul></section>
   <p class="foot">Open Garden · 오픈가든 · open-garden.co.kr</p>
 </main>
 
@@ -156,13 +154,13 @@ nav.tabs a span{color:var(--gray);font-weight:500;font-size:12px}
   <div class="bar-top"><span class="bar-count" id="cnt">선택한 품목이 없습니다</span><span class="bar-total" id="tot">₩0<small>VAT 별도</small></span></div>
   <div class="prog" id="prog" aria-hidden="true"><i id="progI"></i></div>
   <div class="prog-txt" id="progT"></div>
-  <button class="btn-go" id="go" disabled>견적 요청하기</button>
+  <button class="btn-go" id="go" disabled>%%WORD%% 요청하기</button>
 </div></div>
 
 <div id="sheetWrap">
   <div class="sheet-bg" id="sheetBg"></div>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetH"><div class="wrap" id="sheetIn">
-    <h2 id="sheetH">견적 요청 확인</h2>
+    <h2 id="sheetH">%%WORD%% 요청 확인</h2>
     <ul class="sum" id="sum"></ul>
     <p class="below" id="below" hidden></p>
     <form id="form" novalidate>
@@ -215,13 +213,15 @@ nav.tabs a span{color:var(--gray);font-weight:500;font-size:12px}
       .catch(function(){ throw '링크가 올바르지 않습니다. 받으신 링크 전체로 다시 열어 주세요.'; });
   }
 
-  unlock().then(start).catch(function(m){ fail(typeof m === 'string' ? m : '잠시 후 다시 열어 주세요.'); });
+  // 주문 링크(/o/)는 서버가 품목을 바로 그려 보낸다 — 열쇠 없이 바로 시작
+  if (CFG.enc) unlock().then(start).catch(function(m){ fail(typeof m === 'string' ? m : '잠시 후 다시 열어 주세요.'); });
+  else start({ customer: CFG.customer || null });
 
   function start(data){
-    $('secure').innerHTML = data.sections;
+    if (data.sections) $('secure').innerHTML = data.sections;
     CUSTOMER = data.customer || null;
     if (CUSTOMER && CUSTOMER.name) {
-      $('forWho').textContent = CUSTOMER.name + ' 전용 제안입니다';
+      $('forWho').textContent = CUSTOMER.name + ' 전용 ' + (CFG.word === '주문' ? '주문서' : '제안') + '입니다';
       $('forWho').hidden = false;
       $('fName').value = CUSTOMER.name;
       if (CUSTOMER.phone) $('fPhone').value = CUSTOMER.phone;
@@ -231,11 +231,12 @@ nav.tabs a span{color:var(--gray);font-weight:500;font-size:12px}
     try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch(e) {}
     opts.forEach(function(o){
       if (saved[o.dataset.id]) setQty(o, saved[o.dataset.id]);
+      else if (+o.dataset.qty > 0) setQty(o, +o.dataset.qty);
       var inp = o.querySelector('input');
       var all = o.querySelector('.all');
       if (all) all.addEventListener('click', function(){ setQty(o, parseInt(o.dataset.max, 10)); update(); });
-      o.querySelector('.minus').addEventListener('click', function(){ setQty(o, qtyOf(o) - 100); update(); });
-      o.querySelector('.plus').addEventListener('click', function(){ setQty(o, qtyOf(o) + 100); update(); });
+      o.querySelector('.minus').addEventListener('click', function(){ setQty(o, qtyOf(o) - stepOf(o)); update(); });
+      o.querySelector('.plus').addEventListener('click', function(){ setQty(o, qtyOf(o) + stepOf(o)); update(); });
       inp.addEventListener('input', function(){ o.classList.toggle('on', qtyOf(o) > 0); update(); });
       inp.addEventListener('change', function(){ setQty(o, qtyOf(o)); update(); });
       inp.addEventListener('focus', function(){ if (inp.value === '0') inp.select(); });
@@ -243,12 +244,14 @@ nav.tabs a span{color:var(--gray);font-weight:500;font-size:12px}
     update();
   }
 
+  function stepOf(o){ return parseInt(o.dataset.step, 10) || 100; }
+  function unitOf(o){ return o.dataset.unit || '구'; }
   function qtyOf(o){ return Math.max(0, parseInt(o.querySelector('input').value, 10) || 0); }
   function setQty(o, q){
     var max = parseInt(o.dataset.max, 10);
     var w = o.querySelector('.o-warn');
     q = Math.max(0, Math.round(q) || 0);
-    if (max && q > max) { q = max; w.textContent = '재고 ' + fmt(max) + '구까지 가능합니다'; w.hidden = false; }
+    if (max && q > max) { q = max; w.textContent = '재고 ' + fmt(max) + unitOf(o) + '까지 가능합니다'; w.hidden = false; }
     else w.hidden = true;
     o.querySelector('input').value = q;
     o.classList.toggle('on', q > 0);
@@ -257,12 +260,12 @@ nav.tabs a span{color:var(--gray);font-weight:500;font-size:12px}
   function picked(){
     return opts.filter(function(o){ return qtyOf(o) > 0; }).map(function(o){
       var q = qtyOf(o), p = +o.dataset.price;
-      return { id:o.dataset.id, grp:o.dataset.grp, name:o.dataset.name, spec:o.dataset.spec, price:p, qty:q, amt:p*q };
+      return { id:o.dataset.id, grp:o.dataset.grp, name:o.dataset.name, spec:o.dataset.spec, unit:unitOf(o), price:p, qty:q, amt:p*q };
     });
   }
   function update(){
     var list = picked(), total = list.reduce(function(s,i){ return s + i.amt; }, 0);
-    $('cnt').textContent = list.length ? '선택 ' + list.length + '개 품목 · ' + fmt(list.reduce(function(s,i){return s+i.qty;},0)) + '구' : '선택한 품목이 없습니다';
+    $('cnt').textContent = list.length ? '선택 ' + list.length + '개 품목' + (CFG.unit ? ' · ' + fmt(list.reduce(function(s,i){return s+i.qty;},0)) + CFG.unit : '') : '선택한 품목이 없습니다';
     $('tot').innerHTML = '₩' + fmt(total) + '<small>VAT 별도</small>';
     var t = $('progT');
     if (!CFG.min) { $('prog').hidden = true; t.hidden = true; }
@@ -282,7 +285,7 @@ nav.tabs a span{color:var(--gray);font-weight:500;font-size:12px}
     var sum = $('sum'); sum.innerHTML = '';
     st.list.forEach(function(i){
       var li = document.createElement('li');
-      var a = document.createElement('span'); a.textContent = i.name + ' ' + i.spec + ' × ' + fmt(i.qty) + '구';
+      var a = document.createElement('span'); a.textContent = i.name + ' ' + i.spec + ' × ' + fmt(i.qty) + i.unit;
       var b = document.createElement('span'); b.textContent = '₩' + fmt(i.amt);
       li.appendChild(a); li.appendChild(b); sum.appendChild(li);
     });
@@ -301,8 +304,8 @@ nav.tabs a span{color:var(--gray);font-weight:500;font-size:12px}
   $('sheetBg').addEventListener('click', closeSheet);
 
   function summaryText(no, st){
-    return '[오픈가든 견적 요청 ' + no + ']\n' + CFG.title + '\n'
-      + st.list.map(function(i){ return '· ' + i.name + ' ' + i.spec + ' × ' + fmt(i.qty) + '구 = ₩' + fmt(i.amt); }).join('\n')
+    return '[오픈가든 ' + CFG.word + ' 요청 ' + no + ']\n' + CFG.title + '\n'
+      + st.list.map(function(i){ return '· ' + i.name + ' ' + i.spec + ' × ' + fmt(i.qty) + i.unit + ' = ₩' + fmt(i.amt); }).join('\n')
       + '\n합계 ₩' + fmt(st.total) + ' (VAT 별도)';
   }
 
@@ -313,7 +316,7 @@ nav.tabs a span{color:var(--gray);font-weight:500;font-size:12px}
     if (phone.replace(/\D/g, '').length < 9) { err.textContent = '연락처를 확인해주세요.'; $('fPhone').focus(); return; }
     if (!$('fAgree').checked) { err.textContent = '개인정보 수집·이용에 동의해주세요.'; return; }
     if (!st.list.length) { err.textContent = '수량을 입력한 품목이 없습니다.'; return; }
-    var memo = '[제안서 ' + CFG.pid + '] ' + CFG.title + ' (' + CFG.date + ')' + (CUSTOMER && CUSTOMER.name ? ' · ' + CUSTOMER.name + ' 전용' : '') + '\n'
+    var memo = '[' + (CFG.word === '주문' ? '주문 링크 ' : '제안서 ') + CFG.pid + '] ' + CFG.title + ' (' + CFG.date + ')' + (CUSTOMER && CUSTOMER.name ? ' · ' + CUSTOMER.name + ' 전용' : '') + '\n'
       + '합계 ₩' + fmt(st.total) + ' (VAT 별도)' + (CFG.min && st.total < CFG.min ? ' · 최소 주문 ' + CFG.minLabel + ' 미달' : '')
       + ($('fMemo').value.trim() ? '\n고객 메모: ' + $('fMemo').value.trim() : '');
     var body = {
@@ -327,7 +330,7 @@ nav.tabs a span{color:var(--gray);font-weight:500;font-size:12px}
         try { localStorage.removeItem(KEY); } catch(e) {}
         var text = summaryText(j.requestNo || '', st);
         var box = $('sheetIn');
-        box.innerHTML = '<div class="done"><h2>견적 요청이 접수되었습니다</h2><div class="no"></div>'
+        box.innerHTML = '<div class="done"><h2>' + CFG.word + ' 요청이 접수되었습니다</h2><div class="no"></div>'
           + '<p>담당자에게 바로 전달되었습니다. 확인 후 견적서를 보내드립니다.</p>'
           + '<div class="acts"><button type="button" id="cpy">요청 내용 복사</button>' + (navigator.share ? '<button type="button" id="shr">단톡방에 공유</button>' : '') + '</div>'
           + '<p class="copied" id="cpyMsg"></p>'
